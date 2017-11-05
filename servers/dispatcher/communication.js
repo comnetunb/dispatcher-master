@@ -61,14 +61,20 @@ module.exports.execute = function () {
          removeWorker( socket );
 
          const simulationInstanceFilter = { worker: socket.remoteAddress };
-         const simulationInstanceUpdate = { state: SimulationInstance.State.Pending, $unset: { worker: 1 } };
 
-         // Update all SimulationInstances that were executing by this worker that left to pending again
-         var promise = SimulationInstance.update( simulationInstanceFilter, simulationInstanceUpdate, { multi: true } ).exec();
+         var promise = SimulationInstance.find( simulationInstanceFilter, '_id' );
 
-         promise.catch( function ( err ) {
-            log.error( err );
-         } );
+         promise.then( function ( simulationInstances ) {
+
+            simulationInstances.forEach( function ( simulationInstanceId ) {
+               updateSimulationInstanceById( simulationInstanceId );
+            } );
+
+         } )
+
+            .catch( function ( e ) {
+               log.error( e );
+            } )
 
          log.warn( 'Worker ' + socket.remoteAddress + ' left the pool' );
 
@@ -101,7 +107,6 @@ module.exports.execute = function () {
    // Open Socket
    server.listen( 16180, '0.0.0.0', () => {
       log.info( 'TCP server listening ' + server.address().address + ':' + server.address().port );
-
    } );
 }
 
@@ -161,17 +166,13 @@ function batchDispatch() {
          return;
       }
 
-      var idx = 0;
-
-      return simulationInstances.forEach( function ( simulationInstance ) {
+      return simulationInstances.forEach( function ( simulationInstance, idx ) {
 
          simulationInstance.set( { 'state': SimulationInstance.State.Executing, 'worker': availableWorkers[idx].address } );
 
-         ++idx;
-
          var promise = simulationInstance.save();
 
-         promise.then( function ( updatedSimulationInstance ) {
+         return promise.then( function ( updatedSimulationInstance ) {
 
             const workerAddress = updatedSimulationInstance.worker;
 
@@ -195,10 +196,6 @@ function batchDispatch() {
 
             updateWorkerRunningInstances( workerAddress );
          } )
-
-            .catch( function ( err ) {
-               log.error( err );
-            } );
       } );
    } )
 
@@ -381,35 +378,9 @@ function treat( data, socket ) {
 
             log.error( object.SimulationId + ' executed with Failure ' + object.ErrorMessage );
 
-            const simulationInstancePopulate = { path: '_simulation', select: 'state' };
-
-            var promise = SimulationInstance.findById( object.SimulationId ).populate( simulationInstancePopulate ).exec();
-
-            promise.then( function ( simulationInstance ) {
-
-               if ( simulationInstance === null ) {
-                  throw 'Simulation Instance not found!';
-               }
-
-               var simulationInstanceUpdate;
-
-               if ( simulationInstance._simulation.state === Simulation.State.Cancelled ) {
-                  simulationInstanceUpdate = { 'state': SimulationInstance.State.Cancelled, $unset: { 'worker': 1 } };
-               } else {
-                  simulationInstanceUpdate = { 'state': SimulationInstance.State.Pending, $unset: { 'worker': 1 } };
-               }
-
-               var promise = SimulationInstance.findByIdAndUpdate( simulationInstance._id, simulationInstanceUpdate ).exec();
-
-               promise.then( function () {
-                  updateWorkerRunningInstances( socket.remoteAddress );
-               } )
-
-            } )
-
-               .catch( function ( e ) {
-                  log.error( err );
-               } );
+            updateSimulationInstanceById( object.SimulationId, function () {
+               updateWorkerRunningInstances( socket.remoteAddress )
+            } );
          }
 
          break;
@@ -431,6 +402,43 @@ function updateWorkerRunningInstances( workerAddress ) {
       .catch( function ( err ) {
          log.error( err );
       } );
+}
+
+/**
+ * Treats scenarios where SimulationGroup was canceled but this
+ * simulationInstance was running on a worker that left the pool
+ * or an error occurred meanwhile
+ */
+
+function updateSimulationInstanceById( simulationInstanceId, callback ) {
+
+   const simulationInstancePopulate = {
+      path: '_simulation',
+      select: '_simulationGroup',
+      populate: { path: '_simulationGroup' }
+   };
+
+   var promise = SimulationInstance.findById( simulationInstanceId ).populate( simulationInstancePopulate );
+
+   promise.then( function ( simulationInstance ) {
+
+      const simulationGroupState = simulationInstance._simulation._simulationGroup.state;
+
+      simulationInstance.worker = undefined;
+
+      if ( simulationGroupState === SimulationGroup.State.Executing ) {
+         simulationInstance.state = SimulationInstance.State.Pending;
+      } else {
+         simulationInstance.state = SimulationInstance.State.Canceled;
+      }
+
+      simulationInstance.save( callback );
+   } )
+
+      .catch( function ( e ) {
+         log.error( e );
+      } );
+
 }
 
 function cleanUp() {
