@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <% include ../template/head.ejs %>
+</head>
+
+<body>
+  <header>
+    <% include ../template/header.ejs %>
+  </header>
+
+  <div id="wrapper">
+
+    <% include template/sidebar.ejs %>
+
+    <div id="page-wrapper" style="min-height: 898px;">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">Online Workers</h1>
+        </div>
+      </div>
+
+      <div id="worker-container">
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+    google.charts.load( 'current', { 'packages': ['gauge'] } );
+
+    var prev_handler = window.onload;
+    window.onload = function () {
+      if ( prev_handler ) {
+        prev_handler();
+      }
+
+      generateChart();
+    };
+
+    var workerAddresses = [];
+    function generateChart() {
+      drawChart();
+      setInterval( drawChart, 1000 );
+    }
+    function drawChart() {
+      const xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function () {
+        if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
+
+          const workers = JSON.parse( xmlhttp.response );
+
+          var pageHeader = document.getElementsByClassName( 'page-header' )[0];
+          pageHeader.innerHTML = 'Online Workers [ ' + workers.length + ' ]';
+
+          var activeWorkers = [];
+          const container = document.getElementById( 'worker-container' );
+
+          for ( var idx = 0; idx < workers.length; ++idx ) {
+
+            var gauge;
+            var panel;
+            if ( ( panel = document.getElementById( workers[idx].address ) ) === null ) {
+
+              // Worker's element is not created yet
+              workerAddresses.push( workers[idx].address );
+              activeWorkers.push( workers[idx].address );
+
+              panel = document.createElement( 'div' );
+              panel.className = 'panel panel-primary autocollapse';
+              panel.id = workers[idx].address;
+
+              var panelHeading = document.createElement( 'div' );
+              panelHeading.className = 'panel-heading clickable';
+
+              var runningInstances = document.createElement( 'span' );
+              runningInstances.className = 'badge';
+              runningInstances.innerHTML = workers[idx].runningInstances;
+              runningInstances.setAttribute( 'data-toggle', 'popover' );
+              runningInstances.setAttribute( 'data-trigger', 'hover' );
+              runningInstances.setAttribute( 'data-placement', 'top' );
+              runningInstances.setAttribute( 'data-content', 'Running Instances' );
+
+              var panelTitle = document.createElement( 'h3' );
+              panelTitle.className = 'panel-title';
+              panelTitle.innerHTML = runningInstances.outerHTML + " " + workers[idx].address;
+              panelHeading.appendChild( panelTitle );
+
+              panel.appendChild( panelHeading );
+
+              panelBody = document.createElement( 'div' );
+              panelBody.className = 'panel-body';
+              panelBody.style = 'display: none';
+
+              gauge = document.createElement( 'div' );
+              gauge.className = 'gauge';
+
+              panelBody.appendChild( gauge );
+
+              panel.appendChild( panelBody );
+
+              container.appendChild( panel );
+
+            } else {
+              activeWorkers.push( workers[idx].address );
+
+              var child = panel.getElementsByTagName( '*' );
+
+              for ( var i = -1, l = child.length; ++i < l; ) {
+                if ( child[i].className == 'gauge' ) {
+                  gauge = child[i];
+                }
+
+                if ( child[i].className == 'badge' ) {
+                  child[i].innerHTML = workers[idx].runningInstances;
+                }
+              }
+            }
+
+            var data = google.visualization.arrayToDataTable( [
+              ['Label', 'Value'],
+              ['Memory', ( 1 - workers[idx].lastResource.memory ) * 100],
+              ['CPU', ( 1 - workers[idx].lastResource.cpu ) * 100]
+            ] );
+            var options = {
+              width: 400, height: 120,
+              redFrom: 90, redTo: 100,
+              yellowFrom: 75, yellowTo: 90,
+              minorTicks: 5
+            };
+
+            var chart = new google.visualization.Gauge( gauge );
+            chart.draw( data, options );
+          }
+
+          // Cleaning
+          for ( var idx = 0; idx < workerAddresses.length; ++idx ) {
+            var found = activeWorkers.indexOf( workerAddresses[idx] );
+            if ( found === -1 ) {
+              const div = document.getElementById( workerAddresses[idx] );
+              div.remove();
+              workerAddresses.splice( idx, 1 );
+            }
+          }
+
+          $( document ).ready( function () {
+            $( '[data-toggle="popover"]' ).popover();
+          } );
+        }
+      }
+      xmlhttp.open( 'GET', '/workers', true );
+      xmlhttp.send();
+    }
+
+    $( document ).on( 'click', '.panel div.clickable', function ( e ) {
+      var $this = $( this ); //Heading
+      var $panel = $this.parent( '.panel' );
+      var $panel_body = $panel.children( '.panel-body' );
+      var $display = $panel_body.css( 'display' );
+
+      if ( $display == 'block' ) {
+        $panel_body.slideUp();
+      } else if ( $display == 'none' ) {
+        $panel_body.slideDown();
+      }
+    } );
+
+    $( document ).ready( function ( e ) {
+      var $classy = '.panel.autocollapse';
+
+      var $found = $( $classy );
+      $found.find( '.panel-body' ).hide();
+      $found.removeClass( $classy );
+    } );
+
+  </script>
+
+  <script src='../js/sb-admin-2.js'></script>
+
+</body>
+
+</html>
+<footer>
+  <% include ../template/footer.ejs %>
+</footer>

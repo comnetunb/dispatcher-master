@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <% include template/head.ejs %>
+</head>
+
+<body>
+  <header>
+    <% include template/header.ejs %>
+  </header>
+
+
+  <% if ( locals.error.length > 0 ) { %>
+
+  <div class="modal fade" id="errorModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Error</h4>
+        </div>
+        <div class="modal-body">
+          <p><%- locals.error %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $( window ).on( 'load', function () {
+      $( '#errorModal' ).modal( 'show' );
+    } );
+  </script>
+
+  <% } %>
+
+  <div class='jumbotron'>
+    <div class='container'>
+      <h1 class='display-3'>Hello, world!</h1>
+      <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+      <p><a class='btn btn-primary btn-lg' href='#' role='button'>Learn more &raquo;</a></p>
+    </div>
+  </div>
+
+  <div class='container'>
+    <!-- Example row of columns -->
+    <div class='row'>
+      <div class='col-md-4'>
+        <h2>Heading</h2>
+        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+        <p><a class='btn btn-secondary' href='#' role='button'>View details &raquo;</a></p>
+      </div>
+      <div class='col-md-4'>
+        <h2>Heading</h2>
+        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+        <p><a class='btn btn-secondary' href='#' role='button'>View details &raquo;</a></p>
+      </div>
+      <div class='col-md-4'>
+        <h2>Heading</h2>
+        <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+        <p><a class='btn btn-secondary' href='#' role='button'>View details &raquo;</a></p>
+      </div>
+    </div>
+
+  </div> <!-- /container -->
+
+</body>
+
+  <% include template/footer.ejs %>
+
+</html>

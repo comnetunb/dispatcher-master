@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <% include ../template/head.ejs %>
+</head>
+
+
+<body>
+  <header>
+    <% include ../template/header.ejs %>
+  </header>
+
+  <div id="wrapper">
+
+    <% include template/sidebar.ejs %>
+
+    <div id="page-wrapper" style="min-height: 898px;">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">Logs</h1>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Date</th>
+                <th style='width:65%'>Log</th>
+              </tr>
+            </thead>
+          </table>
+          <div style="height: 500px; overflow: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th style='width:65%'></th>
+                </tr>
+              </thead>
+              <tbody id="log-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    var logRows = [];
+
+    function monitor() {
+
+      retrieveLogs();
+      setInterval( retrieveLogs, 5000 );
+    }
+
+    function retrieveLogs() {
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if ( this.readyState == 4 && this.status == 200 ) {
+
+          const logs = JSON.parse( xhttp.response );
+
+          var logTable = document.getElementById( 'log-table' );
+
+          for ( var log in logs ) {
+
+            if ( document.getElementById( logs[log]._id ) !== null ) {
+              continue;
+            }
+
+            var logRow = document.createElement( 'tr' );
+            logRow.id = logs[log]._id;
+            var logCellLevel = document.createElement( 'td' );
+
+            var logCellDate = document.createElement( 'td' );
+            logCellDate.innerHTML = new Date( logs[log].date );
+
+            var logCellTxt = document.createElement( 'td' );
+            logCellTxt.innerHTML = logs[log].log;
+
+            var labelSpan = document.createElement( 'span' );
+
+            switch ( logs[log].level ) {
+
+              case 0: // Trace
+                labelSpan.className = 'label label-primary';
+                labelSpan.innerHTML = 'TRACE';
+                break;
+              case 1: // Debug
+                labelSpan.className = 'label label-success';
+                labelSpan.innerHTML = 'DEBUG';
+                break;
+              case 2: // Info
+                labelSpan.className = 'label label-info';
+                labelSpan.innerHTML = 'INFO';
+                break;
+              case 3: // Warn
+                labelSpan.className = 'label label-warning';
+                labelSpan.innerHTML = 'WARN';
+                break;
+              case 4: // Error
+                labelSpan.className = 'label label-danger';
+                labelSpan.innerHTML = 'ERROR';
+                break;
+              case 5: // Fatal
+                labelSpan.className = 'label label-danger';
+                labelSpan.innerHTML = 'FATAL';
+                break;
+            }
+
+            logCellLevel.appendChild( labelSpan );
+
+            logRow.appendChild( logCellLevel );
+            logRow.appendChild( logCellDate );
+            logRow.appendChild( logCellTxt );
+
+            logRows.push( logRow );
+
+            logTable.appendChild( logRow );
+          }
+        }
+
+        while ( logRows.length > 500 ) {
+          logRows[0].remove();
+          logRows.splice( 0, 1 );
+        }
+      };
+
+      xhttp.open( "GET", "/api/log/get_all", true );
+      xhttp.send();
+
+    }
+
+    var prev_handler = window.onload;
+    window.onload = function () {
+      if ( prev_handler ) {
+        prev_handler();
+      }
+
+      monitor();
+    };
+
+  </script>
+
+  <script src='../js/sb-admin-2.js'></script>
+
+</body>
+
+</html>
+<footer>
+  <% include ../template/footer.ejs %>
+</footer>

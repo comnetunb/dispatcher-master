@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Web Dispatcher", "web_dispatcher.njsproj", "{799B3B1D-7397-401E-B2AF-652AB8FE493E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{799B3B1D-7397-401E-B2AF-652AB8FE493E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{799B3B1D-7397-401E-B2AF-652AB8FE493E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{799B3B1D-7397-401E-B2AF-652AB8FE493E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{799B3B1D-7397-401E-B2AF-652AB8FE493E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
