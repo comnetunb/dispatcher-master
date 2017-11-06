@@ -114,7 +114,7 @@ module.exports.execute = function () {
    } );
 }
 
-function requestResource() {
+function requestResource () {
 
    setInterval( function () {
 
@@ -125,7 +125,7 @@ function requestResource() {
    }, config.requestResourceInterval * 1000 )
 }
 
-function dispatch() {
+function dispatch () {
 
    setInterval( function () {
 
@@ -141,7 +141,7 @@ function dispatch() {
  * and dispatch it to all those workers
  */
 
-function batchDispatch() {
+function batchDispatch () {
 
    const availableWorkers = workerManager.getAvailables( config.cpu.threshold, config.memory.threshold );
 
@@ -208,7 +208,7 @@ function batchDispatch() {
       } );
 }
 
-function addWorker( worker ) {
+function addWorker ( worker ) {
 
    workerManager.add( worker.remoteAddress );
 
@@ -216,20 +216,18 @@ function addWorker( worker ) {
 }
 
 /**
- * 
- * Asks to a worker if there is any simulationInstance running.
- * This is useful if a worker as running an instance but disconnected
- * from the network due to connection problems or dispatcher restarted.
+ * Needs to know if new worker has any executing instance
+ * from previous time
  */
 
-function requestWorkerInformation( worker ) {
+function requestWorkerInformation ( worker ) {
 
    informationRequest.format()
 
    worker.write( informationRequest.format() );
 }
 
-function removeWorker( worker ) {
+function removeWorker ( worker ) {
 
    workerManager.remove( worker.remoteAddress );
 
@@ -240,7 +238,7 @@ function removeWorker( worker ) {
    }
 }
 
-function treat( data, worker ) {
+function treat ( data, worker ) {
 
    var object = JSON.parse( data.toString() );
 
@@ -405,7 +403,7 @@ function treat( data, worker ) {
 
       case factory.Id.InformationResponse:
 
-         const executingSimulationInstances = object.executingSimulationInstances;
+         const executingSimulationInstances = object.information;
 
          executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
 
@@ -434,12 +432,14 @@ function treat( data, worker ) {
                simulationInstance.worker = worker.remoteAddress;
                simulationInstance.startTime = executingSimulationInstance.startTime;
 
-               simulationInstance.save();
+               simulationInstance.save( function () {
+                  updateWorkerRunningInstances( simulationInstance.worker );
+               } );
             } )
 
-            .catch( function ( e ) {
-               log.error( e );
-            } );
+               .catch( function ( e ) {
+                  log.error( e );
+               } );
          } );
 
          break;
@@ -449,7 +449,7 @@ function treat( data, worker ) {
    }
 }
 
-function updateWorkerRunningInstances( workerAddress ) {
+function updateWorkerRunningInstances ( workerAddress ) {
 
    var promise = SimulationInstance.count( { worker: workerAddress } ).exec();
 
@@ -469,7 +469,7 @@ function updateWorkerRunningInstances( workerAddress ) {
  * or an error occurred meanwhile
  */
 
-function updateSimulationInstanceById( simulationInstanceId, callback ) {
+function updateSimulationInstanceById ( simulationInstanceId, callback ) {
 
    const simulationInstancePopulate = {
       path: '_simulation',
@@ -500,7 +500,7 @@ function updateSimulationInstanceById( simulationInstanceId, callback ) {
 
 }
 
-function cleanUp() {
+function cleanUp () {
 
    // Clean all simulations that were executing when dispatcher died
    const simulationInstanceFilter = { state: SimulationInstance.State.Executing };
