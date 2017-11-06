@@ -22,6 +22,8 @@ const SimulationGroup = require( '../../database/models/simulation_group' );
 const resourceRequest = require( '../../../protocol/dwp/pdu/resource_request' );
 const simulationRequest = require( '../../../protocol/dwp/pdu/simulation_request' );
 const simulationResponse = require( '../../../protocol/dwp/pdu/simulation_response' );
+const informationRequest = require( '../../../protocol/dwp/pdu/information_request' );
+const informationResponse = require( '../../../protocol/dwp/pdu/information_response' );
 const simulationTerminateRequest = require( '../../../protocol/dwp/pdu/simulation_terminate_request' );
 
 const log = require( '../../database/models/log' );
@@ -43,24 +45,26 @@ module.exports.execute = function () {
 
    dispatch();
 
-   server.on( 'connection', ( socket ) => {
+   server.on( 'connection', function ( worker ) {
 
       // Creates a buffer for each worker
       var buffer = '';
 
       // Insert new worker to the pool
-      addWorker( socket );
+      addWorker( worker );
+
+      requestWorkerInformation( worker );
 
       // Emit to UDP discovery
-      event.emit( 'new_worker', socket.remoteAddress );
+      event.emit( 'new_worker', worker.remoteAddress );
 
-      log.info( socket.remoteAddress + ':' + socket.remotePort + ' connected' );
+      log.info( worker.remoteAddress + ':' + worker.remotePort + ' connected' );
 
-      socket.once( 'close', () => {
+      worker.once( 'close', function () {
 
-         removeWorker( socket );
+         removeWorker( worker );
 
-         const simulationInstanceFilter = { worker: socket.remoteAddress };
+         const simulationInstanceFilter = { worker: worker.remoteAddress };
 
          var promise = SimulationInstance.find( simulationInstanceFilter, '_id' );
 
@@ -76,7 +80,7 @@ module.exports.execute = function () {
                log.error( e );
             } )
 
-         log.warn( 'Worker ' + socket.remoteAddress + ' left the pool' );
+         log.warn( 'Worker ' + worker.remoteAddress + ' left the pool' );
 
          if ( workerPool.length === 0 ) {
             log.warn( 'There are no workers left' );
@@ -84,7 +88,7 @@ module.exports.execute = function () {
          }
       } );
 
-      socket.on( 'data', ( data ) => {
+      worker.on( 'data', function ( data ) {
          // Treat chunk data
          buffer += data;
 
@@ -93,7 +97,7 @@ module.exports.execute = function () {
             do {
                packet = factory.expose( buffer );
                buffer = factory.remove( buffer );
-               treat( packet, socket );
+               treat( packet, worker );
             } while ( buffer.length !== 0 )
 
          } catch ( e ) {
@@ -101,10 +105,10 @@ module.exports.execute = function () {
          }
       } );
 
-      socket.on( 'error', () => { } );
+      worker.on( 'error', function () { } );
    } );
 
-   // Open Socket
+   // Open worker
    server.listen( 16180, '0.0.0.0', () => {
       log.info( 'TCP server listening ' + server.address().address + ':' + server.address().port );
    } );
@@ -211,6 +215,20 @@ function addWorker( worker ) {
    workerPool.push( worker );
 }
 
+/**
+ * 
+ * Asks to a worker if there is any simulationInstance running.
+ * This is useful if a worker as running an instance but disconnected
+ * from the network due to connection problems or dispatcher restarted.
+ */
+
+function requestWorkerInformation( worker ) {
+
+   informationRequest.format()
+
+   worker.write( informationRequest.format() );
+}
+
 function removeWorker( worker ) {
 
    workerManager.remove( worker.remoteAddress );
@@ -222,7 +240,7 @@ function removeWorker( worker ) {
    }
 }
 
-function treat( data, socket ) {
+function treat( data, worker ) {
 
    var object = JSON.parse( data.toString() );
 
@@ -238,7 +256,7 @@ function treat( data, socket ) {
 
          const update = { cpu: object.cpu, memory: object.memory };
 
-         workerManager.update( socket.remoteAddress, update );
+         workerManager.update( worker.remoteAddress, update );
 
          break;
 
@@ -284,7 +302,7 @@ function treat( data, socket ) {
 
             promise.then( function ( simulationInstance ) {
 
-               log.info( 'Worker ' + socket.remoteAddress + ' has finished one simulation instance' );
+               log.info( 'Worker ' + worker.remoteAddress + ' has finished one simulation instance' );
 
                // Count how many simulationInstances are pending or executing
                const condition = {
@@ -379,14 +397,55 @@ function treat( data, socket ) {
             log.error( object.SimulationId + ' executed with Failure ' + object.ErrorMessage );
 
             updateSimulationInstanceById( object.SimulationId, function () {
-               updateWorkerRunningInstances( socket.remoteAddress )
+               updateWorkerRunningInstances( worker.remoteAddress )
             } );
          }
 
          break;
 
+      case factory.Id.InformationResponse:
+
+         const executingSimulationInstances = object.executingSimulationInstances;
+
+         executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
+
+            var promise = SimulationInstance.findById( executingSimulationInstance.id );
+
+            promise.then( function ( simulationInstance ) {
+
+               if ( ( simulationInstance.state === SimulationInstance.State.Canceled ) ||
+                  ( simulationInstance.state === SimulationInstance.State.Finished ) ) {
+
+                  // TODO: send a simulationTerminate
+                  return;
+               }
+
+               if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
+
+                  // TODO: estimate which worker will finish faster and then 
+                  // send a simulationTerminate to the slower one
+
+                  //if ( executingSimulationInstance.startTime < simulationInstance.startTime ) {
+                  //   return;
+                  //}
+               }
+
+               simulationInstance.state = SimulationInstance.State.Executing;
+               simulationInstance.worker = worker.remoteAddress;
+               simulationInstance.startTime = executingSimulationInstance.startTime;
+
+               simulationInstance.save();
+            } )
+
+            .catch( function ( e ) {
+               log.error( e );
+            } );
+         } );
+
+         break;
+
       default:
-         return log.error( 'Invalid message received from ' + socket.remoteAddress );
+         return log.error( 'Invalid message received from ' + worker.remoteAddress );
    }
 }
 
