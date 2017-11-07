@@ -7,7 +7,7 @@
 const communication = require('./communication');
 const worker_discovery = require( './worker_discovery' );
 
-const log = require( '../../database/models/log' );
+const log = require( '../shared/log' );
 
 module.exports = function () {
 

@@ -9,7 +9,7 @@ const EventEmitter = require( 'events' );
 const communication = require( './communication' );
 const ip = require( 'ip' );
 
-const log = require( '../../database/models/log' );
+const log = require( '../shared/log' );
 
 // UDP socket which will receive workers requests
 const socket = dgram.createSocket( 'udp4' );

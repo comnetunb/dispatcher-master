@@ -9,8 +9,7 @@ const SimulationInstance = require( '../../database/models/simulation_instance' 
 const EventEmitter = require( 'events' );
 const communication = require( './communication' );
 
-const log = require( '../../database/models/log' );
-
+const log = require( '../shared/log' );
 
 const event = new EventEmitter();
 

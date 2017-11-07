@@ -16,9 +16,7 @@ const Level = {
    Fatal: 5
 }
 
-const sessionId = mongoose.Types.ObjectId();
-
-module.exports.sessionId = sessionId;
+const SessionId = mongoose.Types.ObjectId();
 
 const logSchema = Schema( {
 
@@ -36,59 +34,12 @@ const logSchema = Schema( {
    },
    session: {
       type: Schema.Types.ObjectId,
-      default: sessionId
+      default: SessionId
    }
 
 } );
 
-const Log = mongoose.model( 'Log', logSchema );
+logSchema.statics.Level = Level;
+logSchema.statics.SessionId = SessionId;
 
-module.exports.getAllLogs = function () {
-
-   const logFilter = { 'session': sessionId };
-
-   return Log.find( logFilter ).limit( 500 ).sort( { date: -1 } ).exec();
-}
-
-module.exports.trace = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Trace } );
-
-   log.save();
-}
-
-module.exports.debug = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Debug } );
-
-   log.save();
-
-}
-
-module.exports.info = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Info } );
-
-   log.save();
-}
-
-module.exports.warn = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Warn } );
-
-   log.save();
-}
-
-module.exports.error = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Error } );
-
-   log.save();
-}
-
-module.exports.fatal = function ( message ) {
-
-   const log = new Log( { log: message, date: Date.now(), level: Level.Fatal } );
-
-   log.save();
-}
+module.exports = mongoose.model( 'Log', logSchema );

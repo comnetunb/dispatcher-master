@@ -26,7 +26,7 @@ const informationRequest = require( '../../../protocol/dwp/pdu/information_reque
 const informationResponse = require( '../../../protocol/dwp/pdu/information_response' );
 const simulationTerminateRequest = require( '../../../protocol/dwp/pdu/simulation_terminate_request' );
 
-const log = require( '../../database/models/log' );
+const log = require( '../shared/log' );
 
 // TCP socket in which all the dispatcher-workers communication will be accomplished
 const server = net.createServer();

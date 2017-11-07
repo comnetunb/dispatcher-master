@@ -58,6 +58,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\shared\configuration.js" />
+    <Compile Include="servers\shared\log.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\shared\mailer.js" />
     <Compile Include="servers\shared\worker_manager.js" />
     <Compile Include="servers\web\apis\log.js">

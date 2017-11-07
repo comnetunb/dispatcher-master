@@ -16,7 +16,7 @@ const SimulationGroup = require( '../../../database/models/simulation_group' )
 const Simulation = require( '../../../database/models/simulation' );
 const SimulationInstance = require( '../../../database/models/simulation_instance' );
 
-const log = require( '../../../database/models/log' );
+const log = require( '../../shared/log' );
 
 module.exports = function ( app ) {
 
