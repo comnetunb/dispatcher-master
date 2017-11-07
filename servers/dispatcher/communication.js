@@ -22,8 +22,8 @@ const SimulationGroup = require( '../../database/models/simulation_group' );
 const resourceRequest = require( '../../../protocol/dwp/pdu/resource_request' );
 const simulationRequest = require( '../../../protocol/dwp/pdu/simulation_request' );
 const simulationResponse = require( '../../../protocol/dwp/pdu/simulation_response' );
-const informationRequest = require( '../../../protocol/dwp/pdu/information_request' );
-const informationResponse = require( '../../../protocol/dwp/pdu/information_response' );
+const reportRequest = require( '../../../protocol/dwp/pdu/report_request' );
+const reportResponse = require( '../../../protocol/dwp/pdu/report_response' );
 const simulationTerminateRequest = require( '../../../protocol/dwp/pdu/simulation_terminate_request' );
 
 const log = require( '../shared/log' );
@@ -50,7 +50,7 @@ module.exports.execute = function () {
       // Creates a buffer for each worker
       var buffer = '';
 
-      requestWorkerInformation( worker );
+      requestWorkerReport( worker );
 
       // Emit to UDP discovery in order to clean its cache
       event.emit( 'new_worker', worker.remoteAddress );
@@ -219,11 +219,11 @@ function addWorker ( worker ) {
  * from previous time
  */
 
-function requestWorkerInformation ( worker ) {
+function requestWorkerReport ( worker ) {
 
-   informationRequest.format()
+   reportRequest.format()
 
-   worker.write( informationRequest.format() );
+   worker.write( reportRequest.format() );
 }
 
 function removeWorker ( worker ) {
@@ -401,12 +401,12 @@ function treat ( data, worker ) {
 
          break;
 
-      case factory.Id.InformationResponse:
+      case factory.Id.ReportResponse:
 
          // Insert new worker to the pool
          addWorker( worker );
 
-         const executingSimulationInstances = object.information;
+         const executingSimulationInstances = object.report;
 
          executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
 

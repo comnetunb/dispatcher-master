@@ -36,15 +36,15 @@
         prev_handler();
       }
 
-      generateChart();
+      generateBoard();
     };
 
     var workerAddresses = [];
-    function generateChart() {
-      drawChart();
-      setInterval( drawChart, 1000 );
+    function generateBoard() {
+      drawBoard();
+      setInterval( drawBoard, 1000 );
     }
-    function drawChart() {
+    function drawBoard() {
       const xmlhttp = new XMLHttpRequest();
       xmlhttp.onreadystatechange = function () {
         if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
@@ -85,7 +85,32 @@
               var panelTitle = document.createElement( 'h3' );
               panelTitle.className = 'panel-title';
               panelTitle.innerHTML = runningInstances.outerHTML + " " + workers[idx].address;
+              panelTitle.style.display = 'inline';
               panelHeading.appendChild( panelTitle );
+
+              var controlBtns = document.createElement( 'div' );
+              controlBtns.align = 'right';
+
+              var pauseBtn = document.createElement( 'label' );
+              pauseBtn.type = 'button';
+              pauseBtn.className = 'btn btn-primary';
+              pauseBtn.innerHTML = '<span class=\'glyphicon glyphicon-pause\'></span>';
+
+              var resumeBtn = document.createElement( 'label' );
+              resumeBtn.type = 'button';
+              resumeBtn.className = 'btn btn-primary';
+              resumeBtn.innerHTML = '<span class=\'glyphicon glyphicon-play\'></span>';
+
+              var stopBtn = document.createElement( 'label' );
+              stopBtn.type = 'button';
+              stopBtn.className = 'btn btn-primary';
+              stopBtn.innerHTML = '<span class=\'glyphicon glyphicon-stop\'></span>';
+
+              controlBtns.appendChild( pauseBtn );
+              controlBtns.appendChild( resumeBtn );
+              controlBtns.appendChild( stopBtn );
+
+              panelHeading.appendChild( controlBtns );
 
               panel.appendChild( panelHeading );
 
