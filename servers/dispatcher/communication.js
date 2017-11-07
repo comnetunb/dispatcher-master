@@ -50,12 +50,9 @@ module.exports.execute = function () {
       // Creates a buffer for each worker
       var buffer = '';
 
-      // Insert new worker to the pool
-      addWorker( worker );
-
       requestWorkerInformation( worker );
 
-      // Emit to UDP discovery
+      // Emit to UDP discovery in order to clean its cache
       event.emit( 'new_worker', worker.remoteAddress );
 
       log.info( worker.remoteAddress + ':' + worker.remotePort + ' connected' );
@@ -109,7 +106,7 @@ module.exports.execute = function () {
    } );
 
    // Open worker
-   server.listen( 16180, '0.0.0.0', () => {
+   server.listen( 16180, '0.0.0.0', function () {
       log.info( 'TCP server listening ' + server.address().address + ':' + server.address().port );
    } );
 }
@@ -172,7 +169,9 @@ function batchDispatch () {
 
       return simulationInstances.forEach( function ( simulationInstance, idx ) {
 
-         simulationInstance.set( { 'state': SimulationInstance.State.Executing, 'worker': availableWorkers[idx].address } );
+         simulationInstance.state = SimulationInstance.State.Executing;
+         simulationInstance.worker = availableWorkers[idx].address;
+         simulationInstance.startTime = Date.now();
 
          var promise = simulationInstance.save();
 
@@ -293,6 +292,7 @@ function treat ( data, worker ) {
             var simulationInstanceUpdate = {
                result: object.Output,
                state: SimulationInstance.State.Finished,
+               endTime: Date.now(),
                $unset: { 'worker': 1 }
             }
 
@@ -402,6 +402,9 @@ function treat ( data, worker ) {
          break;
 
       case factory.Id.InformationResponse:
+
+         // Insert new worker to the pool
+         addWorker( worker );
 
          const executingSimulationInstances = object.information;
 
