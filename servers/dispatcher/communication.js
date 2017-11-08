@@ -111,7 +111,7 @@ module.exports.execute = function () {
    } );
 }
 
-function requestResource () {
+function requestResource() {
 
    setInterval( function () {
 
@@ -122,7 +122,7 @@ function requestResource () {
    }, config.requestResourceInterval * 1000 )
 }
 
-function dispatch () {
+function dispatch() {
 
    setInterval( function () {
 
@@ -138,7 +138,7 @@ function dispatch () {
  * and dispatch it to all those workers
  */
 
-function batchDispatch () {
+function batchDispatch() {
 
    const availableWorkers = workerManager.getAvailables( config.cpu.threshold, config.memory.threshold );
 
@@ -207,7 +207,7 @@ function batchDispatch () {
       } );
 }
 
-function addWorker ( worker ) {
+function addWorker( worker ) {
 
    workerManager.add( worker.remoteAddress );
 
@@ -219,14 +219,14 @@ function addWorker ( worker ) {
  * from previous time
  */
 
-function requestWorkerReport ( worker ) {
+function requestWorkerReport( worker ) {
 
    reportRequest.format()
 
    worker.write( reportRequest.format() );
 }
 
-function removeWorker ( worker ) {
+function removeWorker( worker ) {
 
    workerManager.remove( worker.remoteAddress );
 
@@ -237,7 +237,7 @@ function removeWorker ( worker ) {
    }
 }
 
-function treat ( data, worker ) {
+function treat( data, worker ) {
 
    var object = JSON.parse( data.toString() );
 
@@ -417,18 +417,23 @@ function treat ( data, worker ) {
                if ( ( simulationInstance.state === SimulationInstance.State.Canceled ) ||
                   ( simulationInstance.state === SimulationInstance.State.Finished ) ) {
 
-                  // TODO: send a simulationTerminate
+                  worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
                   return;
                }
 
+               var previousWorkerAddress = '';
+
                if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
 
-                  // TODO: estimate which worker will finish faster and then 
-                  // send a simulationTerminate to the slower one
+                  // This worker that returned will always have older startTime
+                  for ( var idx = 0; idx < workerPool.length; ++idx ) {
+                     if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
+                        workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                        previousWorkerAddress = workerPool[idx].remoteAddress;
+                        break;
+                     }
+                  }
 
-                  //if ( executingSimulationInstance.startTime < simulationInstance.startTime ) {
-                  //   return;
-                  //}
                }
 
                simulationInstance.state = SimulationInstance.State.Executing;
@@ -436,7 +441,13 @@ function treat ( data, worker ) {
                simulationInstance.startTime = executingSimulationInstance.startTime;
 
                simulationInstance.save( function () {
+
                   updateWorkerRunningInstances( simulationInstance.worker );
+
+                  if ( previousWorkerAddress !== '' ) {
+                     updateWorkerRunningInstances( previousWorkerAddress );
+                  }
+
                } );
             } )
 
@@ -452,7 +463,7 @@ function treat ( data, worker ) {
    }
 }
 
-function updateWorkerRunningInstances ( workerAddress ) {
+function updateWorkerRunningInstances( workerAddress ) {
 
    var promise = SimulationInstance.count( { worker: workerAddress } ).exec();
 
@@ -472,7 +483,7 @@ function updateWorkerRunningInstances ( workerAddress ) {
  * or an error occurred meanwhile
  */
 
-function updateSimulationInstanceById ( simulationInstanceId, callback ) {
+function updateSimulationInstanceById( simulationInstanceId, callback ) {
 
    const simulationInstancePopulate = {
       path: '_simulation',
@@ -503,7 +514,7 @@ function updateSimulationInstanceById ( simulationInstanceId, callback ) {
 
 }
 
-function cleanUp () {
+function cleanUp() {
 
    // Clean all simulations that were executing when dispatcher died
    const simulationInstanceFilter = { state: SimulationInstance.State.Executing };
