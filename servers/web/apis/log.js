@@ -6,7 +6,7 @@
 
 const router = require( '../router' );
 
-const log = require( '../../../database/models/log' )
+const log = require( '../../shared/log' );
 
 module.exports = function ( app ) {
 

@@ -6,7 +6,7 @@
 
 const nodemailer = require( 'nodemailer' );
 const config = require( './configuration' ).getConfiguration();
-const log = require( '../../database/models/log' );
+const log = require( '../shared/log' );
 
 var transporter = nodemailer.createTransport( {
    service: config.transporter.service,

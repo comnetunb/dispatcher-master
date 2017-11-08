@@ -38,12 +38,18 @@ const simulationInstanceSchema = Schema( {
    },
    result: {
       type: String
+   },
+   startTime: {
+      type: Date
+   },
+   endTime: {
+      type: Date
    }
 
-});
+} );
 
 simulationInstanceSchema.statics.State = State;
 
-simulationInstanceSchema.index( { _simulation: 1, seed: 1, load: 1 }, { unique: true });
+simulationInstanceSchema.index( { _simulation: 1, seed: 1, load: 1 }, { unique: true } );
 
 module.exports = mongoose.model( 'SimulationInstance', simulationInstanceSchema );

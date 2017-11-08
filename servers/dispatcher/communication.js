@@ -22,9 +22,11 @@ const SimulationGroup = require( '../../database/models/simulation_group' );
 const resourceRequest = require( '../../../protocol/dwp/pdu/resource_request' );
 const simulationRequest = require( '../../../protocol/dwp/pdu/simulation_request' );
 const simulationResponse = require( '../../../protocol/dwp/pdu/simulation_response' );
+const reportRequest = require( '../../../protocol/dwp/pdu/report_request' );
+const reportResponse = require( '../../../protocol/dwp/pdu/report_response' );
 const simulationTerminateRequest = require( '../../../protocol/dwp/pdu/simulation_terminate_request' );
 
-const log = require( '../../database/models/log' );
+const log = require( '../shared/log' );
 
 // TCP socket in which all the dispatcher-workers communication will be accomplished
 const server = net.createServer();
@@ -43,24 +45,23 @@ module.exports.execute = function () {
 
    dispatch();
 
-   server.on( 'connection', ( socket ) => {
+   server.on( 'connection', function ( worker ) {
 
       // Creates a buffer for each worker
       var buffer = '';
 
-      // Insert new worker to the pool
-      addWorker( socket );
+      requestWorkerReport( worker );
 
-      // Emit to UDP discovery
-      event.emit( 'new_worker', socket.remoteAddress );
+      // Emit to UDP discovery in order to clean its cache
+      event.emit( 'new_worker', worker.remoteAddress );
 
-      log.info( socket.remoteAddress + ':' + socket.remotePort + ' connected' );
+      log.info( worker.remoteAddress + ':' + worker.remotePort + ' connected' );
 
-      socket.once( 'close', () => {
+      worker.once( 'close', function () {
 
-         removeWorker( socket );
+         removeWorker( worker );
 
-         const simulationInstanceFilter = { worker: socket.remoteAddress };
+         const simulationInstanceFilter = { worker: worker.remoteAddress };
 
          var promise = SimulationInstance.find( simulationInstanceFilter, '_id' );
 
@@ -76,7 +77,7 @@ module.exports.execute = function () {
                log.error( e );
             } )
 
-         log.warn( 'Worker ' + socket.remoteAddress + ' left the pool' );
+         log.warn( 'Worker ' + worker.remoteAddress + ' left the pool' );
 
          if ( workerPool.length === 0 ) {
             log.warn( 'There are no workers left' );
@@ -84,7 +85,7 @@ module.exports.execute = function () {
          }
       } );
 
-      socket.on( 'data', ( data ) => {
+      worker.on( 'data', function ( data ) {
          // Treat chunk data
          buffer += data;
 
@@ -93,7 +94,7 @@ module.exports.execute = function () {
             do {
                packet = factory.expose( buffer );
                buffer = factory.remove( buffer );
-               treat( packet, socket );
+               treat( packet, worker );
             } while ( buffer.length !== 0 )
 
          } catch ( e ) {
@@ -101,11 +102,11 @@ module.exports.execute = function () {
          }
       } );
 
-      socket.on( 'error', () => { } );
+      worker.on( 'error', function () { } );
    } );
 
-   // Open Socket
-   server.listen( 16180, '0.0.0.0', () => {
+   // Open worker
+   server.listen( 16180, '0.0.0.0', function () {
       log.info( 'TCP server listening ' + server.address().address + ':' + server.address().port );
    } );
 }
@@ -168,7 +169,9 @@ function batchDispatch() {
 
       return simulationInstances.forEach( function ( simulationInstance, idx ) {
 
-         simulationInstance.set( { 'state': SimulationInstance.State.Executing, 'worker': availableWorkers[idx].address } );
+         simulationInstance.state = SimulationInstance.State.Executing;
+         simulationInstance.worker = availableWorkers[idx].address;
+         simulationInstance.startTime = Date.now();
 
          var promise = simulationInstance.save();
 
@@ -211,6 +214,18 @@ function addWorker( worker ) {
    workerPool.push( worker );
 }
 
+/**
+ * Needs to know if new worker has any executing instance
+ * from previous time
+ */
+
+function requestWorkerReport( worker ) {
+
+   reportRequest.format()
+
+   worker.write( reportRequest.format() );
+}
+
 function removeWorker( worker ) {
 
    workerManager.remove( worker.remoteAddress );
@@ -222,7 +237,7 @@ function removeWorker( worker ) {
    }
 }
 
-function treat( data, socket ) {
+function treat( data, worker ) {
 
    var object = JSON.parse( data.toString() );
 
@@ -238,7 +253,7 @@ function treat( data, socket ) {
 
          const update = { cpu: object.cpu, memory: object.memory };
 
-         workerManager.update( socket.remoteAddress, update );
+         workerManager.update( worker.remoteAddress, update );
 
          break;
 
@@ -277,6 +292,7 @@ function treat( data, socket ) {
             var simulationInstanceUpdate = {
                result: object.Output,
                state: SimulationInstance.State.Finished,
+               endTime: Date.now(),
                $unset: { 'worker': 1 }
             }
 
@@ -284,7 +300,7 @@ function treat( data, socket ) {
 
             promise.then( function ( simulationInstance ) {
 
-               log.info( 'Worker ' + socket.remoteAddress + ' has finished one simulation instance' );
+               log.info( 'Worker ' + worker.remoteAddress + ' has finished one simulation instance' );
 
                // Count how many simulationInstances are pending or executing
                const condition = {
@@ -379,14 +395,71 @@ function treat( data, socket ) {
             log.error( object.SimulationId + ' executed with Failure ' + object.ErrorMessage );
 
             updateSimulationInstanceById( object.SimulationId, function () {
-               updateWorkerRunningInstances( socket.remoteAddress )
+               updateWorkerRunningInstances( worker.remoteAddress )
             } );
          }
 
          break;
 
+      case factory.Id.ReportResponse:
+
+         // Insert new worker to the pool
+         addWorker( worker );
+
+         const executingSimulationInstances = object.report;
+
+         executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
+
+            var promise = SimulationInstance.findById( executingSimulationInstance.id );
+
+            promise.then( function ( simulationInstance ) {
+
+               if ( ( simulationInstance.state === SimulationInstance.State.Canceled ) ||
+                  ( simulationInstance.state === SimulationInstance.State.Finished ) ) {
+
+                  worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                  return;
+               }
+
+               var previousWorkerAddress = '';
+
+               if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
+
+                  // This worker that returned will always have older startTime
+                  for ( var idx = 0; idx < workerPool.length; ++idx ) {
+                     if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
+                        workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                        previousWorkerAddress = workerPool[idx].remoteAddress;
+                        break;
+                     }
+                  }
+
+               }
+
+               simulationInstance.state = SimulationInstance.State.Executing;
+               simulationInstance.worker = worker.remoteAddress;
+               simulationInstance.startTime = executingSimulationInstance.startTime;
+
+               simulationInstance.save( function () {
+
+                  updateWorkerRunningInstances( simulationInstance.worker );
+
+                  if ( previousWorkerAddress !== '' ) {
+                     updateWorkerRunningInstances( previousWorkerAddress );
+                  }
+
+               } );
+            } )
+
+               .catch( function ( e ) {
+                  log.error( e );
+               } );
+         } );
+
+         break;
+
       default:
-         return log.error( 'Invalid message received from ' + socket.remoteAddress );
+         return log.error( 'Invalid message received from ' + worker.remoteAddress );
    }
 }
 
