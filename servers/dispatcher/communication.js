@@ -425,15 +425,22 @@ function treat( data, worker ) {
 
                if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
 
-                  // This worker that returned will always have older startTime
-                  for ( var idx = 0; idx < workerPool.length; ++idx ) {
-                     if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
-                        workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
-                        previousWorkerAddress = workerPool[idx].remoteAddress;
-                        break;
-                     }
-                  }
+                  if ( simulationInstance.startTime > executingSimulationInstance.startTime ) {
 
+                     for ( var idx = 0; idx < workerPool.length; ++idx ) {
+                        if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
+                           workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                           previousWorkerAddress = workerPool[idx].remoteAddress;
+                           break;
+                        }
+                     }
+
+                  } else {
+
+                     worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                     return;
+
+                  }
                }
 
                simulationInstance.state = SimulationInstance.State.Executing;

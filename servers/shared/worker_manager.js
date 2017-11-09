@@ -105,11 +105,6 @@ module.exports.getAvailables = function ( cpuThreshold, memoryThreshold ) {
          continue;
       }
 
-      // @TODO: Workaround until requestResource has date information in it
-      if ( worker.runningInstances > 5 ) {
-         continue;
-      }
-
       if ( ( worker.cpu >= cpuThreshold ) && ( worker.memory >= memoryThreshold ) ) {
          availableWorkers.push( worker );
       }
