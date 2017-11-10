@@ -2,210 +2,241 @@
 <html>
 
 <head>
-  <% include ../template/head.ejs %>
+   <% include ../template/head.ejs %>
 </head>
 
 <body>
-  <header>
-    <% include ../template/header.ejs %>
-  </header>
+   <header>
+      <% include ../template/header.ejs %>
+   </header>
 
-  <div id="wrapper">
+   <div id="wrapper">
 
-    <% include template/sidebar.ejs %>
+      <% include template/sidebar.ejs %>
 
-    <div id="page-wrapper" style="min-height: 898px;">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="page-header">Online Workers</h1>
-        </div>
+      <div id="page-wrapper" style="min-height: 898px;">
+         <div class="row">
+            <div class="col-lg-12">
+               <h1 class="page-header">Online Workers</h1>
+            </div>
+         </div>
+
+         <div id="worker-container">
+         </div>
       </div>
+   </div>
 
-      <div id="worker-container">
-      </div>
-    </div>
-  </div>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script>
+      google.charts.load( 'current', { 'packages': ['gauge'] } );
 
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
-    google.charts.load( 'current', { 'packages': ['gauge'] } );
+      var prev_handler = window.onload;
+      window.onload = function () {
+         if ( prev_handler ) {
+            prev_handler();
+         }
 
-    var prev_handler = window.onload;
-    window.onload = function () {
-      if ( prev_handler ) {
-        prev_handler();
+         generateBoard();
+      };
+
+      var workerAddresses = [];
+      function generateBoard() {
+         drawBoard();
+         setInterval( drawBoard, 1000 );
       }
+      function drawBoard() {
+         const xmlhttp = new XMLHttpRequest();
+         xmlhttp.onreadystatechange = function () {
+            if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
 
-      generateBoard();
-    };
+               const workers = JSON.parse( xmlhttp.response );
 
-    var workerAddresses = [];
-    function generateBoard() {
-      drawBoard();
-      setInterval( drawBoard, 1000 );
-    }
-    function drawBoard() {
-      const xmlhttp = new XMLHttpRequest();
-      xmlhttp.onreadystatechange = function () {
-        if ( xmlhttp.readyState == 4 && xmlhttp.status == 200 ) {
+               var pageHeader = document.getElementsByClassName( 'page-header' )[0];
+               pageHeader.innerHTML = 'Online Workers [ ' + workers.length + ' ]';
 
-          const workers = JSON.parse( xmlhttp.response );
+               var activeWorkers = [];
+               const container = document.getElementById( 'worker-container' );
 
-          var pageHeader = document.getElementsByClassName( 'page-header' )[0];
-          pageHeader.innerHTML = 'Online Workers [ ' + workers.length + ' ]';
+               for ( var idx = 0; idx < workers.length; ++idx ) {
 
-          var activeWorkers = [];
-          const container = document.getElementById( 'worker-container' );
+                  var gauge;
+                  var panel;
+                  if ( ( panel = document.getElementById( workers[idx].address ) ) === null ) {
 
-          for ( var idx = 0; idx < workers.length; ++idx ) {
+                     // Worker's element is not created yet
+                     workerAddresses.push( workers[idx].address );
+                     activeWorkers.push( workers[idx].address );
 
-            var gauge;
-            var panel;
-            if ( ( panel = document.getElementById( workers[idx].address ) ) === null ) {
+                     panel = document.createElement( 'div' );
+                     panel.className = 'panel panel-primary autocollapse';
+                     panel.id = workers[idx].address;
 
-              // Worker's element is not created yet
-              workerAddresses.push( workers[idx].address );
-              activeWorkers.push( workers[idx].address );
+                     var panelHeading = document.createElement( 'div' );
+                     panelHeading.className = 'panel-heading clickable';
 
-              panel = document.createElement( 'div' );
-              panel.className = 'panel panel-primary autocollapse';
-              panel.id = workers[idx].address;
+                     var panelNavBar = document.createElement( 'div' );
+                     panelNavBar.className = 'navbar-collapse';
+                     panelHeading.appendChild( panelNavBar );
 
-              var panelHeading = document.createElement( 'div' );
-              panelHeading.className = 'panel-heading clickable';
+                     var leftNav = document.createElement( 'ul' );
+                     leftNav.className = 'nav navbar-nav';
+                     panelNavBar.appendChild( leftNav );
 
-              var runningInstances = document.createElement( 'span' );
-              runningInstances.className = 'badge';
-              runningInstances.innerHTML = workers[idx].runningInstances;
-              runningInstances.setAttribute( 'data-toggle', 'popover' );
-              runningInstances.setAttribute( 'data-trigger', 'hover' );
-              runningInstances.setAttribute( 'data-placement', 'top' );
-              runningInstances.setAttribute( 'data-content', 'Running Instances' );
+                     var runningInstances = document.createElement( 'span' );
+                     runningInstances.className = 'badge';
+                     runningInstances.innerHTML = workers[idx].runningInstances;
+                     runningInstances.setAttribute( 'data-toggle', 'popover' );
+                     runningInstances.setAttribute( 'data-trigger', 'hover' );
+                     runningInstances.setAttribute( 'data-placement', 'top' );
+                     runningInstances.setAttribute( 'data-content', 'Running Instances' );
 
-              var panelTitle = document.createElement( 'h3' );
-              panelTitle.className = 'panel-title';
-              panelTitle.innerHTML = runningInstances.outerHTML + " " + workers[idx].address;
-              panelTitle.style.display = 'inline';
-              panelHeading.appendChild( panelTitle );
+                     var panelTitle = document.createElement( 'h3' );
+                     panelTitle.className = 'panel-title';
+                     panelTitle.innerHTML = runningInstances.outerHTML + " " + workers[idx].address;
+                     panelTitle.style.display = 'inline';
+                     panelTitle.style = 'margin-top: 10px';
 
-              //var controlBtns = document.createElement( 'div' );
-              //controlBtns.align = 'right';
+                     var leftNavLi = document.createElement( 'li' );
+                     leftNavLi.appendChild( panelTitle );
+                     leftNav.appendChild( leftNavLi );
 
-              //var pauseBtn = document.createElement( 'label' );
-              //pauseBtn.type = 'button';
-              //pauseBtn.className = 'btn btn-primary';
-              //pauseBtn.innerHTML = '<span class=\'glyphicon glyphicon-pause\'></span>';
+                     var rightNav = document.createElement( 'ul' );
+                     rightNav.className = 'nav navbar-nav navbar-right';
+                     panelNavBar.appendChild( rightNav );
 
-              //var resumeBtn = document.createElement( 'label' );
-              //resumeBtn.type = 'button';
-              //resumeBtn.className = 'btn btn-primary';
-              //resumeBtn.innerHTML = '<span class=\'glyphicon glyphicon-play\'></span>';
+                     var pauseBtn = document.createElement( 'label' );
+                     pauseBtn.type = 'button';
+                     pauseBtn.className = 'btn btn-primary non-clickable';
+                     pauseBtn.innerHTML = '<span class=\'glyphicon glyphicon-pause non-clickable\'></span>';
 
-              //var stopBtn = document.createElement( 'label' );
-              //stopBtn.type = 'button';
-              //stopBtn.className = 'btn btn-primary';
-              //stopBtn.innerHTML = '<span class=\'glyphicon glyphicon-stop\'></span>';
+                     var rightNavLi1 = document.createElement( 'li' );
+                     rightNavLi1.appendChild( pauseBtn );
 
-              //controlBtns.appendChild( pauseBtn );
-              //controlBtns.appendChild( resumeBtn );
-              //controlBtns.appendChild( stopBtn );
+                     var resumeBtn = document.createElement( 'label' );
+                     resumeBtn.type = 'button';
+                     resumeBtn.className = 'btn btn-primary non-clickable';
+                     resumeBtn.innerHTML = '<span class=\'glyphicon glyphicon-play non-clickable\'></span>';
 
-              //panelHeading.appendChild( controlBtns );
+                     var rightNavLi2 = document.createElement( 'li' );
+                     rightNavLi2.appendChild( resumeBtn );
 
-              panel.appendChild( panelHeading );
+                     var stopBtn = document.createElement( 'label' );
+                     stopBtn.type = 'button';
+                     stopBtn.className = 'btn btn-primary non-clickable';
+                     stopBtn.innerHTML = '<span class=\'glyphicon glyphicon-stop non-clickable\'></span>';
 
-              panelBody = document.createElement( 'div' );
-              panelBody.className = 'panel-body';
-              panelBody.style = 'display: none';
+                     var rightNavLi3 = document.createElement( 'li' );
+                     rightNavLi3.appendChild( stopBtn );
 
-              gauge = document.createElement( 'div' );
-              gauge.className = 'gauge';
+                     rightNav.appendChild( rightNavLi1 );
+                     rightNav.appendChild( rightNavLi2 );
+                     rightNav.appendChild( rightNavLi3 );
 
-              panelBody.appendChild( gauge );
+                     panelNavBar.appendChild( rightNav );
 
-              panel.appendChild( panelBody );
+                     panel.appendChild( panelHeading );
 
-              container.appendChild( panel );
+                     panelBody = document.createElement( 'div' );
+                     panelBody.className = 'panel-body';
+                     panelBody.style = 'display: none';
 
-            } else {
-              activeWorkers.push( workers[idx].address );
+                     gauge = document.createElement( 'div' );
+                     gauge.className = 'gauge';
 
-              var child = panel.getElementsByTagName( '*' );
+                     panelBody.appendChild( gauge );
 
-              for ( var i = -1, l = child.length; ++i < l; ) {
-                if ( child[i].className == 'gauge' ) {
-                  gauge = child[i];
-                }
+                     panel.appendChild( panelBody );
 
-                if ( child[i].className == 'badge' ) {
-                  child[i].innerHTML = workers[idx].runningInstances;
-                }
-              }
+                     container.appendChild( panel );
+
+                  } else {
+                     activeWorkers.push( workers[idx].address );
+
+                     var child = panel.getElementsByTagName( '*' );
+
+                     for ( var i = -1, l = child.length; ++i < l; ) {
+                        if ( child[i].className == 'gauge' ) {
+                           gauge = child[i];
+                        }
+
+                        if ( child[i].className == 'badge' ) {
+                           child[i].innerHTML = workers[idx].runningInstances;
+                        }
+                     }
+                  }
+
+                  var data = google.visualization.arrayToDataTable( [
+                     ['Label', 'Value'],
+                     ['Memory', ( 1 - workers[idx].lastResource.memory ) * 100],
+                     ['CPU', ( 1 - workers[idx].lastResource.cpu ) * 100]
+                  ] );
+                  var options = {
+                     width: 400, height: 120,
+                     redFrom: 90, redTo: 100,
+                     yellowFrom: 75, yellowTo: 90,
+                     minorTicks: 5
+                  };
+
+                  var chart = new google.visualization.Gauge( gauge );
+                  chart.draw( data, options );
+               }
+
+               // Cleaning
+               for ( var idx = 0; idx < workerAddresses.length; ++idx ) {
+                  var found = activeWorkers.indexOf( workerAddresses[idx] );
+                  if ( found === -1 ) {
+                     const div = document.getElementById( workerAddresses[idx] );
+                     div.remove();
+                     workerAddresses.splice( idx, 1 );
+                  }
+               }
+
+               $( document ).ready( function () {
+                  $( '[data-toggle="popover"]' ).popover();
+               } );
             }
-
-            var data = google.visualization.arrayToDataTable( [
-              ['Label', 'Value'],
-              ['Memory', ( 1 - workers[idx].lastResource.memory ) * 100],
-              ['CPU', ( 1 - workers[idx].lastResource.cpu ) * 100]
-            ] );
-            var options = {
-              width: 400, height: 120,
-              redFrom: 90, redTo: 100,
-              yellowFrom: 75, yellowTo: 90,
-              minorTicks: 5
-            };
-
-            var chart = new google.visualization.Gauge( gauge );
-            chart.draw( data, options );
-          }
-
-          // Cleaning
-          for ( var idx = 0; idx < workerAddresses.length; ++idx ) {
-            var found = activeWorkers.indexOf( workerAddresses[idx] );
-            if ( found === -1 ) {
-              const div = document.getElementById( workerAddresses[idx] );
-              div.remove();
-              workerAddresses.splice( idx, 1 );
-            }
-          }
-
-          $( document ).ready( function () {
-            $( '[data-toggle="popover"]' ).popover();
-          } );
-        }
+         }
+         xmlhttp.open( 'GET', '/workers', true );
+         xmlhttp.send();
       }
-      xmlhttp.open( 'GET', '/workers', true );
-      xmlhttp.send();
-    }
 
-    $( document ).on( 'click', '.panel div.clickable', function ( e ) {
-      var $this = $( this ); //Heading
-      var $panel = $this.parent( '.panel' );
-      var $panel_body = $panel.children( '.panel-body' );
-      var $display = $panel_body.css( 'display' );
+      $( document ).on( 'click', '.panel div.clickable', function ( e ) {
+         var $this = $( this ); //Heading
 
-      if ( $display == 'block' ) {
-        $panel_body.slideUp();
-      } else if ( $display == 'none' ) {
-        $panel_body.slideDown();
-      }
-    } );
+         if ( $( e.target ).hasClass( 'non-clickable' ) ) {
+            return;
+         }
 
-    $( document ).ready( function ( e ) {
-      var $classy = '.panel.autocollapse';
+         if ( $this.hasClass( 'non-clickable' ) ) {
+            console.log( 'eita' );
+         }
 
-      var $found = $( $classy );
-      $found.find( '.panel-body' ).hide();
-      $found.removeClass( $classy );
-    } );
+         var $panel = $this.parent( '.panel' );
+         var $panel_body = $panel.children( '.panel-body' );
+         var $display = $panel_body.css( 'display' );
 
-  </script>
+         if ( $display == 'block' ) {
+            $panel_body.slideUp();
+         } else if ( $display == 'none' ) {
+            $panel_body.slideDown();
+         }
+      } );
 
-  <script src='../js/sb-admin-2.js'></script>
+      $( document ).ready( function ( e ) {
+         var $classy = '.panel.autocollapse';
+
+         var $found = $( $classy );
+         $found.find( '.panel-body' ).hide();
+         $found.removeClass( $classy );
+      } );
+
+   </script>
+
+   <script src='../js/sb-admin-2.js'></script>
 
 </body>
 
 </html>
 <footer>
-  <% include ../template/footer.ejs %>
+   <% include ../template/footer.ejs %>
 </footer>
