@@ -505,6 +505,7 @@ function updateSimulationInstanceById( simulationInstanceId, callback ) {
       const simulationGroupState = simulationInstance._simulation._simulationGroup.state;
 
       simulationInstance.worker = undefined;
+      simulationInstance.startTime = undefined;
 
       if ( simulationGroupState === SimulationGroup.State.Executing ) {
          simulationInstance.state = SimulationInstance.State.Pending;
