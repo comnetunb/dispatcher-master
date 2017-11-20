@@ -12,6 +12,7 @@ const EventEmitter = require( 'events' );
 
 const config = require( '../shared/configuration' ).getConfiguration();
 const workerManager = require( '../shared/worker_manager' );
+const simulationUtils = require( '../shared/simulation_utils' );
 
 // Schemas
 const SimulationInstance = require( '../../database/models/simulation_instance' );
@@ -38,6 +39,8 @@ var event = new EventEmitter();
 module.exports.event = event;
 
 module.exports.execute = function () {
+
+   simulationUtils.estimateSimulationGroupEndTime('5a0324eb292ae30aa615a4bd');
 
    cleanUp();
 
