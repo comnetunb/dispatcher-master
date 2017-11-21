@@ -55,6 +55,9 @@ const simulationGroupSchema = Schema( {
    },
    endTime: {
       type: Date
+   },
+   estimatedEndTime: {
+      type: Date
    }
 
 });

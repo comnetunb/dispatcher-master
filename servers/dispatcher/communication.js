@@ -12,6 +12,7 @@ const EventEmitter = require( 'events' );
 
 const config = require( '../shared/configuration' ).getConfiguration();
 const workerManager = require( '../shared/worker_manager' );
+const simulationUtils = require( '../shared/simulation_utils' );
 
 // Schemas
 const SimulationInstance = require( '../../database/models/simulation_instance' );
@@ -299,6 +300,11 @@ function treat( data, worker ) {
             var promise = SimulationInstance.findByIdAndUpdate( simulationId, simulationInstanceUpdate ).exec();
 
             promise.then( function ( simulationInstance ) {
+
+               Simulation.findById( simulationInstance._simulation ).select( '_simulationGroup' ).exec()
+                  .then( function ( simulationGroupId ) {
+                     simulationUtils.estimateSimulationGroupEndTime( simulationGroupId._simulationGroup );
+                  } );
 
                log.info( 'Worker ' + worker.remoteAddress + ' has finished one simulation instance' );
 
