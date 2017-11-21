@@ -24,6 +24,7 @@ module.exports.add = function add( workerAddress ) {
    workers.push( {
       address: workerAddress,
       runningInstances: 0,
+      status: undefined,
       cpu: undefined,
       memory: undefined,
       lastResource: {

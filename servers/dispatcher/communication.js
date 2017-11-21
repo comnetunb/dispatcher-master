@@ -271,7 +271,7 @@ function treat( data, worker ) {
             } catch ( err ) {
                // If an error occurred, update it to finished anyways
                // No need to keep trying executing this simulation
-               log.error( err );
+               log.error( err + '\nJSON:' + JSON.stringify( output ) );
             }
 
             var promise_i = SimulationInstance.findById( object.SimulationId ).exec();
@@ -446,6 +446,8 @@ function treat( data, worker ) {
 
          // Insert new worker to the pool
          addWorker( worker );
+
+         workerManager.update( worker, { status: object.report.status } )
 
          const executingSimulationInstances = object.report;
 

@@ -81,19 +81,20 @@
                      var leftNav = document.createElement( 'ul' );
                      leftNav.className = 'nav navbar-nav';
                      panelNavBar.appendChild( leftNav );
+
                      var runningInstances = document.createElement( 'span' );
                      runningInstances.className = 'badge';
-                     runningInstances.innerHTML = workers[idx].performance.level + ' - ' + workers[idx].runningInstances;
-                     runningInstances.setAttribute( 'data-toggle', 'popover' );
-                     runningInstances.setAttribute( 'data-trigger', 'hover' );
+                     runningInstances.innerHTML = workers[idx].runningInstances;
+                     runningInstances.setAttribute( 'data-toggle', 'tooltip' );
                      runningInstances.setAttribute( 'data-placement', 'top' );
-                     runningInstances.setAttribute( 'data-content', 'Running Instances' );
+                     runningInstances.setAttribute( 'title', 'Running Instances' );
+
 
                      var panelTitle = document.createElement( 'h3' );
                      panelTitle.className = 'panel-title';
                      panelTitle.innerHTML = runningInstances.outerHTML + " " + workers[idx].address;
                      panelTitle.style.display = 'inline';
-                     panelTitle.style = 'margin-top: 10px';
+                     panelTitle.style = 'margin-top: 25px';
 
                      var leftNavLi = document.createElement( 'li' );
                      leftNavLi.appendChild( panelTitle );
@@ -105,24 +106,34 @@
 
                      var pauseBtn = document.createElement( 'label' );
                      pauseBtn.type = 'button';
-                     pauseBtn.className = 'btn btn-primary non-clickable';
-                     pauseBtn.innerHTML = '<span class=\'glyphicon glyphicon-pause non-clickable\'></span>';
+                     pauseBtn.className = 'btn btn-secondary non-clickable';
+                     if ( workers[idx].status === undefined || workers[idx].status === 0 ) {
+                        pauseBtn.className += ' disabled';
+                     }
+                     pauseBtn.innerHTML = '<span class=\'glyphicon glyphicon-pause non-clickable\'></span><h6 class="non-clickable">PAUSE</h6>';
 
                      var rightNavLi1 = document.createElement( 'li' );
                      rightNavLi1.appendChild( pauseBtn );
 
                      var resumeBtn = document.createElement( 'label' );
                      resumeBtn.type = 'button';
-                     resumeBtn.className = 'btn btn-primary non-clickable';
-                     resumeBtn.innerHTML = '<span class=\'glyphicon glyphicon-play non-clickable\'></span>';
+                     resumeBtn.className = 'btn btn-secondary non-clickable';
+                     resumeBtn.innerHTML = '<span class=\'glyphicon glyphicon-play non-clickable\'></span><h6 class="non-clickable">RESUME</h6>';
+                     if ( workers[idx].status === undefined || workers[idx].status === 1 ) {
+                        console.log( workers[idx].running)
+                        resumeBtn.className += ' disabled';
+                     }
 
                      var rightNavLi2 = document.createElement( 'li' );
                      rightNavLi2.appendChild( resumeBtn );
 
                      var stopBtn = document.createElement( 'label' );
                      stopBtn.type = 'button';
-                     stopBtn.className = 'btn btn-primary non-clickable';
-                     stopBtn.innerHTML = '<span class=\'glyphicon glyphicon-stop non-clickable\'></span>';
+                     stopBtn.className = 'btn btn-secondary non-clickable';
+                     stopBtn.innerHTML = '<span class=\'glyphicon glyphicon-stop non-clickable\'></span><h6 class="non-clickable">STOP</h6>';
+                     stopBtn.setAttribute( 'data-toggle', 'confirmation' );
+                     stopBtn.setAttribute( 'data-popout', 'true' );
+                     stopBtn.setAttribute( 'data-singleton', 'true' );
 
                      var rightNavLi3 = document.createElement( 'li' );
                      rightNavLi3.appendChild( stopBtn );
@@ -159,7 +170,7 @@
                         }
 
                         if ( child[i].className == 'badge' ) {
-                           child[i].innerHTML = workers[idx].performance.level + ' - ' + workers[idx].runningInstances;
+                           child[i].innerHTML = workers[idx].runningInstances;
                         }
                      }
                   }
@@ -192,6 +203,23 @@
 
                $( document ).ready( function () {
                   $( '[data-toggle="popover"]' ).popover();
+               } );
+
+
+               $( '[data-toggle=confirmation]' ).confirmation( { rootSelector: '[data-toggle=confirmation]' } );
+
+               $( '[name=Cancel]' ).on( 'confirmed.bs.confirmation', function () {
+                  //$.post( '/cancel', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
+                  //   () => {
+                  //      location.reload();
+                  //   } );
+               } );
+
+               $( '[name=Remove]' ).on( 'confirmed.bs.confirmation', function () {
+                  //$.post( '/remove', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
+                  //   () => {
+                  //      location.reload();
+                  //   } );
                } );
             }
          }
