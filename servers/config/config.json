@@ -1,10 +1,10 @@
 ﻿{
    "cpu": {
-      "threshold": 0.0,
+      "threshold": 0.5,
       "weight": 1
    },
    "memory": {
-      "threshold": 0.2,
+      "threshold": 0.5,
       "weight": 3
    },
    "requestResourceInterval": 1,

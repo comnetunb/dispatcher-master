@@ -7,8 +7,9 @@
 const SimulationGroup = require( '../../database/models/simulation_group' );
 const Simulation = require( '../../database/models/simulation' );
 const SimulationInstance = require( '../../database/models/simulation_instance' );
+const log = require( './log' );
 
-module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroupEndTime ( simulationGroupId ) {
+module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroupEndTime( simulationGroupId ) {
 
    const simulationFilter = { _simulationGroup: simulationGroupId };
 
@@ -21,20 +22,26 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
          state: SimulationInstance.State.Finished
       };
 
-      return SimulationInstance.find( simulationInstanceFilter ).select( 'startTime endTime' ).sort( 'startTime' ).exec();
-   } )
+      var promise = SimulationInstance.find( simulationInstanceFilter ).select( 'startTime endTime' ).sort( 'startTime' ).exec();
 
-      .then( function ( simulationInstancesTime ) {
+      promise.then( function ( simulationInstancesTime ) {
 
          if ( simulationInstancesTime.length < 2 ) {
+            // Can't estimate
             return;
          }
 
          var simulationInstanceDurationMean = 0;
          var simulationInstanceDispatchMean = 0;
-         var remainingInstances = 500;
+         var length = 0;
 
          for ( var idx = 1; idx < simulationInstancesTime.length; ++idx ) {
+
+            if ( simulationInstancesTime[idx].startTime === undefined || simulationInstancesTime[idx].endTime === undefined ) {
+               continue;
+            }
+
+            ++length;
 
             simulationInstanceDurationMean +=
                simulationInstancesTime[idx].endTime.getTime() -
@@ -45,17 +52,49 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
                simulationInstancesTime[idx - 1].startTime.getTime();
          }
 
-         simulationInstanceDurationMean /= simulationInstancesTime.length;
-         simulationInstanceDispatchMean /= simulationInstancesTime.length - 1;
+         if ( length < 2 ) {
+            return;
+         }
 
-         var estimatedTime = new Date( Date.now() + ( remainingInstances * ( simulationInstanceDurationMean + simulationInstanceDispatchMean ) ) );
+         simulationInstanceDurationMean /= length;
+         simulationInstanceDispatchMean /= length - 1;
 
-         console.log( estimatedTime );
+         const simulationInstanceFilter = {
+            _simulation: { $in: simulationIds },
+            $or: [{ state: SimulationInstance.State.Pending },
+            { state: SimulationInstance.State.Executing }]
+         };
+
+         var promise = SimulationInstance.find( simulationInstanceFilter ).exec();
+
+         promise.then( function ( remainingInstances ) {
+
+            var estimatedEndTime = 0;
+
+            for ( var remainingInstance in remainingInstances ) {
+
+               if ( remainingInstances[remainingInstance].state == SimulationInstance.State.Pending ) {
+                  estimatedEndTime += simulationInstanceDurationMean + simulationInstanceDispatchMean;
+                  continue
+               }
+
+               if ( remainingInstances[remainingInstance].startTime === undefined ) {
+                  continue;
+               }
+
+               estimatedEndTime += simulationInstanceDurationMean - ( Date.now() - remainingInstances[remainingInstance].startTime );
+            }
+
+            estimatedEndTime = new Date( Date.now() + estimatedEndTime );
+
+            const simulationGroupUpdate = { estimatedEndTime: estimatedEndTime };
+
+            return SimulationGroup.findByIdAndUpdate( simulationGroupId, simulationGroupUpdate ).exec();
+         } )
       } )
+   } )
 
       .catch( function ( err ) {
-
+         log.error( err );
       } );
-
-
 }
