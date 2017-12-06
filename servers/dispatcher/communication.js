@@ -283,6 +283,7 @@ function treat( data, worker ) {
                }
 
                updateWorkerRunningInstances( simulationInstance.worker );
+               simulationUtils.updateSimulationInstanceDurationMean( simulationInstance );
             } )
 
                .catch( function ( err ) {

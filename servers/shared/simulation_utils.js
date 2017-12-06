@@ -98,3 +98,39 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
          log.error( err );
       } );
 }
+
+module.exports.updateSimulationInstanceDurationMean = function ( simulationInstance ) {
+
+   const simulationInstanceFilter = { _simulation: simulationInstance._simulation };
+
+   var promise = SimulationInstance.find( simulationFilter ).exec();
+
+   promise.then( function ( simulationInstances ) {
+
+      var instanceDurationMean = 0;
+
+      for ( var idx = 0; idx < simulationInstances.length; ++idx ) {
+
+         if ( simulationInstances.length < 3 ) {
+            return;
+         }
+
+         if ( simulationInstances[idx].startTime === undefined || simulationInstances[idx].endTime === undefined ) {
+            continue;
+         }
+
+         instanceDurationMean += simulationInstances[idx].endTime - simulationInstances[idx].startTime;
+      }
+
+      instanceDurationMean /= simulationInstances.length;
+
+      const simulationUpdate = { instanceDurationMean: instanceDurationMean };
+
+      Simulation.findByIdAndUpdate( simulationInstance._simulation, simulationUpdate );
+   } )
+
+      .catch( function ( err ) {
+         log.error( err );
+      } );
+
+}
