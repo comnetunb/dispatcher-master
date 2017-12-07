@@ -19,7 +19,9 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
 
       const simulationInstanceFilter = {
          _simulation: { $in: simulationIds },
-         state: SimulationInstance.State.Finished
+         state: SimulationInstance.State.Finished,
+         startTime: { $exists: true },
+         endTime: { $exists: true }
       };
 
       var promise = SimulationInstance.find( simulationInstanceFilter ).select( 'startTime endTime' ).sort( 'startTime' ).exec();
@@ -33,15 +35,8 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
 
          var simulationInstanceDurationMean = 0;
          var simulationInstanceDispatchMean = 0;
-         var length = 0;
 
          for ( var idx = 1; idx < simulationInstancesTime.length; ++idx ) {
-
-            if ( simulationInstancesTime[idx].startTime === undefined || simulationInstancesTime[idx].endTime === undefined ) {
-               continue;
-            }
-
-            ++length;
 
             simulationInstanceDurationMean +=
                simulationInstancesTime[idx].endTime.getTime() -
@@ -52,12 +47,8 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
                simulationInstancesTime[idx - 1].startTime.getTime();
          }
 
-         if ( length < 2 ) {
-            return;
-         }
-
-         simulationInstanceDurationMean /= length;
-         simulationInstanceDispatchMean /= length - 1;
+         simulationInstanceDurationMean /= simulationInstancesTime.length;
+         simulationInstanceDispatchMean /= simulationInstancesTime.length - 1;
 
          const simulationInstanceFilter = {
             _simulation: { $in: simulationIds },
@@ -92,6 +83,43 @@ module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroup
             return SimulationGroup.findByIdAndUpdate( simulationGroupId, simulationGroupUpdate ).exec();
          } )
       } )
+   } )
+
+      .catch( function ( err ) {
+         log.error( err );
+      } );
+}
+
+module.exports.updateSimulationInstanceDurationMean = function ( simulationInstance, callback ) {
+
+   const simulationInstanceFilter = {
+      _simulation: simulationInstance._simulation,
+      startTime: { $exists: true },
+      endTime: { $exists: true }
+   };
+
+   var promise = SimulationInstance.find( simulationInstanceFilter ).exec();
+
+   promise.then( function ( simulationInstances ) {
+
+      var instanceDurationMean = 0;
+
+      for ( var idx = 0; idx < simulationInstances.length; ++idx ) {
+
+         if ( simulationInstances.length < 3 ) {
+            return;
+         }
+
+         instanceDurationMean += simulationInstances[idx].endTime - simulationInstances[idx].startTime;
+      }
+
+      instanceDurationMean /= simulationInstances.length;
+
+      const simulationUpdate = { instanceDurationMean: instanceDurationMean };
+
+      var promise = Simulation.findByIdAndUpdate( simulationInstance._simulation, simulationUpdate, { new: true } ).exec();
+
+      promise.then( callback );
    } )
 
       .catch( function ( err ) {

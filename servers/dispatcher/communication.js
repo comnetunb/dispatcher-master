@@ -297,9 +297,44 @@ function treat( data, worker ) {
                $unset: { 'worker': 1 }
             }
 
-            var promise = SimulationInstance.findByIdAndUpdate( simulationId, simulationInstanceUpdate ).exec();
+            var promise = SimulationInstance.findByIdAndUpdate( simulationId, simulationInstanceUpdate, { new: true } ).exec();
 
             promise.then( function ( simulationInstance ) {
+
+               simulationUtils.updateSimulationInstanceDurationMean( simulationInstance, function ( simulation ) {
+
+                  const duration = simulationInstance.endTime - simulationInstance.startTime;
+                  const workerCur = workerManager.get( worker.remoteAddress );
+
+                  var ratio = ( simulation.instanceDurationMean / duration ) - 1;
+
+                  if ( workerCur === {} ) {
+                     return;
+                  }
+
+                  if ( workerCur.performance.ratio !== undefined ) {
+                     ratio = ( ratio + workerCur.performance.ratio ) / 2;
+                  }
+
+                  var level;
+
+                  if ( ratio > config.workerPerformance.threshold ) {
+                     level = 'Fast';
+                  } else if ( ratio < -config.workerPerformance.threshold ) {
+                     level = 'Slow';
+                  } else {
+                     level = 'Medium';
+                  }
+
+                  const workerUpdate = {
+                     performance: {
+                        ratio: ratio,
+                        level: level
+                     }
+                  }
+
+                  workerManager.update( workerCur.address, workerUpdate );
+               } );
 
                Simulation.findById( simulationInstance._simulation ).select( '_simulationGroup' ).exec()
                   .then( function ( simulationGroupId ) {
@@ -360,9 +395,9 @@ function treat( data, worker ) {
                      return promise.then( function ( simulationGroup ) {
 
                         const endTime = new Date( simulationGroupUpdate.endTime );
-                        const totalTime = ( endTime - simulationGroup.startTime ) / 1000; // seconds
+                        const totalTime = ( endTime - simulationGroup.startTime ); // seconds
 
-                        var elapsedTime = new Date( totalTime * 1000 );
+                        var elapsedTime = new Date( totalTime );
                         var hh = elapsedTime.getUTCHours();
                         var mm = elapsedTime.getUTCMinutes();
                         var ss = elapsedTime.getSeconds();

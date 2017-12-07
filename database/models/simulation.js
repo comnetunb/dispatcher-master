@@ -36,7 +36,10 @@ const simulationSchema = Schema( {
    },
    state: {
       type: Number,
-      default: State.Executing,
+      default: State.Executing
+   },
+   instanceDurationMean: {
+      type: Number
    }
 
 });
