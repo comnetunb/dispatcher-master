@@ -40,6 +40,10 @@ function treatDefaultValues() {
       configuration.memory = {};
    }
 
+   if ( configuration.workerPerformance === undefined ) {
+      configuration.workerPerformance = {};
+   }
+
    if ( configuration.transporter === undefined ) {
       configuration.transporter = {};
       configuration.transporter.auth = {};
@@ -54,13 +58,6 @@ function treatDefaultValues() {
       configuration.cpu.threshold = 0;
    }
 
-
-   if ( configuration.cpu.weight === undefined || typeof configuration.cpu.weight === 'string' ) {
-      configuration.cpu.weight = 1;
-   } else if ( configuration.cpu.weight < 0 ) {
-      configuration.cpu.weight = 1;
-   }
-
    if ( configuration.memory.threshold === undefined || typeof configuration.memory.threshold === 'string' ) {
       configuration.memory.threshold = 0.5;
    } else if ( configuration.memory.threshold > 1 ) {
@@ -69,10 +66,12 @@ function treatDefaultValues() {
       configuration.memory.threshold = 0;
    }
 
-   if ( configuration.memory.weight === undefined || typeof configuration.memory.weight === 'string' ) {
-      configuration.memory.weight = 1;
-   } else if ( configuration.memory.weight < 0 ) {
-      configuration.memory.weight = 1;
+   if ( configuration.workerPerformance.threshold === undefined || typeof configuration.workerPerformance.threshold === 'string' ) {
+      configuration.workerPerformance.threshold = 0.25;
+   } else if ( configuration.workerPerformance.threshold > 1 ) {
+      configuration.workerPerformance.threshold = 1;
+   } else if ( configuration.workerPerformance.threshold < 0 ) {
+      configuration.workerPerformance.threshold = 0;
    }
 
    if ( configuration.requestResourceInterval === undefined || typeof configuration.requestResourceInterval === 'string' ) {

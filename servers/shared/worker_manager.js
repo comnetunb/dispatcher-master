@@ -29,6 +29,10 @@ module.exports.add = function add( workerAddress ) {
       lastResource: {
          cpu: undefined,
          memory: undefined
+      },
+      performance: {
+         ratio: undefined,
+         level: 'Undefined'
       }
    } );
 }

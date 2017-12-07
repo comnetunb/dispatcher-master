@@ -81,10 +81,9 @@
                      var leftNav = document.createElement( 'ul' );
                      leftNav.className = 'nav navbar-nav';
                      panelNavBar.appendChild( leftNav );
-
                      var runningInstances = document.createElement( 'span' );
                      runningInstances.className = 'badge';
-                     runningInstances.innerHTML = workers[idx].runningInstances;
+                     runningInstances.innerHTML = workers[idx].performance.level + ' - ' + workers[idx].runningInstances;
                      runningInstances.setAttribute( 'data-toggle', 'popover' );
                      runningInstances.setAttribute( 'data-trigger', 'hover' );
                      runningInstances.setAttribute( 'data-placement', 'top' );
@@ -160,7 +159,7 @@
                         }
 
                         if ( child[i].className == 'badge' ) {
-                           child[i].innerHTML = workers[idx].runningInstances;
+                           child[i].innerHTML = workers[idx].performance.level + ' - ' + workers[idx].runningInstances;
                         }
                      }
                   }

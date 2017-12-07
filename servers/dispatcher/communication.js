@@ -306,17 +306,34 @@ function treat( data, worker ) {
                   const duration = simulationInstance.endTime - simulationInstance.startTime;
                   const workerCur = workerManager.get( worker.remoteAddress );
 
-                  var performance = ( simulation.instanceDurationMean / duration ) - 1;
+                  var ratio = ( simulation.instanceDurationMean / duration ) - 1;
 
                   if ( workerCur === {} ) {
                      return;
                   }
 
-                  if ( workerCur.performance !== undefined ) {
-                     performance = ( performance + workerCur.performance ) / 2;
+                  if ( workerCur.performance.ratio !== undefined ) {
+                     ratio = ( ratio + workerCur.performance.ratio ) / 2;
                   }
 
-                  workerManager.update( workerCur.remoteAddress, { performance: performance } );
+                  var level;
+
+                  if ( ratio > config.workerPerformance.threshold ) {
+                     level = 'Fast';
+                  } else if ( ratio < -config.workerPerformance.threshold ) {
+                     level = 'Slow';
+                  } else {
+                     level = 'Medium';
+                  }
+
+                  const workerUpdate = {
+                     performance: {
+                        ratio: ratio,
+                        level: level
+                     }
+                  }
+
+                  workerManager.update( workerCur.address, workerUpdate );
                } );
 
                Simulation.findById( simulationInstance._simulation ).select( '_simulationGroup' ).exec()
