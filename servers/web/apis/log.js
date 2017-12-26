@@ -23,7 +23,7 @@ module.exports = function ( app ) {
          res.send( logs.reverse() );
       } )
          .catch( function ( e ) {
-
+            log.error( e );
             res.sendStatus( 500 );
          } );
 

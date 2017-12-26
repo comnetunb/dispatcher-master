@@ -81,7 +81,7 @@
 
          };
 
-         xhttp.open( "GET", "/api/get_simulation_group", true );
+         xhttp.open( "GET", "/api/simulation_group/get_executing", true );
          xhttp.send();
       }
 
@@ -91,126 +91,128 @@
 
          for ( var idx in simulationGroups ) {
 
-            if ( simulationGroups[idx].state === 0 ) {
+            if ( document.getElementById( simulationGroups[idx]._id ) !== null ) {
 
-               if ( document.getElementById( simulationGroups[idx]._id ) !== null ) {
+               var tdEstimatedEndTime = document.getElementById( 'tdeet_' + simulationGroups[idx]._id );
 
-                  var tdEstimatedEndTime = document.getElementById( 'tdeet_' + simulationGroups[idx]._id );
-
-                  if ( simulationGroups[idx].estimatedEndTime === undefined ) {
-                     tdEstimatedEndTime.innerHTML = 'Can\'t estimate yet';
-                  } else {
-                     tdEstimatedEndTime.innerHTML = new Date( simulationGroups[idx].estimatedEndTime );
-                  }
-
-                  continue;
-               }
-
-               var tr = document.createElement( 'tr' );
-               tr.id = simulationGroups[idx]._id;
-
-               var tdName = document.createElement( 'td' );
-
-               var form = document.createElement( 'form' );
-               form.method = 'post';
-               form.action = '/simulation_group/' + simulationGroups[idx]._id;
-
-               var input = document.createElement( 'input' );
-               input.type = 'submit';
-               input.className = 'btn btn-link p-0'
-               input.value = simulationGroups[idx].name;
-
-               form.appendChild( input );
-               tdName.appendChild( form );
-
-               var tdRemainingInstances = document.createElement( 'td' );
-               tdRemainingInstances.id = 'tdri_' + simulationGroups[idx]._id;
-
-               var tdSeedAmount = document.createElement( 'td' );
-               tdSeedAmount.innerHTML = simulationGroups[idx].seedAmount;
-
-               var tdPriority = document.createElement( 'td' );
-               var labelPriority = document.createElement( 'span' );
-
-               switch ( simulationGroups[idx].priority ) {
-                  case 0: // Minimum
-                     labelPriority.className = 'label label-default';
-                     labelPriority.innerHTML = 'Minimum';
-                     break;
-                  case 1: // Low
-                     labelPriority.className = 'label label-primary';
-                     labelPriority.innerHTML = 'Low';
-                     break;
-                  case 2: // Normal
-                     labelPriority.className = 'label label-success';
-                     labelPriority.innerHTML = 'Normal';
-                     break;
-                  case 3: // High
-                     labelPriority.className = 'label label-warning';
-                     labelPriority.innerHTML = 'High';
-                     break;
-                  case 4: // Urgent
-                     labelPriority.className = 'label label-danger';
-                     labelPriority.innerHTML = 'Urgent';
-                     break;
-                  default:
-                     labelPriority.className = 'label label-default';
-                     labelPriority.innerHTML = 'Undefined';
-                     break;
-               }
-
-               tdPriority.appendChild( labelPriority );
-
-               var tdStartTime = document.createElement( 'td' );
-               tdStartTime.innerHTML = new Date( simulationGroups[idx].startTime );
-
-               //var tdExport = document.createElement( 'td' );
-
-               //var exportBtn = document.createElement( 'a' );
-               //exportBtn.href = '/api/simulation_group/export/' + simulationGroups[idx]._id;
-               //exportBtn.className = 'btn btn-info';
-               //exportBtn.setAttribute( 'role', 'button' );
-               //exportBtn.innerHTML = '<span class=\'glyphicon glyphicon-download-alt\'></span> Export';
-
-               //tdExport.appendChild( exportBtn );
-
-               var tdEstimatedEndTime = document.createElement( 'td' );
-               tdEstimatedEndTime.id = 'tdeet_' + simulationGroups[idx]._id;
                if ( simulationGroups[idx].estimatedEndTime === undefined ) {
                   tdEstimatedEndTime.innerHTML = 'Can\'t estimate yet';
                } else {
                   tdEstimatedEndTime.innerHTML = new Date( simulationGroups[idx].estimatedEndTime );
                }
 
-               var tdCancel = document.createElement( 'td' );
-
-               var btn = document.createElement( 'button' );
-               btn.className = 'btn btn-large btn-danger';
-               btn.setAttribute( 'data-toggle', 'confirmation' );
-               btn.setAttribute( 'data-popout', 'true' );
-               btn.setAttribute( 'data-singleton', 'true' );
-               btn.name = 'Cancel';
-
-               btn.innerHTML = '<span class=\'glyphicon glyphicon-remove\'></span> Cancel'
-
-               tdCancel.appendChild( btn );
-
-               tr.appendChild( tdName );
-               tr.appendChild( tdRemainingInstances );
-               tr.appendChild( tdSeedAmount );
-               tr.appendChild( tdPriority );
-               tr.appendChild( tdStartTime );
-               //tr.appendChild( tdExport );
-               tr.appendChild( tdEstimatedEndTime );
-               tr.appendChild( tdCancel );
-
-               tb.appendChild( tr );
-            } else {
-               var td = document.getElementById( simulationGroups[idx]._id );
-               if ( td !== null ) {
-                  td.remove();
-               }
+               continue;
             }
+
+            var tr = document.createElement( 'tr' );
+            tr.id = simulationGroups[idx]._id;
+
+            var tdName = document.createElement( 'td' );
+
+            var form = document.createElement( 'form' );
+            form.method = 'post';
+            form.action = '/simulation_group/' + simulationGroups[idx]._id;
+
+            var input = document.createElement( 'input' );
+            input.type = 'submit';
+            input.className = 'btn btn-link p-0'
+            input.value = simulationGroups[idx].name;
+
+            form.appendChild( input );
+            tdName.appendChild( form );
+
+            var tdRemainingInstances = document.createElement( 'td' );
+            tdRemainingInstances.id = 'tdri_' + simulationGroups[idx]._id;
+
+            var tdSeedAmount = document.createElement( 'td' );
+            tdSeedAmount.innerHTML = simulationGroups[idx].seedAmount;
+
+            var tdPriority = document.createElement( 'td' );
+            var labelPriority = document.createElement( 'span' );
+
+            switch ( simulationGroups[idx].priority ) {
+               case 0: // Minimum
+                  labelPriority.className = 'label label-default';
+                  labelPriority.innerHTML = 'Minimum';
+                  break;
+               case 1: // Low
+                  labelPriority.className = 'label label-primary';
+                  labelPriority.innerHTML = 'Low';
+                  break;
+               case 2: // Normal
+                  labelPriority.className = 'label label-success';
+                  labelPriority.innerHTML = 'Normal';
+                  break;
+               case 3: // High
+                  labelPriority.className = 'label label-warning';
+                  labelPriority.innerHTML = 'High';
+                  break;
+               case 4: // Urgent
+                  labelPriority.className = 'label label-danger';
+                  labelPriority.innerHTML = 'Urgent';
+                  break;
+               default:
+                  labelPriority.className = 'label label-default';
+                  labelPriority.innerHTML = 'Undefined';
+                  break;
+            }
+
+            tdPriority.appendChild( labelPriority );
+
+            var tdStartTime = document.createElement( 'td' );
+            tdStartTime.innerHTML = new Date( simulationGroups[idx].startTime );
+
+            //var tdExport = document.createElement( 'td' );
+
+            //var exportBtn = document.createElement( 'a' );
+            //exportBtn.href = '/api/simulation_group/export/' + simulationGroups[idx]._id;
+            //exportBtn.className = 'btn btn-info';
+            //exportBtn.setAttribute( 'role', 'button' );
+            //exportBtn.innerHTML = '<span class=\'glyphicon glyphicon-download-alt\'></span> Export';
+
+            //tdExport.appendChild( exportBtn );
+
+            var tdEstimatedEndTime = document.createElement( 'td' );
+            tdEstimatedEndTime.id = 'tdeet_' + simulationGroups[idx]._id;
+            if ( simulationGroups[idx].estimatedEndTime === undefined ) {
+               tdEstimatedEndTime.innerHTML = 'Can\'t estimate yet';
+            } else {
+               tdEstimatedEndTime.innerHTML = new Date( simulationGroups[idx].estimatedEndTime );
+            }
+
+            var tdCancel = document.createElement( 'td' );
+
+            var btn = document.createElement( 'button' );
+            btn.className = 'btn btn-large btn-danger';
+            btn.setAttribute( 'data-toggle', 'confirmation' );
+            btn.setAttribute( 'data-popout', 'true' );
+            btn.setAttribute( 'data-singleton', 'true' );
+            btn.name = 'Cancel';
+
+            btn.innerHTML = '<span class=\'glyphicon glyphicon-remove\'></span> Cancel'
+
+            tdCancel.appendChild( btn );
+
+            tr.appendChild( tdName );
+            tr.appendChild( tdRemainingInstances );
+            tr.appendChild( tdSeedAmount );
+            tr.appendChild( tdPriority );
+            tr.appendChild( tdStartTime );
+            //tr.appendChild( tdExport );
+            tr.appendChild( tdEstimatedEndTime );
+            tr.appendChild( tdCancel );
+
+            tb.appendChild( tr );
+
+            // TODO: Remove groups that are already finished
+
+            //if(state == 0) {}
+            //else {
+            //   var td = document.getElementById( simulationGroups[idx]._id );
+            //   if ( td !== null ) {
+            //      td.remove();
+            //   }
+            //}
          }
       }
 

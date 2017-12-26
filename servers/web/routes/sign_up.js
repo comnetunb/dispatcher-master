@@ -4,6 +4,7 @@
 //
 ////////////////////////////////////////////////
 
+const log = require( '../../shared/log' );
 const User = require( '../../../database/models/user' );
 
 module.exports = function ( app ) {
@@ -67,6 +68,7 @@ module.exports = function ( app ) {
                      res.redirect( '/' );
                   }
                   else {
+                     log.error( err );
                      req.flash( 'error', 'An internal error occurred. Please try again latter.' );
                      res.redirect( '/' );
                   }

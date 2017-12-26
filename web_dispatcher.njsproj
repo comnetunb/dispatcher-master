@@ -76,7 +76,6 @@
     <Compile Include="servers\web\routes\login.js" />
     <Compile Include="servers\web\routes\sign_up.js" />
     <Compile Include="servers\web\routes\simulation.js" />
-    <Compile Include="servers\web\routes\simulation_group.js" />
     <Compile Include="views\dashboard\logs.ejs">
       <SubType>Code</SubType>
     </Compile>

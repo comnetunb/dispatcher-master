@@ -8,6 +8,7 @@
 
 const router = require( '../router' );
 const simulationHandler = require( '../../dispatcher/simulation_handler' )
+const log = require( '../../shared/log' );
 
 const User = require( '../../../database/models/user' );
 const Binary = require( '../../../database/models/binary' );
@@ -16,7 +17,6 @@ const SimulationGroup = require( '../../../database/models/simulation_group' )
 const Simulation = require( '../../../database/models/simulation' );
 const SimulationInstance = require( '../../../database/models/simulation_instance' );
 
-const log = require( '../../shared/log' );
 
 module.exports = function ( app ) {
 
@@ -33,23 +33,23 @@ module.exports = function ( app ) {
          const simulationInstancePopulate = { path: '_simulation', select: 'name' };
 
          return SimulationInstance.find( simulationInstanceFilter ).populate( simulationInstancePopulate ).select( 'result _simulation -_id' ).exec();
-      })
+      } )
 
-      .then( function ( simulationInstances ) {
+         .then( function ( simulationInstances ) {
 
-         simulationInstances = JSON.stringify( simulationInstances )
+            simulationInstances = JSON.stringify( simulationInstances )
 
-         const options = { title: 'Simulation', active: 'simulation', results: simulationInstances };
+            const options = { title: 'Simulation', active: 'simulation', results: simulationInstances };
 
-         res.render( 'simulation', options );
-      })
+            res.render( 'simulation', options );
+         } )
 
-      .catch( function ( err ) {
+         .catch( function ( err ) {
+            log.error( err );
+            res.sendStatus( 400 );
 
-         res.sendStatus( 400 );
-
-      });
-   });
+         } );
+   } );
 
    app.get( '/simulation/:id', ( req, res ) => {
 
@@ -66,26 +66,26 @@ module.exports = function ( app ) {
             .populate( simulationInstancePopulate )
             .select( 'result _simulation -_id' )
             .exec();
-      })
+      } )
 
-      .then( function ( simulationInstances ) {
+         .then( function ( simulationInstances ) {
 
-         res.send( simulationInstances );
+            res.send( simulationInstances );
 
-      })
+         } )
 
-      .catch( function ( err ) {
+         .catch( function ( err ) {
+            log.error( err );
+            res.sendStatus( 400 );
 
-         res.sendStatus( 400 );
-
-      });
-   });
+         } );
+   } );
 
    app.post( '/simulation_group/:id', ( req, res ) => {
 
       res.redirect( '/simulation_group/' + req.params.id );
 
-   });
+   } );
 
    app.post( '/cancel', function ( req, res ) {
 
@@ -98,29 +98,27 @@ module.exports = function ( app ) {
          const simulationInstanceFilter = { _simulation: { $in: simulationIds } }
          const simulationInstanceUpdate = { state: SimulationInstance.State.Canceled };
 
-         return SimulationInstance.update( simulationInstanceFilter, simulationInstanceUpdate, { multi: true }).exec();
-      })
+         return SimulationInstance.update( simulationInstanceFilter, simulationInstanceUpdate, { multi: true } ).exec();
+      } )
 
-      .then( function () {
+         .then( function () {
 
-         const id = req.body._simulationGroup;
-         const simulationGroupUpdate = { state: SimulationGroup.State.Finished, endTime: Date.now() };
+            const id = req.body._simulationGroup;
+            const simulationGroupUpdate = { state: SimulationGroup.State.Finished, endTime: Date.now() };
 
-         return SimulationGroup.findByIdAndUpdate( id, simulationGroupUpdate )
-      })
+            return SimulationGroup.findByIdAndUpdate( id, simulationGroupUpdate )
+         } )
 
-      .then( function () {
+         .then( function () {
 
-         res.sendStatus( 200 );
-      })
+            res.sendStatus( 200 );
+         } )
 
-      .catch( function ( err ) {
-
-         log.error( err );
-
-         res.sendStatus( 400 );
-      });
-   });
+         .catch( function ( err ) {
+            log.error( err );
+            res.sendStatus( 400 );
+         } );
+   } );
 
    app.post( '/remove', ( req, res ) => {
 
@@ -134,24 +132,22 @@ module.exports = function ( app ) {
          const simulationInstanceFilter = { _simulation: { $in: simulationIds } };
 
          return SimulationInstance.remove( simulationInstanceFilter );
-      })
+      } )
 
-      .then( function () {
+         .then( function () {
 
-         return SimulationGroup.findByIdAndRemove( req.body._simulationGroup );
-      })
+            return SimulationGroup.findByIdAndRemove( req.body._simulationGroup );
+         } )
 
-      .then( function () {
-         res.sendStatus( 200 );
-      })
+         .then( function () {
+            res.sendStatus( 200 );
+         } )
 
-      .catch( function ( err ) {
-
-         log.error( err );
-
-         res.sendStatus( 400 );
-      });
-   });
+         .catch( function ( err ) {
+            log.error( err );
+            res.sendStatus( 400 );
+         } );
+   } );
 
    app.post( '/new_simulation', ( req, res ) => {
 
@@ -261,7 +257,7 @@ module.exports = function ( app ) {
             _user: req.user.id,
             name: binaryFiles[idx].name,
             content: binaryFiles[idx].data
-         });
+         } );
 
          binaries.push( binary );
       }
@@ -274,7 +270,7 @@ module.exports = function ( app ) {
             _user: req.user.id,
             name: documentFiles[idx].name,
             content: documentFiles[idx].data
-         });
+         } );
 
          documents.push( document );
       }
@@ -288,7 +284,7 @@ module.exports = function ( app ) {
             maximum: maxLoad,
             step: step
          }
-      });
+      } );
 
       var promise = simulationGroup.save();
 
@@ -300,55 +296,56 @@ module.exports = function ( app ) {
          promises.push( Document.insertMany( documents ) );
 
          return Promise.all( promises );
-      })
+      } )
 
-      .then( function ( results ) {
+         .then( function ( results ) {
 
-         const binaries = results[0];
-         const documents = results[1];
+            const binaries = results[0];
+            const documents = results[1];
 
-         var simulations = [];
+            var simulations = [];
 
-         for ( var idx = 0; idx < documents.length; ++idx ) {
+            for ( var idx = 0; idx < documents.length; ++idx ) {
 
-            var binary = {};
-            var simulationName = {};
+               var binary = {};
+               var simulationName = {};
 
-            if ( req.body['sameSimulator'] === 'on' ) {
-               binary = binaries[0];
-               simulationName = documents[idx].name;
-            } else {
-               binary = binaries[idx];
-               simulationName = simulationNames[idx];
+               if ( req.body['sameSimulator'] === 'on' ) {
+                  binary = binaries[0];
+                  simulationName = documents[idx].name;
+               } else {
+                  binary = binaries[idx];
+                  simulationName = simulationNames[idx];
+               }
+
+               const simulation = new Simulation( {
+                  _simulationGroup: simulationGroup.id,
+                  _binary: binary.id,
+                  _document: documents[idx].id,
+                  name: simulationName
+               } );
+
+               simulations.push( simulation );
             }
 
-            const simulation = new Simulation( {
-               _simulationGroup: simulationGroup.id,
-               _binary: binary.id,
-               _document: documents[idx].id,
-               name: simulationName
-            });
+            return Simulation.insertMany( simulations );
+         } )
 
-            simulations.push( simulation );
-         }
+         .then( function () {
 
-         return Simulation.insertMany( simulations );
-      })
+            simulationHandler.event.emit( 'new_simulation', simulationGroup.id );
 
-      .then( function () {
+            res.redirect( 'dashboard/executing-simulation-groups' );
+         } )
 
-         simulationHandler.event.emit( 'new_simulation', simulationGroup.id );
-
-         res.redirect( 'dashboard/executing-simulation-groups' );
-      })
-
-      .catch( function ( err ) {
-         req.flash( 'error_msg', JSON.stringify( err ) );
-         res.redirect( 'dashboard/new-simulation-group' );
-      });
-   });
+         .catch( function ( err ) {
+            log.error( err );
+            req.flash( 'error_msg', JSON.stringify( err ) );
+            res.redirect( 'dashboard/new-simulation-group' );
+         } );
+   } );
 
    app.post( '/cancel_new_simulation', ( req, res ) => {
       res.redirect( 'dashboard/executing-simulation-groups' );
-   });
+   } );
 }

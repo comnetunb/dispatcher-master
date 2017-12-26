@@ -1,202 +1,203 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <% include ../template/head.ejs %>
+   <% include ../template/head.ejs %>
 </head>
 
 
 <body>
-  <header>
-    <% include ../template/header.ejs %>
-  </header>
+   <header>
+      <% include ../template/header.ejs %>
+   </header>
 
-  <div id="wrapper">
+   <div id="wrapper">
 
-    <% include template/sidebar.ejs %>
+      <% include template/sidebar.ejs %>
 
-    <div id="page-wrapper" style="min-height: 898px;">
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="page-header">Finished Simulation Groups</h1>
-        </div>
+      <div id="page-wrapper" style="min-height: 898px;">
+         <div class="row">
+            <div class="col-lg-12">
+               <h1 class="page-header">Finished Simulation Groups</h1>
+            </div>
 
-        <div>
-          <input id="search-finished" class="form-control" onkeyup="searchTable(this)" placeholder="Search by Simulation Group">
-          <table class='table table-hover table-striped table-bordered'>
-            <thead>
-              <tr>
-                <th style='width:20%'>Simulation Group</th>
-                <th style='width:10%'>Seed Amount</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="tb_finished"></tbody>
-          </table>
-        </div>
+            <div>
+               <input id="search-finished" class="form-control" onkeyup="searchTable(this)" placeholder="Search by Simulation Group">
+               <table class='table table-hover table-striped table-bordered'>
+                  <thead>
+                     <tr>
+                        <th style='width:20%'>Simulation Group</th>
+                        <th style='width:10%'>Seed Amount</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th></th>
+                        <th></th>
+                     </tr>
+                  </thead>
+                  <tbody id="tb_finished"></tbody>
+               </table>
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
+   </div>
 
-  <script>
-    function monitor() {
+   <script>
+      function monitor() {
 
-      listSimulationGroups();
-      setInterval( listSimulationGroups, 5000 );
-    }
+         listSimulationGroups();
+         setInterval( listSimulationGroups, 5000 );
+      }
 
-    function listSimulationGroups() {
+      function listSimulationGroups() {
 
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function () {
-        if ( this.readyState == 4 && this.status == 200 ) {
+         var xhttp = new XMLHttpRequest();
+         xhttp.onreadystatechange = function () {
+            if ( this.readyState == 4 && this.status == 200 ) {
 
-          const simulationGroups = JSON.parse( xhttp.response );
+               const simulationGroups = JSON.parse( xhttp.response );
 
-          listFinishedSimulationGroups( simulationGroups );
-          var finishedInput = document.getElementById( 'search-finished' );
-          searchTable( finishedInput );
+               listFinishedSimulationGroups( simulationGroups );
+               var finishedInput = document.getElementById( 'search-finished' );
+               searchTable( finishedInput );
 
-          $( '[data-toggle=confirmation]' ).confirmation( { rootSelector: '[data-toggle=confirmation]' } );
+               $( '[data-toggle=confirmation]' ).confirmation( { rootSelector: '[data-toggle=confirmation]' } );
 
-          $( '[name=Cancel]' ).on( 'confirmed.bs.confirmation', function () {
-            $.post( '/cancel', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
-              () => {
-                location.reload();
-              } );
-          } );
+               $( '[name=Cancel]' ).on( 'confirmed.bs.confirmation', function () {
+                  $.post( '/cancel', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
+                     () => {
+                        location.reload();
+                     } );
+               } );
 
-          $( '[name=Remove]' ).on( 'confirmed.bs.confirmation', function () {
-            $.post( '/remove', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
-              () => {
-                location.reload();
-              } );
-          } );
-        }
+               $( '[name=Remove]' ).on( 'confirmed.bs.confirmation', function () {
+                  $.post( '/remove', { _simulationGroup: $( this ).closest( 'tr' ).attr( 'id' ) },
+                     () => {
+                        location.reload();
+                     } );
+               } );
+            }
 
+         };
+
+         xhttp.open( "GET", "/api/simulation_group/get_finished", true );
+         xhttp.send();
+      }
+
+      function listFinishedSimulationGroups( simulationGroups ) {
+
+         const tb = document.getElementById( 'tb_finished' );
+
+         for ( var idx in simulationGroups ) {
+
+            if ( document.getElementById( simulationGroups[idx]._id ) !== null ) {
+               continue;
+            }
+
+            var tr = document.createElement( 'tr' );
+            tr.id = simulationGroups[idx]._id;
+
+            var tdName = document.createElement( 'td' );
+
+            var form = document.createElement( 'form' );
+            form.method = 'post';
+            form.action = '/simulation_group/' + simulationGroups[idx]._id;
+
+            var input = document.createElement( 'input' );
+            input.type = 'submit';
+            input.className = 'btn btn-link p-0'
+            input.value = simulationGroups[idx].name;
+
+            form.appendChild( input );
+            tdName.appendChild( form );
+
+            var tdSeedAmount = document.createElement( 'td' );
+            tdSeedAmount.innerHTML = simulationGroups[idx].seedAmount;
+
+            var tdStartTime = document.createElement( 'td' );
+            tdStartTime.innerHTML = new Date( simulationGroups[idx].startTime );
+
+            var tdEndTime = document.createElement( 'td' );
+            tdEndTime.innerHTML = new Date( simulationGroups[idx].endTime );
+
+            var tdExport = document.createElement( 'td' );
+
+            var exportBtn = document.createElement( 'a' );
+            exportBtn.href = '/api/simulation_group/export/' + simulationGroups[idx]._id;
+            exportBtn.className = 'btn btn-info';
+            exportBtn.setAttribute( 'role', 'button' );
+            exportBtn.innerHTML = '<span class=\'glyphicon glyphicon-download-alt\'></span> Export';
+
+            tdExport.appendChild( exportBtn );
+
+            var tdRemove = document.createElement( 'td' );
+
+            var btn = document.createElement( 'button' );
+            btn.className = 'btn btn-large btn-danger';
+            btn.setAttribute( 'data-toggle', 'confirmation' );
+            btn.setAttribute( 'data-popout', 'true' );
+            btn.setAttribute( 'data-singleton', 'true' );
+            btn.name = 'Remove';
+
+            btn.innerHTML = '<span class=\'glyphicon glyphicon-remove\'></span> Remove'
+
+            tdRemove.appendChild( btn );
+
+            tr.appendChild( tdName );
+            tr.appendChild( tdSeedAmount );
+            tr.appendChild( tdStartTime );
+            tr.appendChild( tdEndTime );
+            tr.appendChild( tdExport );
+            tr.appendChild( tdRemove );
+
+            tb.appendChild( tr );
+
+            //if ( simulationGroups[idx].state === 1 ) {
+            //TODO: REMOVE DELETED GROUPS
+            //} else {
+            //   var td = document.getElementById( simulationGroups[idx]._id );
+            //   if ( td !== null ) {
+            //      td.remove();
+            //   }
+            //}
+         }
+      }
+
+      //  window.onload = monitor;
+
+      var prev_handler = window.onload;
+      window.onload = function () {
+         if ( prev_handler ) {
+            prev_handler();
+         }
+
+         monitor();
       };
 
-      xhttp.open( "GET", "/api/get_simulation_group", true );
-      xhttp.send();
-    }
+      function searchTable( input ) {
 
-    function listFinishedSimulationGroups( simulationGroups ) {
+         var table = input.nextElementSibling;
+         var tr = table.getElementsByTagName( "tr" );
+         var filter = input.value.toUpperCase();
 
-      const tb = document.getElementById( 'tb_finished' );
-
-      for ( var idx in simulationGroups ) {
-
-        if ( simulationGroups[idx].state === 1 ) {
-
-          if ( document.getElementById( simulationGroups[idx]._id ) !== null ) {
-            continue;
-          }
-
-          var tr = document.createElement( 'tr' );
-          tr.id = simulationGroups[idx]._id;
-
-          var tdName = document.createElement( 'td' );
-
-          var form = document.createElement( 'form' );
-          form.method = 'post';
-          form.action = '/simulation_group/' + simulationGroups[idx]._id;
-
-          var input = document.createElement( 'input' );
-          input.type = 'submit';
-          input.className = 'btn btn-link p-0'
-          input.value = simulationGroups[idx].name;
-
-          form.appendChild( input );
-          tdName.appendChild( form );
-
-          var tdSeedAmount = document.createElement( 'td' );
-          tdSeedAmount.innerHTML = simulationGroups[idx].seedAmount;
-
-          var tdStartTime = document.createElement( 'td' );
-          tdStartTime.innerHTML = new Date( simulationGroups[idx].startTime );
-
-          var tdEndTime = document.createElement( 'td' );
-          tdEndTime.innerHTML = new Date( simulationGroups[idx].endTime );
-
-          var tdExport = document.createElement( 'td' );
-
-          var exportBtn = document.createElement( 'a' );
-          exportBtn.href = '/api/simulation_group/export/' + simulationGroups[idx]._id;
-          exportBtn.className = 'btn btn-info';
-          exportBtn.setAttribute( 'role', 'button' );
-          exportBtn.innerHTML = '<span class=\'glyphicon glyphicon-download-alt\'></span> Export';
-
-          tdExport.appendChild( exportBtn );
-
-          var tdRemove = document.createElement( 'td' );
-
-          var btn = document.createElement( 'button' );
-          btn.className = 'btn btn-large btn-danger';
-          btn.setAttribute( 'data-toggle', 'confirmation' );
-          btn.setAttribute( 'data-popout', 'true' );
-          btn.setAttribute( 'data-singleton', 'true' );
-          btn.name = 'Remove';
-
-          btn.innerHTML = '<span class=\'glyphicon glyphicon-remove\'></span> Remove'
-
-          tdRemove.appendChild( btn );
-
-          tr.appendChild( tdName );
-          tr.appendChild( tdSeedAmount );
-          tr.appendChild( tdStartTime );
-          tr.appendChild( tdEndTime );
-          tr.appendChild( tdExport );
-          tr.appendChild( tdRemove );
-
-          tb.appendChild( tr );
-        } else {
-          var td = document.getElementById( simulationGroups[idx]._id );
-          if ( td !== null ) {
-            td.remove();
-          }
-        }
+         // Loop through all table rows, and hide those who don't match the search query
+         for ( i = 0; i < tr.length; i++ ) {
+            td = tr[i].getElementsByTagName( "td" )[0];
+            if ( td ) {
+               var text = td.firstChild.firstChild.value;
+               if ( text.toUpperCase().indexOf( filter ) > -1 ) {
+                  tr[i].style.display = "";
+               } else {
+                  tr[i].style.display = "none";
+               }
+            }
+         }
       }
-    }
+   </script>
 
-   //  window.onload = monitor;
-
-    var prev_handler = window.onload;
-    window.onload = function () {
-        if (prev_handler) {
-           prev_handler();
-        }
-
-        monitor();
-    };
-
-    function searchTable( input ) {
-
-      var table = input.nextElementSibling;
-      var tr = table.getElementsByTagName( "tr" );
-      var filter = input.value.toUpperCase();
-
-      // Loop through all table rows, and hide those who don't match the search query
-      for ( i = 0; i < tr.length; i++ ) {
-        td = tr[i].getElementsByTagName( "td" )[0];
-        if ( td ) {
-          var text = td.firstChild.firstChild.value;
-          if ( text.toUpperCase().indexOf( filter ) > -1 ) {
-            tr[i].style.display = "";
-          } else {
-            tr[i].style.display = "none";
-          }
-        }
-      }
-    }
-  </script>
-
-  <script src='../js/sb-admin-2.js'></script>
+   <script src='../js/sb-admin-2.js'></script>
 
 </body>
 
 </html>
 <footer>
-  <% include ../template/footer.ejs %>
+   <% include ../template/footer.ejs %>
 </footer>

@@ -8,6 +8,7 @@ const SimulationGroup = require( '../../../database/models/simulation_group' );
 const Simulation = require( '../../../database/models/simulation' );
 const SimulationInstance = require( '../../../database/models/simulation_instance' );
 
+const log = require( '../../shared/log' );
 const json2csv = require( 'json-2-csv' );
 const mkdirp = require( 'mkdirp' );
 const fs = require( 'fs' );
@@ -17,6 +18,45 @@ const path = require( 'path' );
 const rimraf = require( 'rimraf' );
 
 module.exports = function ( app ) {
+
+
+   app.get( '/api/simulation_group/get_executing', function ( req, res ) {
+
+      const simulationGroupFilter = {
+         state: SimulationGroup.State.Executing,
+         _user: req.user.id
+      };
+
+      const promise = SimulationGroup.find( simulationGroupFilter ).exec();
+
+      promise.then( function ( simulationGroups ) {
+         res.send( simulationGroups );
+      } )
+
+         .catch( function ( err ) {
+            log.error( err );
+         } );
+
+   } );
+
+   app.get( '/api/simulation_group/get_finished', function ( req, res ) {
+
+      const simulationGroupFilter = {
+         state: SimulationGroup.State.Finished,
+         _user: req.user.id
+      };
+
+      const promise = SimulationGroup.find( simulationGroupFilter ).exec();
+
+      promise.then( function ( simulationGroups ) {
+         res.send( simulationGroups );
+      } )
+
+         .catch( function ( err ) {
+            log.error( err );
+         } );
+
+   } );
 
    app.get( '/api/simulation_group/get_remaining_instances/:id', ( req, res ) => {
 
@@ -42,10 +82,9 @@ module.exports = function ( app ) {
          } )
 
          .catch( function ( e ) {
-            console.log( e );
+            log.error( e );
             res.sendStatus( 500 );
          } );
-
    } );
 
    app.get( '/api/simulation_group/count_executing', ( req, res ) => {
@@ -62,7 +101,7 @@ module.exports = function ( app ) {
          res.send( { 'result': count } );
 
       } ).catch( function ( e ) {
-
+         log.error( e );
          res.sendStatus( 500 );
 
       } );
@@ -78,13 +117,10 @@ module.exports = function ( app ) {
       var promise = SimulationGroup.count( simulationGroupFilter );
 
       promise.then( function ( count ) {
-
          res.send( { 'result': count } );
-
       } ).catch( function ( e ) {
-
+         log.error( e );
          res.sendStatus( 500 );
-
       } );
    } );
 
@@ -248,7 +284,7 @@ module.exports = function ( app ) {
          } )
 
          .catch( function ( e ) {
-            console.log( e );
+            log.error( e );
             res.sendStatus( 500 );
          } );
    } );

@@ -14,7 +14,6 @@ const login = require( './routes/login' );
 const dashboard = require( './routes/dashboard' );
 const sign_up = require( './routes/sign_up' );
 const simulation = require( './routes/simulation' );
-const simulation_group = require( './routes/simulation_group' );
 
 // APIs
 const api_simulation_group = require( './apis/simulation_group' );
@@ -27,7 +26,6 @@ module.exports.execute = function ( app ) {
    dashboard( app );
    sign_up( app );
    simulation( app );
-   simulation_group( app );
 
    api_simulation_group( app );
    api_log( app );
