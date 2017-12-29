@@ -4,8 +4,8 @@
 //
 ////////////////////////////////////////////////
 
-const log = require( '../../shared/log' );
-const User = require( '../../../database/models/user' );
+const log = rootRequire( 'servers/shared/log' );
+const User = rootRequire( 'database/models/user' );
 
 module.exports = function ( app ) {
 

@@ -4,18 +4,17 @@
 //
 ////////////////////////////////////////////////
 
-const communication = require('./communication');
-const worker_discovery = require( './worker_discovery' );
-
-const log = require( '../shared/log' );
+const communication = rootRequire( 'servers/dispatcher/communication' );
+const worker_discovery = rootRequire( 'servers/dispatcher/worker_discovery' );
+const log = rootRequire( 'servers/shared/log' );
 
 module.exports = function () {
 
    try {
       communication.execute();
       worker_discovery.execute();
-   } catch (err) {
-      log.error(err);
+   } catch ( err ) {
+      log.error( err );
    }
 
 }

@@ -6,28 +6,27 @@
 
 const ip = require( 'ip' );
 const net = require( 'net' );
-const factory = require( '../../../protocol/dwp/factory' );
-const mailer = require( '../shared/mailer' );
 const EventEmitter = require( 'events' );
 
-const config = require( '../shared/configuration' ).getConfiguration();
-const workerManager = require( '../shared/worker_manager' );
-const simulationUtils = require( '../shared/simulation_utils' );
+const config = rootRequire( 'servers/shared/configuration' ).getConfiguration();
+const workerManager = rootRequire( 'servers/shared/worker_manager' );
+const simulationUtils = rootRequire( 'servers/shared/simulation_utils' );
+const log = rootRequire( 'servers/shared/log' );
+const mailer = rootRequire( 'servers/shared/mailer' );
 
 // Schemas
-const SimulationInstance = require( '../../database/models/simulation_instance' );
-const Simulation = require( '../../database/models/simulation' );
-const SimulationGroup = require( '../../database/models/simulation_group' );
+const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
+const Simulation = rootRequire( 'database/models/simulation' );
+const SimulationGroup = rootRequire( 'database/models/simulation_group' );
 
 // Pdus
-const resourceRequest = require( '../../../protocol/dwp/pdu/resource_request' );
-const simulationRequest = require( '../../../protocol/dwp/pdu/simulation_request' );
-const simulationResponse = require( '../../../protocol/dwp/pdu/simulation_response' );
-const reportRequest = require( '../../../protocol/dwp/pdu/report_request' );
-const reportResponse = require( '../../../protocol/dwp/pdu/report_response' );
-const simulationTerminateRequest = require( '../../../protocol/dwp/pdu/simulation_terminate_request' );
-
-const log = require( '../shared/log' );
+const factory = protocolRequire( 'dwp/factory' );
+const resourceRequest = protocolRequire( 'dwp/pdu/resource_request' );
+const simulationRequest = protocolRequire( 'dwp/pdu/simulation_request' );
+const simulationResponse = protocolRequire( 'dwp/pdu/simulation_response' );
+const reportRequest = protocolRequire( 'dwp/pdu/report_request' );
+const reportResponse = protocolRequire( 'dwp/pdu/report_response' );
+const simulationTerminateRequest = protocolRequire( 'dwp/pdu/simulation_terminate_request' );
 
 // TCP socket in which all the dispatcher-workers communication will be accomplished
 const server = net.createServer();

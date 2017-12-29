@@ -4,11 +4,6 @@
 //
 ////////////////////////////////////////////////
 
-const SimulationGroup = require( '../../../database/models/simulation_group' );
-const Simulation = require( '../../../database/models/simulation' );
-const SimulationInstance = require( '../../../database/models/simulation_instance' );
-
-const log = require( '../../shared/log' );
 const json2csv = require( 'json-2-csv' );
 const mkdirp = require( 'mkdirp' );
 const fs = require( 'fs' );
@@ -16,6 +11,11 @@ const dirname = require( 'path' ).dirname;
 const archiver = require( 'archiver' );
 const path = require( 'path' );
 const rimraf = require( 'rimraf' );
+
+const SimulationGroup = rootRequire( 'database/models/simulation_group' );
+const Simulation = rootRequire( 'database/models/simulation' );
+const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
+const log = rootRequire( 'servers/shared/log' );
 
 module.exports = function ( app ) {
 

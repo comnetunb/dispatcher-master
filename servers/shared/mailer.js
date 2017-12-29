@@ -5,8 +5,8 @@
 ////////////////////////////////////////////////
 
 const nodemailer = require( 'nodemailer' );
-const config = require( './configuration' ).getConfiguration();
-const log = require( '../shared/log' );
+const config = rootRequire( 'servers/shared/configuration' ).getConfiguration();
+const log = rootRequire( 'servers/shared/log' );
 
 var transporter = nodemailer.createTransport( {
    service: config.transporter.service,
@@ -25,7 +25,7 @@ module.exports.sendMail = function ( to, subject, text ) {
       text: text
    };
 
-   var promise = transporter.sendMail( mailOptions, function ( error, info ) {
+   transporter.sendMail( mailOptions, function ( error, info ) {
       if ( error ) {
          log.error( error );
       }

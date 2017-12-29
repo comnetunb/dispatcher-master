@@ -4,7 +4,7 @@
 //
 ////////////////////////////////////////////////
 
-const Log = require( '../../database/models/log' );
+const Log = rootRequire( 'database/models/log' );
 
 module.exports.getAllLogs = function () {
 

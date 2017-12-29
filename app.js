@@ -3,7 +3,15 @@
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
 ////////////////////////////////////////////////
-const User = require( './database/models/user' );
+
+global.rootRequire = function ( name ) {
+   return require( __dirname + '/' + name );
+}
+
+global.protocolRequire = function ( name ) {
+   return require( __dirname + '/../protocol/' + name );
+}
+
 
 const express = require( 'express' );
 const bodyParser = require( 'body-parser' );
@@ -11,9 +19,10 @@ const expressValidator = require( 'express-validator' );
 const flash = require( 'connect-flash' );
 const upload = require( 'express-fileupload' );
 
-const dispatcher = require( './servers/dispatcher/dispatcher' );
-const db_driver = require( './database/db_driver' );
-const router = require( './servers/web/router' );
+const User = rootRequire( 'database/models/user' );
+const dispatcher = rootRequire( 'servers/dispatcher/dispatcher' );
+const db_driver = rootRequire( 'database/db_driver' );
+const router = rootRequire( 'servers/web/router' );
 
 const app = express();
 

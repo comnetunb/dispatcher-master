@@ -6,16 +6,16 @@
 
 'use strict'
 
-const router = require( '../router' );
-const simulationHandler = require( '../../dispatcher/simulation_handler' )
-const log = require( '../../shared/log' );
+const router = rootRequire( 'servers/web/router' );
+const simulationHandler = rootRequire( 'servers/dispatcher/simulation_handler' )
+const log = rootRequire( 'servers/shared/log' );
 
-const User = require( '../../../database/models/user' );
-const Binary = require( '../../../database/models/binary' );
-const Document = require( '../../../database/models/document' );
-const SimulationGroup = require( '../../../database/models/simulation_group' )
-const Simulation = require( '../../../database/models/simulation' );
-const SimulationInstance = require( '../../../database/models/simulation_instance' );
+const User = rootRequire( 'database/models/user' );
+const Binary = rootRequire( 'database/models/binary' );
+const Document = rootRequire( 'database/models/document' );
+const SimulationGroup = rootRequire( 'database/models/simulation_group' )
+const Simulation = rootRequire( 'database/models/simulation' );
+const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
 
 
 module.exports = function ( app ) {

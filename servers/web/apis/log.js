@@ -4,9 +4,8 @@
 //
 ////////////////////////////////////////////////
 
-const router = require( '../router' );
-
-const log = require( '../../shared/log' );
+const router = rootRequire( 'servers/web/router' );
+const log = rootRequire( 'servers/shared/log' );
 
 module.exports = function ( app ) {
 

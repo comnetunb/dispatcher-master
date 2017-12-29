@@ -4,7 +4,7 @@
 //
 ////////////////////////////////////////////////
 
-const config = require( './configuration' ).getConfiguration();
+const config = rootRequire( 'servers/shared/configuration' ).getConfiguration();
 
 var workers = [];
 

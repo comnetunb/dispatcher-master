@@ -4,8 +4,8 @@
 //
 ////////////////////////////////////////////////
 
-const router = require( '../router' );
-const workerManager = require( '../../shared/worker_manager' );
+const router = rootRequire( 'servers/web/router' );
+const workerManager = rootRequire( 'servers/shared/worker_manager' );
 
 module.exports = function ( app ) {
 

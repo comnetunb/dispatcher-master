@@ -4,10 +4,10 @@
 //
 ////////////////////////////////////////////////
 
-const SimulationGroup = require( '../../database/models/simulation_group' );
-const Simulation = require( '../../database/models/simulation' );
-const SimulationInstance = require( '../../database/models/simulation_instance' );
-const log = require( './log' );
+const SimulationGroup = rootRequire( 'database/models/simulation_group' );
+const Simulation = rootRequire( 'database/models/simulation' );
+const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
+const log = rootRequire( 'servers/shared/log' );
 
 module.exports.estimateSimulationGroupEndTime = function estimateSimulationGroupEndTime( simulationGroupId ) {
 

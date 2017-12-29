@@ -6,18 +6,18 @@
 
 const passport = require( 'passport' );
 
-const User = require( '../../database/models/user' )
+const User = rootRequire( 'database/models/user' )
 
 // Routes
-const home = require( './routes/home' );
-const login = require( './routes/login' );
-const dashboard = require( './routes/dashboard' );
-const sign_up = require( './routes/sign_up' );
-const simulation = require( './routes/simulation' );
+const home = rootRequire( 'servers/web/routes/home' );
+const login = rootRequire( 'servers/web/routes/login' );
+const dashboard = rootRequire( 'servers/web/routes/dashboard' );
+const sign_up = rootRequire( 'servers/web/routes/sign_up' );
+const simulation = rootRequire( 'servers/web/routes/simulation' );
 
 // APIs
-const api_simulation_group = require( './apis/simulation_group' );
-const api_log = require( './apis/log' )
+const api_simulation_group = rootRequire( 'servers/web/apis/simulation_group' );
+const api_log = rootRequire( 'servers/web/apis/log' )
 
 module.exports.execute = function ( app ) {
 

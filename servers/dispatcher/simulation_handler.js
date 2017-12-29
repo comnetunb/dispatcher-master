@@ -4,12 +4,12 @@
 //
 ////////////////////////////////////////////////
 
-const Simulation = require( '../../database/models/simulation' );
-const SimulationInstance = require( '../../database/models/simulation_instance' );
-const EventEmitter = require( 'events' );
-const communication = require( './communication' );
+const Simulation = rootRequire( 'database/models/simulation' );
+const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
+const communication = rootRequire( 'servers/dispatcher/communication' );
+const log = rootRequire( 'servers/shared/log' );
 
-const log = require( '../shared/log' );
+const EventEmitter = require( 'events' );
 
 const event = new EventEmitter();
 
@@ -19,7 +19,7 @@ event.on( 'new_simulation', ( id ) => {
 
    const simulationPopulate = { path: '_simulationGroup', select: 'seedAmount load' };
 
-   var promise = Simulation.find( { _simulationGroup: id }).populate( simulationPopulate ).exec();
+   var promise = Simulation.find( { _simulationGroup: id } ).populate( simulationPopulate ).exec();
 
    promise.then( function ( simulations ) {
 
@@ -43,7 +43,7 @@ event.on( 'new_simulation', ( id ) => {
                   _simulation: simulations[idx]._id,
                   seed: seed,
                   load: load
-               });
+               } );
 
                simulationInstances.push( simulationInstance );
             }
@@ -53,9 +53,9 @@ event.on( 'new_simulation', ( id ) => {
       }
 
       return Promise.all( promises );
-   })
+   } )
 
-   .catch( function ( err ) {
-      log.error( err );
-   });
-});
+      .catch( function ( err ) {
+         log.error( err );
+      } );
+} );
