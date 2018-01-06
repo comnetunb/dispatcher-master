@@ -12,7 +12,6 @@ global.protocolRequire = function ( name ) {
    return require( __dirname + '/../protocol/' + name );
 }
 
-
 const express = require( 'express' );
 const bodyParser = require( 'body-parser' );
 const expressValidator = require( 'express-validator' );

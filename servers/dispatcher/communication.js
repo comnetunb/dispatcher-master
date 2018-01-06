@@ -150,8 +150,8 @@ function batchDispatch() {
    const simulationInstancePopulate = {
       path: '_simulation',
       select: '_binary _document _simulationGroup',
-      populate: { path: '_binary _document _simulationGroup' },
-      options: { sort: { '_simulationgroup.priority': -1 } }
+      populate: { path: '_binary _document _simulationGroup _simulationGroup.name' },
+      options: { sort: { '_simulationGroup.priority': -1 } }
    };
 
    const promise = SimulationInstance.find( simulationInstanceFilter )
@@ -194,8 +194,9 @@ function batchDispatch() {
 
             worker.write( pdu );
 
-            log.info( 'Dispatched simulation to ' + workerAddress );
+            const simulationGroupName = simulationInstance._simulation._simulationGroup.name;
 
+            log.info( 'Dispatched simulation instance with load ' + simulationInstance.load + ' from group <b>' + simulationGroupName + '</b> to ' + workerAddress );
 
             updateWorkerRunningInstances( workerAddress );
          } )
@@ -563,6 +564,38 @@ function updateSimulationInstanceById( simulationInstanceId, callback ) {
 }
 
 function cleanUp() {
+
+   // <Workaround>
+   {
+      const simulationInstancePopulate = {
+         path: '_simulation',
+         select: '_simulationGroup',
+         populate: { path: '_simulationGroup' }
+      };
+
+      const simulationInstanceFilter = { state: SimulationInstance.State.Executing };
+
+      var promise = SimulationInstance.find( simulationInstanceFilter ).populate( simulationInstancePopulate );
+
+      promise.then( function ( simulationInstances ) {
+
+         simulationInstances.forEach( function ( simulationInstance ) {
+
+            const simulationGroupState = simulationInstance._simulation._simulationGroup.state;
+
+            if ( simulationGroupState !== SimulationGroup.State.Executing ) {
+               simulationInstance.state = SimulationInstance.State.Canceled;
+               simulationInstance.save();
+            }
+
+         } );
+      } )
+
+         .catch( function ( e ) {
+            log.error( e );
+         } );
+   }
+   // </Workaround>
 
    // Clean all simulations that were executing when dispatcher died
    const simulationInstanceFilter = { state: SimulationInstance.State.Executing };
