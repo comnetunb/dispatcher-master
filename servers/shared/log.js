@@ -55,3 +55,15 @@ module.exports.fatal = function ( message ) {
 
    log.save();
 }
+
+module.exports.bold = function ( text ) {
+   return tag( text, 'b' );
+}
+
+module.exports.italic = function ( text ) {
+   return tag( text, 'i' );
+}
+
+function tag( text, attribute ) {
+   return '<' + attribute + '>' + text + '</' + attribute + '>';
+}

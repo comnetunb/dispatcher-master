@@ -196,7 +196,7 @@ function batchDispatch() {
 
             const simulationGroupName = simulationInstance._simulation._simulationGroup.name;
 
-            log.info( 'Dispatched simulation instance with load ' + simulationInstance.load + ' from group <b>' + simulationGroupName + '</b> to ' + workerAddress );
+            log.info( 'Dispatched simulation instance with load ' + simulationInstance.load + ' from group ' + log.italic( simulationGroupName ) + ' to ' + workerAddress );
 
             updateWorkerRunningInstances( workerAddress );
          } )
