@@ -6,7 +6,6 @@
 
 const Simulation = rootRequire( 'database/models/simulation' );
 const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
-const communication = rootRequire( 'servers/dispatcher/communication' );
 const log = rootRequire( 'servers/shared/log' );
 
 const EventEmitter = require( 'events' );

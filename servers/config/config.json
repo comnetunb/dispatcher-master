@@ -9,7 +9,7 @@
       "threshold": 0.25
    },
    "requestResourceInterval": 1,
-   "dispatchInterval": 10,
+   "dispatchInterval": 1,
    "transporter": {
       "service": "gmail",
       "auth": {
