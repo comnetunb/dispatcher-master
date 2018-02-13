@@ -14,6 +14,8 @@ const simulationUtils = rootRequire( 'servers/shared/simulation_utils' );
 const log = rootRequire( 'servers/shared/log' );
 const mailer = rootRequire( 'servers/shared/mailer' );
 
+const simulationInstanceEvent = rootRequire( 'servers/web/apis/simulation_instance' ).event;
+
 // Schemas
 const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
 const Simulation = rootRequire( 'database/models/simulation' );
@@ -27,6 +29,8 @@ const simulationResponse = protocolRequire( 'dwp/pdu/simulation_response' );
 const reportRequest = protocolRequire( 'dwp/pdu/report_request' );
 const reportResponse = protocolRequire( 'dwp/pdu/report_response' );
 const simulationTerminateRequest = protocolRequire( 'dwp/pdu/simulation_terminate_request' );
+const controlCommand = protocolRequire( 'dwp/pdu/control_command' );
+const WorkerState = protocolRequire( 'dwp/common' ).WorkerState;
 
 // TCP socket in which all the dispatcher-workers communication will be accomplished
 const server = net.createServer();
@@ -103,6 +107,55 @@ module.exports.execute = function () {
       } );
 
       worker.on( 'error', function () { } );
+
+      simulationInstanceEvent.on( 'pause', function ( address ) {
+
+         if ( workerManager.get( address ).state == WorkerState.Paused ) {
+            return;
+         }
+
+         workerManager.update( address, { state: WorkerState.Paused } );
+
+         cleanWorkerSimulationInstances( address );
+
+         for ( var workerInstance in workerPool ) {
+            if ( workerPool[workerInstance].remoteAddress === address ) {
+               worker = workerPool[workerInstance];
+               worker.write( controlCommand.format( { command: controlCommand.Command.Pause } ) );
+               log.info( 'Pause command sent to ' + address );
+               break;
+            }
+         }
+      } );
+
+      simulationInstanceEvent.on( 'resume', function ( address ) {
+
+         if ( workerManager.get( address ).state == WorkerState.Executing ) {
+            return;
+         }
+
+         workerManager.update( address, { state: WorkerState.Executing } );
+         for ( var workerInstance in workerPool ) {
+            if ( workerPool[workerInstance].remoteAddress === address ) {
+               worker = workerPool[workerInstance];
+               worker.write( controlCommand.format( { command: controlCommand.Command.Resume } ) );
+               log.info( 'Resume command sent to ' + address );
+               break;
+            }
+         }
+      } );
+
+      simulationInstanceEvent.on( 'stop', function ( address ) {
+
+         for ( var workerInstance in workerPool ) {
+            if ( workerPool[workerInstance].remoteAddress === address ) {
+               worker = workerPool[workerInstance];
+               worker.write( controlCommand.format( { command: controlCommand.Command.Stop } ) );
+               log.info( 'Stop command sent to ' + address );
+               break;
+            }
+         }
+      } );
    } );
 
    // Open worker
@@ -236,6 +289,31 @@ function removeWorker( worker ) {
    if ( idx > -1 ) {
       workerPool.splice( idx, 1 );
    }
+}
+
+function cleanWorkerSimulationInstances( workerAddress ) {
+
+   const simulationInstanceFilter = { worker: workerAddress };
+
+   const promise = SimulationInstance.find( simulationInstanceFilter, '_id' );
+
+   promise.then( function ( simulationInstanceIds ) {
+
+      const simulationInstanceFilter = { _id: { $in: simulationInstanceIds } }
+      const simulationInstanceUpdate = {
+         $unset: { worker: 1, startTime: 1 },
+         state: SimulationInstance.State.Pending
+      };
+
+      return SimulationInstance.update( simulationInstanceFilter, simulationInstanceUpdate, { multi: true } ).exec();
+   } )
+      .then( function () {
+         updateWorkerRunningInstances( workerAddress );
+      } )
+
+      .catch( function ( e ) {
+         log.error( e );
+      } )
 }
 
 function treat( data, worker ) {
@@ -444,67 +522,72 @@ function treat( data, worker ) {
 
       case factory.Id.ReportResponse:
 
-         // Insert new worker to the pool
-         addWorker( worker );
+         if ( !Object.keys( workerManager.get( worker.remoteAddress ) ).length ) {
+            // Insert new worker to the pool
+            addWorker( worker );
+         }
 
-         workerManager.update( worker, { status: object.report.status } )
+         workerManager.update( worker.remoteAddress, { state: object.state, alias: object.alias } )
 
-         const executingSimulationInstances = object.report;
+         if ( object.state === WorkerState.Executing ) {
+            const executingSimulationInstances = object.report;
 
-         executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
+            executingSimulationInstances.forEach( function ( executingSimulationInstance ) {
 
-            var promise = SimulationInstance.findById( executingSimulationInstance.id );
+               var promise = SimulationInstance.findById( executingSimulationInstance.id );
 
-            promise.then( function ( simulationInstance ) {
+               promise.then( function ( simulationInstance ) {
 
-               if ( ( simulationInstance.state === SimulationInstance.State.Canceled ) ||
-                  ( simulationInstance.state === SimulationInstance.State.Finished ) ) {
-
-                  worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
-                  return;
-               }
-
-               var previousWorkerAddress = '';
-
-               if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
-
-                  if ( simulationInstance.startTime > executingSimulationInstance.startTime ) {
-
-                     for ( var idx = 0; idx < workerPool.length; ++idx ) {
-                        if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
-                           workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
-                           previousWorkerAddress = workerPool[idx].remoteAddress;
-                           break;
-                        }
-                     }
-
-                  } else {
+                  if ( ( simulationInstance.state === SimulationInstance.State.Canceled ) ||
+                     ( simulationInstance.state === SimulationInstance.State.Finished ) ) {
 
                      worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
                      return;
-
-                  }
-               }
-
-               simulationInstance.state = SimulationInstance.State.Executing;
-               simulationInstance.worker = worker.remoteAddress;
-               simulationInstance.startTime = executingSimulationInstance.startTime;
-
-               simulationInstance.save( function () {
-
-                  updateWorkerRunningInstances( simulationInstance.worker );
-
-                  if ( previousWorkerAddress !== '' ) {
-                     updateWorkerRunningInstances( previousWorkerAddress );
                   }
 
-               } );
-            } )
+                  var previousWorkerAddress = '';
 
-               .catch( function ( e ) {
-                  log.error( e );
-               } );
-         } );
+                  if ( ( simulationInstance.worker !== undefined ) && ( worker.remoteAddress !== simulationInstance.worker ) ) {
+
+                     if ( simulationInstance.startTime > executingSimulationInstance.startTime ) {
+
+                        for ( var idx = 0; idx < workerPool.length; ++idx ) {
+                           if ( workerPool[idx].remoteAddress === simulationInstance.worker ) {
+                              workerPool[idx].write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                              previousWorkerAddress = workerPool[idx].remoteAddress;
+                              break;
+                           }
+                        }
+
+                     } else {
+
+                        worker.write( simulationTerminateRequest.format( { SimulationId: executingSimulationInstance.id } ) );
+                        return;
+
+                     }
+                  }
+
+                  simulationInstance.state = SimulationInstance.State.Executing;
+                  simulationInstance.worker = worker.remoteAddress;
+                  simulationInstance.startTime = executingSimulationInstance.startTime;
+
+                  simulationInstance.save( function () {
+
+                     updateWorkerRunningInstances( simulationInstance.worker );
+
+                     if ( previousWorkerAddress !== '' ) {
+                        updateWorkerRunningInstances( previousWorkerAddress );
+                     }
+
+                  } );
+               } )
+
+                  .catch( function ( e ) {
+                     log.error( e );
+                  } );
+            } );
+         }
+
 
          break;
 

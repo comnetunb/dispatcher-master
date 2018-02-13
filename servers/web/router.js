@@ -18,6 +18,7 @@ const simulation = rootRequire( 'servers/web/routes/simulation' );
 // APIs
 const api_simulation_group = rootRequire( 'servers/web/apis/simulation_group' );
 const api_log = rootRequire( 'servers/web/apis/log' )
+const api_simulation_instance = rootRequire( 'servers/web/apis/simulation_instance' )
 
 module.exports.execute = function ( app ) {
 
@@ -29,6 +30,7 @@ module.exports.execute = function ( app ) {
 
    api_simulation_group( app );
    api_log( app );
+   api_simulation_instance( app );
 }
 
 passport.serializeUser(( user, done ) => {

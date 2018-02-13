@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////
 
 const config = rootRequire( 'servers/shared/configuration' ).getConfiguration();
+const WorkerState = protocolRequire( 'dwp/common' ).WorkerState;
 
 var workers = [];
 
@@ -24,7 +25,7 @@ module.exports.add = function add( workerAddress ) {
    workers.push( {
       address: workerAddress,
       runningInstances: 0,
-      status: undefined,
+      state: WorkerState.Executing,
       cpu: undefined,
       memory: undefined,
       lastResource: {
@@ -34,7 +35,8 @@ module.exports.add = function add( workerAddress ) {
       performance: {
          ratio: undefined,
          level: 'Undefined'
-      }
+      },
+      alias: undefined
    } );
 }
 
@@ -110,7 +112,7 @@ module.exports.getAvailables = function ( cpuThreshold, memoryThreshold ) {
          continue;
       }
 
-      if ( ( worker.cpu >= cpuThreshold ) && ( worker.memory >= memoryThreshold ) ) {
+      if ( ( worker.cpu >= cpuThreshold ) && ( worker.memory >= memoryThreshold ) && ( worker.state === WorkerState.Executing ) ) {
          availableWorkers.push( worker );
       }
    }
