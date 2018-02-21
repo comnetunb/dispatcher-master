@@ -51,13 +51,25 @@
     <Compile Include="servers\dispatcher\communication.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\dispatcher\dwp_treatment\resource_response.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\dispatcher\dwp_treatment\simulation_response.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\dispatcher\simulation_handler.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\dispatcher\utils.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\dispatcher\worker_discovery.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\shared\configuration.js" />
+    <Compile Include="servers\shared\exportation.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\shared\log.js">
       <SubType>Code</SubType>
     </Compile>
@@ -126,6 +138,7 @@
     <Folder Include="servers\" />
     <Folder Include="servers\config\" />
     <Folder Include="servers\dispatcher\" />
+    <Folder Include="servers\dispatcher\dwp_treatment\" />
     <Folder Include="servers\shared\" />
     <Folder Include="servers\web\" />
     <Folder Include="servers\web\apis\" />

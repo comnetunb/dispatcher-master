@@ -1,136 +1,124 @@
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 
-const config = rootRequire( 'servers/shared/configuration' ).getConfiguration();
-const WorkerState = protocolRequire( 'dwp/common' ).WorkerState;
+const config = rootRequire('servers/shared/configuration').getConfiguration()
+const WorkerState = protocolRequire('dwp/common').WorkerState
 
-var workers = [];
+var workers = []
 
-module.exports.add = function add( workerAddress ) {
+module.exports.add = function add (workerAddress) {
+  for (var idx = 0; idx < workers.length; ++idx) {
+    const worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.address !== workerAddress) {
+      continue
+    }
 
-      const worker = workers[idx];
+    return
+  }
 
-      if ( worker.address !== workerAddress ) {
-         continue;
-      }
-
-      return;
-   }
-
-   workers.push( {
-      address: workerAddress,
-      runningInstances: 0,
-      state: WorkerState.Executing,
+  workers.push({
+    address: workerAddress,
+    runningInstances: 0,
+    state: WorkerState.Executing,
+    cpu: undefined,
+    memory: undefined,
+    lastResource: {
       cpu: undefined,
-      memory: undefined,
-      lastResource: {
-         cpu: undefined,
-         memory: undefined
-      },
-      performance: {
-         ratio: undefined,
-         level: 'Undefined'
-      },
-      alias: undefined
-   } );
+      memory: undefined
+    },
+    performance: {
+      ratio: undefined,
+      level: 'Undefined'
+    },
+    alias: undefined
+  })
 }
 
-module.exports.update = function update( workerAddress, update ) {
+module.exports.update = function update (workerAddress, update) {
+  for (var idx = 0; idx < workers.length; ++idx) {
+    var worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.address !== workerAddress) {
+      continue
+    }
 
-      var worker = workers[idx];
+    for (var key in update) {
+      worker[key] = update[key]
+    }
 
-      if ( worker.address !== workerAddress ) {
-         continue;
-      }
+    if (worker.cpu !== undefined) {
+      worker.lastResource.cpu = worker.cpu
+    }
 
-      for ( var key in update ) {
-         worker[key] = update[key];
-      }
+    if (worker.memory !== undefined) {
+      worker.lastResource.memory = worker.memory
+    }
 
-      if ( worker.cpu !== undefined ) {
-         worker.lastResource.cpu = worker.cpu;
-      }
-
-      if ( worker.memory !== undefined ) {
-         worker.lastResource.memory = worker.memory;
-      }
-
-      break;
-   }
+    break
+  }
 }
 
-module.exports.get = function get( workerAddress ) {
+module.exports.get = function get (workerAddress) {
+  for (var idx = 0; idx < workers.length; ++idx) {
+    const worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.address !== workerAddress) {
+      continue
+    }
 
-      const worker = workers[idx];
+    return worker
+  }
 
-      if ( worker.address !== workerAddress ) {
-         continue;
-      }
-
-      return worker;
-   }
-
-   return {};
+  return {}
 }
 
 module.exports.getAll = function () {
+  var workersSubset = []
 
-   var workersSubset = [];
+  for (var idx = 0; idx < workers.length; ++idx) {
+    const worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.lastResource.cpu === undefined || worker.lastResource.memory === undefined) {
+      continue
+    }
 
-      const worker = workers[idx];
+    workersSubset.push(worker)
+  }
 
-      if ( worker.lastResource.cpu === undefined || worker.lastResource.memory === undefined ) {
-         continue;
-      }
-
-      workersSubset.push( worker );
-   }
-
-   return workersSubset;
+  return workersSubset
 }
 
-module.exports.getAvailables = function ( cpuThreshold, memoryThreshold ) {
+module.exports.getAvailables = function (cpuThreshold, memoryThreshold) {
+  var availableWorkers = []
 
-   var availableWorkers = [];
+  for (var idx = 0; idx < workers.length; ++idx) {
+    const worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.cpu === undefined || worker.memory === undefined) {
+      continue
+    }
 
-      const worker = workers[idx];
+    if ((worker.cpu >= cpuThreshold) && (worker.memory >= memoryThreshold) && (worker.state === WorkerState.Executing)) {
+      availableWorkers.push(worker)
+    }
+  }
 
-      if ( worker.cpu === undefined || worker.memory === undefined ) {
-         continue;
-      }
-
-      if ( ( worker.cpu >= cpuThreshold ) && ( worker.memory >= memoryThreshold ) && ( worker.state === WorkerState.Executing ) ) {
-         availableWorkers.push( worker );
-      }
-   }
-
-   return availableWorkers;
+  return availableWorkers
 }
 
-module.exports.remove = function remove( workerAddress ) {
+module.exports.remove = function remove (workerAddress) {
+  for (var idx = 0; idx < workers.length; ++idx) {
+    var worker = workers[idx]
 
-   for ( var idx = 0; idx < workers.length; ++idx ) {
+    if (worker.address !== workerAddress) {
+      continue
+    }
 
-      var worker = workers[idx];
-
-      if ( worker.address !== workerAddress ) {
-         continue;
-      }
-
-      workers.splice( idx, 1 );
-      break;
-   }
+    workers.splice(idx, 1)
+    break
+  }
 }

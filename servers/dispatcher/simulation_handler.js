@@ -1,60 +1,55 @@
-﻿////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 
-const Simulation = rootRequire( 'database/models/simulation' );
-const SimulationInstance = rootRequire( 'database/models/simulation_instance' );
-const log = rootRequire( 'servers/shared/log' );
+const Simulation = rootRequire('database/models/simulation')
+const SimulationInstance = rootRequire('database/models/simulation_instance')
+const log = rootRequire('servers/shared/log')
 
-const EventEmitter = require( 'events' );
+const EventEmitter = require('events')
 
-const event = new EventEmitter();
+const event = new EventEmitter()
 
-module.exports.event = event;
+module.exports.event = event
 
-event.on( 'new_simulation', ( id ) => {
+event.on('new_simulation', (id) => {
+  const simulationPopulate = { path: '_simulationGroup', select: 'seedAmount load' }
 
-   const simulationPopulate = { path: '_simulationGroup', select: 'seedAmount load' };
+  var promise = Simulation.find({ _simulationGroup: id }).populate(simulationPopulate).exec()
 
-   var promise = Simulation.find( { _simulationGroup: id } ).populate( simulationPopulate ).exec();
+  promise.then(function (simulations) {
+    var promises = []
 
-   promise.then( function ( simulations ) {
+    for (var idx = 0; idx < simulations.length; ++idx) {
+      const seedAmount = simulations[idx]._simulationGroup.seedAmount
 
-      var promises = [];
+      for (var seed = 1; seed <= seedAmount; ++seed) {
+        var simulationInstances = []
 
-      for ( var idx = 0; idx < simulations.length; ++idx ) {
+        const minimumLoad = simulations[idx]._simulationGroup.load.minimum
+        const maximumLoad = simulations[idx]._simulationGroup.load.maximum
+        const step = simulations[idx]._simulationGroup.load.step
 
-         const seedAmount = simulations[idx]._simulationGroup.seedAmount
+        for (var load = minimumLoad; load <= maximumLoad; load += step) {
+          const simulationInstance = new SimulationInstance({
+            _simulation: simulations[idx]._id,
+            seed: seed,
+            load: load
+          })
 
-         for ( var seed = 1; seed <= seedAmount; ++seed ) {
+          simulationInstances.push(simulationInstance)
+        }
 
-            var simulationInstances = [];
-
-            const minimumLoad = simulations[idx]._simulationGroup.load.minimum;
-            const maximumLoad = simulations[idx]._simulationGroup.load.maximum;
-            const step = simulations[idx]._simulationGroup.load.step;
-
-            for ( var load = minimumLoad; load <= maximumLoad; load += step ) {
-
-               const simulationInstance = new SimulationInstance( {
-                  _simulation: simulations[idx]._id,
-                  seed: seed,
-                  load: load
-               } );
-
-               simulationInstances.push( simulationInstance );
-            }
-
-            promises.push( SimulationInstance.insertMany( simulationInstances ) );
-         }
+        promises.push(SimulationInstance.insertMany(simulationInstances))
       }
+    }
 
-      return Promise.all( promises );
-   } )
+    return Promise.all(promises)
+  })
 
-      .catch( function ( err ) {
-         log.error( err );
-      } );
-} );
+      .catch(function (err) {
+        log.error(err)
+      })
+})

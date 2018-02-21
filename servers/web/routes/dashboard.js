@@ -1,55 +1,47 @@
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 
-const router = rootRequire( 'servers/web/router' );
-const workerManager = rootRequire( 'servers/shared/worker_manager' );
+const router = rootRequire('servers/web/router')
+const workerManager = rootRequire('servers/shared/worker_manager')
 
-module.exports = function ( app ) {
-
+module.exports = function (app) {
    // dashboard
-   app.get( '/dashboard/executing-simulation-groups', router.authenticationMiddleware(), function ( req, res ) {
+  app.get('/dashboard/executing-simulation-groups', router.authenticationMiddleware(), function (req, res) {
+    const options = { title: 'Dashboard' }
 
-      const options = { title: 'Dashboard' };
+    res.render('dashboard/executing-simulation-groups', options)
+  })
 
-      res.render( 'dashboard/executing-simulation-groups', options );
-   } );
+  app.get('/dashboard/finished-simulation-groups', router.authenticationMiddleware(), function (req, res) {
+    const options = { title: 'Dashboard' }
 
-   app.get( '/dashboard/finished-simulation-groups', router.authenticationMiddleware(), function ( req, res ) {
+    res.render('dashboard/finished-simulation-groups', options)
+  })
 
-      const options = { title: 'Dashboard' };
+  app.get('/dashboard/new-simulation-group', router.authenticationMiddleware(), function (req, res) {
+    const options = { title: 'Dashboard' }
 
-      res.render( 'dashboard/finished-simulation-groups', options );
-   } );
+    res.render('dashboard/new-simulation-group', options)
+  })
 
-   app.get( '/dashboard/new-simulation-group', router.authenticationMiddleware(), function ( req, res ) {
+  app.get('/dashboard/workers', router.authenticationMiddleware(), function (req, res) {
+    const options = { title: 'Dashboard' }
 
-      const options = { title: 'Dashboard' };
+    res.render('dashboard/workers', options)
+  })
 
-      res.render( 'dashboard/new-simulation-group', options );
-   } );
+  app.get('/dashboard/logs', function (req, res) {
+    const options = { title: 'Dashboard' }
 
-   app.get( '/dashboard/workers', router.authenticationMiddleware(), function ( req, res ) {
+    res.render('dashboard/logs', options)
+  })
 
-      const options = { title: 'Dashboard' };
+  app.get('/workers', function (req, res) {
+    const workers = workerManager.getAll()
 
-      res.render( 'dashboard/workers', options );
-   } );
-
-   app.get( '/dashboard/logs', function ( req, res ) {
-
-      const options = { title: 'Dashboard' };
-
-      res.render( 'dashboard/logs', options );
-   } );
-
-   app.get( '/workers', function ( req, res ) {
-
-      const workers = workerManager.getAll();
-
-      res.send( workers );
-   } );
-
+    res.send(workers)
+  })
 }

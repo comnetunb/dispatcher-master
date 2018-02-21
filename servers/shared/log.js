@@ -1,69 +1,61 @@
-﻿////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 
-const Log = rootRequire( 'database/models/log' );
+const Log = rootRequire('database/models/log')
 
 module.exports.getAllLogs = function () {
+  const logFilter = { 'session': Log.SessionId }
 
-   const logFilter = { 'session': Log.SessionId };
-
-   return Log.find( logFilter ).limit( 500 ).sort( { date: -1 } ).exec();
+  return Log.find(logFilter).limit(500).sort({ date: -1 }).exec()
 }
 
-module.exports.trace = function ( message ) {
+module.exports.trace = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Trace })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Trace } );
-
-   log.save();
+  log.save()
 }
 
-module.exports.debug = function ( message ) {
+module.exports.debug = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Debug })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Debug } );
-
-   log.save();
-
+  log.save()
 }
 
-module.exports.info = function ( message ) {
+module.exports.info = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Info })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Info } );
-
-   log.save();
+  log.save()
 }
 
-module.exports.warn = function ( message ) {
+module.exports.warn = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Warn })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Warn } );
-
-   log.save();
+  log.save()
 }
 
-module.exports.error = function ( message ) {
+module.exports.error = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Error })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Error } );
-
-   log.save();
+  log.save()
 }
 
-module.exports.fatal = function ( message ) {
+module.exports.fatal = function (message) {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal })
 
-   const log = new Log( { log: message, date: Date.now(), level: Log.Level.Fatal } );
-
-   log.save();
+  log.save()
 }
 
-module.exports.bold = function ( text ) {
-   return tag( text, 'b' );
+module.exports.bold = function (text) {
+  return tag(text, 'b')
 }
 
-module.exports.italic = function ( text ) {
-   return tag( text, 'i' );
+module.exports.italic = function (text) {
+  return tag(text, 'i')
 }
 
-function tag( text, attribute ) {
-   return '<' + attribute + '>' + text + '</' + attribute + '>';
+function tag (text, attribute) {
+  return '<' + attribute + '>' + text + '</' + attribute + '>'
 }
