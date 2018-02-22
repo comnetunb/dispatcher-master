@@ -6,6 +6,8 @@
 
 const Log = rootRequire('database/models/log')
 
+const traceback = require('traceback');
+
 module.exports.getAllLogs = function () {
   const logFilter = { 'session': Log.SessionId }
 
@@ -43,16 +45,20 @@ module.exports.error = function (message) {
 }
 
 module.exports.fatal = function (message) {
+  const tb = traceback()[1];
+
+  message = bold('[ ' + tb.file + ' - ' + tb.method + ':' + tb.line + ' ] ') + message
+
   const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal })
 
   log.save()
 }
 
-module.exports.bold = function (text) {
+module.exports.bold = function bold(text) {
   return tag(text, 'b')
 }
 
-module.exports.italic = function (text) {
+module.exports.italic = function italic(text) {
   return tag(text, 'i')
 }
 

@@ -52,6 +52,8 @@ module.exports.execute = function () {
     // Creates a buffer for each worker
     var buffer = ''
 
+    event.emit('new_connection', connection)
+
     requestWorkerReport(worker)
 
     // Emit to UDP discovery in order to clean its cache
@@ -152,7 +154,7 @@ module.exports.execute = function () {
   })
 }
 
-function requestResource() {
+function requestResource () {
   setInterval(function () {
     for (var idx = 0; idx < workerPool.length; ++idx) {
       workerPool[idx].write(resourceRequest.format())
@@ -160,7 +162,7 @@ function requestResource() {
   }, config.requestResourceInterval * 1000)
 }
 
-function dispatch() {
+function dispatch () {
   setInterval(function () {
     batchDispatch()
   }, config.dispatchInterval * 1000)
@@ -172,7 +174,7 @@ function dispatch() {
  * and dispatch it to all those workers
  */
 
-function batchDispatch() {
+function batchDispatch () {
   const availableWorkers = workerManager.getAvailables(config.cpu.threshold, config.memory.threshold)
 
   if (!availableWorkers.length) {
@@ -236,7 +238,7 @@ function batchDispatch() {
   })
 }
 
-function addWorker(worker) {
+function addWorker (worker) {
   workerManager.add(worker.remoteAddress)
 
   workerPool.push(worker)
@@ -247,13 +249,13 @@ function addWorker(worker) {
  * from previous time
  */
 
-function requestWorkerReport(worker) {
+function requestWorkerReport (worker) {
   reportRequest.format()
 
   worker.write(reportRequest.format())
 }
 
-function removeWorker(worker) {
+function removeWorker (worker) {
   workerManager.remove(worker.remoteAddress)
 
   const idx = workerPool.indexOf(worker)
@@ -263,7 +265,7 @@ function removeWorker(worker) {
   }
 }
 
-function cleanWorkerSimulationInstances(workerAddress) {
+function cleanWorkerSimulationInstances (workerAddress) {
   const simulationInstanceFilter = { worker: workerAddress }
 
   const promise = SimulationInstance.find(simulationInstanceFilter, '_id')
@@ -286,7 +288,7 @@ function cleanWorkerSimulationInstances(workerAddress) {
     })
 }
 
-function treat(data, worker) {
+function treat (data, worker) {
   var object = JSON.parse(data.toString())
 
   try {
@@ -536,7 +538,7 @@ function treat(data, worker) {
   }
 }
 
-function updateWorkerRunningInstances(workerAddress) {
+function updateWorkerRunningInstances (workerAddress) {
   var promise = SimulationInstance.count({ worker: workerAddress }).exec()
 
   promise.then(function (count) {
@@ -552,7 +554,7 @@ function updateWorkerRunningInstances(workerAddress) {
  * or an error occurred meanwhile
  */
 
-function updateSimulationInstanceById(simulationInstanceId, callback) {
+function updateSimulationInstanceById (simulationInstanceId, callback) {
   const simulationInstancePopulate = {
     path: '_simulation',
     select: '_simulationGroup',
@@ -579,7 +581,7 @@ function updateSimulationInstanceById(simulationInstanceId, callback) {
   })
 }
 
-function cleanUp() {
+function cleanUp () {
   // <Workaround>
   {
     const simulationInstancePopulate = {

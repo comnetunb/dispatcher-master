@@ -23,7 +23,7 @@ module.exports.add = function add (workerAddress) {
   workers.push({
     address: workerAddress,
     runningInstances: 0,
-    state: WorkerState.Executing,
+    state: WorkerState.EXECUTING,
     cpu: undefined,
     memory: undefined,
     lastResource: {
@@ -73,7 +73,7 @@ module.exports.get = function get (workerAddress) {
     return worker
   }
 
-  return {}
+  return null
 }
 
 module.exports.getAll = function () {
