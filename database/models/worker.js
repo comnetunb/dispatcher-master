@@ -4,24 +4,12 @@
 //
 /// /////////////////////////////////////////////
 
+const SimulationInstance = rootRequire('database/models/simulation_instance')
+
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const workerSchema = Schema({
-  address: workerAddress,
-  runningInstances: 0,
-  state: WorkerState.EXECUTING,
-  cpu: undefined,
-  memory: undefined,
-  lastResource: {
-    cpu: undefined,
-    memory: undefined
-  },
-  performance: {
-    ratio: undefined,
-    level: 'Undefined'
-  },
-  alias: undefined
 
   address: {
     type: String,
@@ -37,40 +25,46 @@ const workerSchema = Schema({
   },
   state: {
     type: Number
-  }
-
-  _simulation: {
-    type: Schema.ObjectId,
-    ref: 'Simulation',
-    required: true
   },
-  state: {
-    type: Number,
-    default: State.Pending
+  lastResource: {
+    cpu: Number,
+    memory: Number
   },
-  seed: {
-    type: Number,
-    required: true
+  performance: {
+    ratio: Number,
+    level: {
+      type: String,
+      default: 'Undefined'
+    }
   },
-  load: {
-    type: Number,
-    required: true
-  },
-  worker: {
+  alias: {
     type: String
-  },
-  result: {
-    type: String
-  },
-  startTime: {
-    type: Date
-  },
-  endTime: {
-    type: Date
   }
-
 })
 
-simulationInstanceSchema.index({ address: 1, port: 1 }, { unique: true })
+const model = mongoose.model('worker', workerSchema)
 
-module.exports = mongoose.model('worker', workerSchema)
+workerSchema.methods.getAvailables = function (cpuThreshold, memoryThreshold) {
+  const filter = { cpu: { $gt: cpuThreshold }, memory: { $gt: memoryThreshold } }
+
+  return model
+    .find(filter)
+    .then(function (availableWorkers) {
+      return availableWorkers
+    }).catch(function (e) {
+
+    })
+}
+
+workerSchema.methods.updateRunningInstances = function () {
+  return SimulationInstance
+    .count({ _worker: this._id })
+    .then(function (count) {
+      this.runningInstances = count
+      return this.save
+    })
+}
+
+workerSchema.index({ address: 1, port: 1 }, { unique: true })
+
+module.exports = model

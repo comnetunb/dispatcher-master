@@ -44,6 +44,17 @@ const simulationSchema = Schema({
 
 })
 
+const model = mongoose.model('Simulation', simulationSchema)
+
 simulationSchema.statics.State = State
 
-module.exports = mongoose.model('Simulation', simulationSchema)
+simulationSchema.statics.countActive = function (simulationGroupId) {
+  const condition = {
+    _simulationGroup: simulationGroupId,
+    state: Simulation.State.Executing
+  }
+
+  return model.count(condition)
+}
+
+module.exports = model

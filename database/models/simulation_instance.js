@@ -21,6 +21,10 @@ const simulationInstanceSchema = Schema({
     ref: 'Simulation',
     required: true
   },
+  _worker: {
+    type: Schema.ObjectId,
+    ref: 'Worker'
+  },
   state: {
     type: Number,
     default: State.Pending
@@ -32,9 +36,6 @@ const simulationInstanceSchema = Schema({
   load: {
     type: Number,
     required: true
-  },
-  worker: {
-    type: String
   },
   result: {
     type: String
@@ -48,7 +49,46 @@ const simulationInstanceSchema = Schema({
 
 })
 
+const model = mongoose.model('SimulationInstance', simulationInstanceSchema)
+
 simulationInstanceSchema.statics.State = State
+
+// Active = Pending or Executing
+simulationInstanceSchema.statics.countActive = function (simulationId) {
+  const condition = {
+    _simulation: simulationId,
+    $or: [{ state: SimulationInstance.State.Pending },
+    { state: SimulationInstance.State.Executing }]
+  }
+
+  return model.count(condition)
+}
+
+simulationInstanceSchema.statics.updateToSafeState = function (simulationInstanceId) {
+  const simulationInstancePopulate = {
+    path: '_simulation',
+    select: '_simulationGroup',
+    populate: { path: '_simulationGroup' }
+  }
+
+  model
+    .findById(simulationInstanceId)
+    .populate(simulationInstancePopulate)
+    .then(function (simulationInstance) {
+      const simulationGroupState = simulationInstance._simulation._simulationGroup.state
+
+      simulationInstance.worker = undefined
+      simulationInstance.startTime = undefined
+
+      if (simulationGroupState === SimulationGroup.State.Executing) {
+        simulationInstance.state = SimulationInstance.State.Pending
+      } else {
+        simulationInstance.state = SimulationInstance.State.Canceled
+      }
+
+      return simulationInstance.save()
+    })
+}
 
 simulationInstanceSchema.methods.isPending = function () {
   return this.state === State.Pending
@@ -68,4 +108,4 @@ simulationInstanceSchema.methods.isCanceled = function () {
 
 simulationInstanceSchema.index({ _simulation: 1, seed: 1, load: 1 }, { unique: true })
 
-module.exports = mongoose.model('SimulationInstance', simulationInstanceSchema)
+module.exports = model

@@ -1,10 +1,8 @@
 
-const shortid = require('shortid')
 
 var connections = []
 
 module.exports.add = function (connection) {
-  connection.id = shortid.generate()
   connections.push(connection)
 }
 
@@ -24,6 +22,10 @@ module.exports.get = function get(id) {
   })
 
   return null
+}
+
+module.exports.getAll = function () {
+  return connections
 }
 
 module.exports.send = function (id, packet) {

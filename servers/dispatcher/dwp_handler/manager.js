@@ -5,10 +5,10 @@ const log = rootRequire('servers/shared/log')
 
 const factory = protocolRequire('dwp/factory')
 
-const performTaskResponseHandler = protocolRequire('dwp/pdu/perform_task_response_handler')
-const reportHandler = protocolRequire('dwp/pdu/report_handler')
-const taskResultHandler = protocolRequire('dwp/pdu/task_result_handler')
-const terminateTaskResponseHandler = protocolRequire('dwp/pdu/terminate_task_response_handler')
+const performTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/perform_task_response_handler')
+const reportHandler = rootRequire('servers/dispatcher/dwp_handler/handler/report_handler')
+const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/task_result_handler')
+const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler')
 
 const Worker = rootRequire('database/models/worker')
 
@@ -20,14 +20,13 @@ communicationEvent.on('new_connection', function (connection) {
     .findOne(filter)
     .then(function (worker) {
       if (!worker) {
+        // Worker doesn't exist. Insert it
         const newWorker = new Worker({
           address: socket.remoteAddress,
           port: socket.remotePort
         })
-
         return newWorker.save()
       }
-
       return worker
     }).then(function (worker) {
       connection.id = worker._id
@@ -38,20 +37,14 @@ communicationEvent.on('new_connection', function (connection) {
 
 })
 
-/**
-  * Treats a DWP PDU received from a worker
-  * @param packet A valid DWP PDU string.
-  * @param socket Socket from worker that sent the PDU.
-  */
-
 module.exports.treat = function (packet, socket) {
 
   const pdu = JSON.parse(packet.toString())
 
   try {
     factory.validate(pdu)
-  } catch (err) {
-    return log.fatal(err)
+  } catch (e) {
+    return log.fatal(e)
   }
 
   const filter = { address: socket.remoteAddress, port: socket.remotePort }
@@ -60,10 +53,10 @@ module.exports.treat = function (packet, socket) {
     .findOne(filter)
     .then(function (worker) {
       if (!worker) {
-        throw 'worker not found'
+        throw 'Worker not found'
       }
 
-      chooseHandler(worker)
+      chooseHandler(pdu, worker)
     }).catch(function (e) {
       log.fatal(e);
     })
