@@ -22,16 +22,16 @@ const event = new EventEmitter()
 event.on('event', (workerInfo) => {
   log.info('Sending response to ' + workerInfo.address + ':' + workerInfo.port)
 
-   // Send response to worker
+  // Send response to worker
   socket.send(socket.address().address, workerInfo.port, workerInfo.address)
 
   pendingList.push(workerInfo.address)
 })
 
 module.exports.execute = function () {
-   // Remove from local cache
-  communication.event.on('new_worker', (workerAddress) => {
-    var idx = pendingList.indexOf(workerAddress)
+  // Remove from local cache
+  communication.event.on('new_connection', (connection) => {
+    var idx = pendingList.indexOf(connection.remoteAddress)
 
     if (idx > -1) {
       pendingList.splice(idx, 1)
@@ -45,13 +45,13 @@ module.exports.execute = function () {
 
   socket.on('message', (message, rinfo) => {
     if (message.indexOf('NewWorker') <= -1) {
-         // Discard this message
+      // Discard this message
       log.error('Invalid message! ' + message + ' from ' + rinfo.address)
       return
     }
 
     if (pendingList.indexOf(rinfo.address) === -1) {
-         // New worker identified
+      // New worker identified
       event.emit('event', rinfo)
     }
   })

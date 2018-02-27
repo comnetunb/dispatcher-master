@@ -75,9 +75,6 @@
     <Compile Include="servers\dispatcher\simulation_handler.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\dispatcher\utils.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="servers\dispatcher\worker_discovery.js">
       <SubType>Code</SubType>
     </Compile>
@@ -85,12 +82,14 @@
     <Compile Include="servers\shared\exportation.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\shared\interface_manager.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\shared\log.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\shared\mailer.js" />
     <Compile Include="servers\shared\simulation_utils.js" />
-    <Compile Include="servers\shared\worker_manager.js" />
     <Compile Include="servers\web\apis\log.js">
       <SubType>Code</SubType>
     </Compile>

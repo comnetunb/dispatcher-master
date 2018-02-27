@@ -5,10 +5,10 @@
 /// /////////////////////////////////////////////
 
 const router = rootRequire('servers/web/router')
-const workerManager = rootRequire('servers/shared/worker_manager')
+const Worker = rootRequire('database/models/worker')
 
 module.exports = function (app) {
-   // dashboard
+  // dashboard
   app.get('/dashboard/executing-simulation-groups', router.authenticationMiddleware(), function (req, res) {
     const options = { title: 'Dashboard' }
 
@@ -40,8 +40,10 @@ module.exports = function (app) {
   })
 
   app.get('/workers', function (req, res) {
-    const workers = workerManager.getAll()
-
-    res.send(workers)
+    Worker
+      .find({})
+      .then(function (workers) {
+        res.send(workers)
+      })
   })
 }

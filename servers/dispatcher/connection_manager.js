@@ -1,34 +1,49 @@
+/// /////////////////////////////////////////////
+//
+// Copyright (c) 2017 Matheus Medeiros Sarmento
+//
+/// /////////////////////////////////////////////
 
+const log = rootRequire('servers/shared/log')
 
 var connections = []
 
-module.exports.add = function (connection) {
+var add = function (id, connection) {
+  connection.id = id
   connections.push(connection)
+
+  log.info(log.bold(connection.remoteAddress + ':' + connection.remotePort) + ' connected')
 }
 
-module.exports.remove = function (connection) {
-  const index = connections.indexOf(connection)
-
-  if (index > -1) {
-    connections.splice(index, 1)
-  }
-}
-
-module.exports.get = function get(id) {
-  connections.forEach(function (connection) {
+var remove = function (id) {
+  connections.forEach(function (connection, index, object) {
     if (connection.id === id) {
-      return connection
+      object.splice(index, 1)
+
+      log.warn(log.bold(connection.remoteAddress + ':' + connection.remotePort) + ' left the pool')
+
+      if (!connections.length) {
+        log.warn('There are no connections left')
+      }
     }
   })
+}
+
+var get = function (id) {
+  for (var index = 0; index < connections.length; ++index) {
+    if (connections[index].id === id) {
+      return connections[index]
+    }
+  }
 
   return null
 }
 
-module.exports.getAll = function () {
+var getAll = function () {
   return connections
 }
 
-module.exports.send = function (id, packet) {
+var send = function (id, packet) {
   const socket = get(id)
 
   if (!socket) {
@@ -36,4 +51,12 @@ module.exports.send = function (id, packet) {
   }
 
   socket.write(packet)
+}
+
+module.exports = {
+  add: add,
+  remove: remove,
+  get: get,
+  getAll: getAll,
+  send: send
 }

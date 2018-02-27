@@ -16,15 +16,13 @@ const flags = protocolRequire('dwp/common').Flags
 const terminateTask = protocolRequire('dwp/pdu/terminate_task')
 
 module.exports.execute = function (pdu, worker) {
-
   if (pdu.flags & flags.RESOURCE) {
-    worker.cpu = pdu.resource.cpu
-    worker.memory = pdu.resource.memory
-    worker.save()
+    worker.resource.outdated = false
+    worker.resource.cpu = pdu.resource.cpu
+    worker.resource.memory = pdu.resource.memory
   }
 
   if (pdu.flags & flags.TASKS) {
-
     Promise.all(pdu.tasks.map(function (task) {
       // Go through all tasks
       return SimulationInstance
@@ -36,29 +34,35 @@ module.exports.execute = function (pdu, worker) {
 
           if (simulationInstance.isFinished() || simulationInstance.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker._id, terminateTask.format({ taskId: task.id }))
+            connectionManager.send(worker.uuid, terminateTask.format({ taskId: task.id }))
             return
           }
 
-          if (simulationInstance._worker) {
+          if (simulationInstance.worker) {
             // There is a worker executing this instance already
             if (simulationInstance.startTime < task.startTime) {
               // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker._id, terminateTask.format({ taskId: task.id }))
+              connectionManager.send(worker.uuid, terminateTask.format({ taskId: task.id }))
               return
             }
 
             // Evaluating by the time they started, the 'newer' worker will finish faster
-            connectionManager.send(simulationInstance._worker, terminateTask.format({ taskId: task.id }))
+            connectionManager.send(simulationInstance.worker, terminateTask.format({ taskId: task.id }))
           }
 
           // Associate this instance to this worker
-          simulationInstance._worker = worker._id
-          simulationInstance.save()
+          simulationInstance.worker = worker.uuid
+          simulationInstance
+            .save()
+            .catch(function (err) {
+              log.fatal(err)
+            })
+        }).catch(function (err) {
+          log.fatal(err)
         })
     })).then(function () {
       // When all instances were set, update worker running instances
-      worker.updateRunningInstances()
+      // worker.updateRunningInstances()
     }).catch(function (e) {
       log.fatal(e)
     })
@@ -66,11 +70,15 @@ module.exports.execute = function (pdu, worker) {
 
   if (pdu.flags & flags.STATE) {
     worker.state = pdu.state
-    worker.save()
   }
 
   if (pdu.flags & flags.ALIAS) {
     worker.alias = pdu.alias
-    worker.save()
   }
+
+  worker
+    .save()
+    .catch(function (err) {
+      log.fatal(err)
+    })
 }

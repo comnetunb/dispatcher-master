@@ -1,13 +1,20 @@
-﻿/// /////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
 /// /////////////////////////////////////////////
 
-const SimulationInstance = rootRequire('database/models/simulation_instance')
-
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+
+const WorkerState = protocolRequire('dwp/common').WorkerState
+
+const SimulationInstance = rootRequire('database/models/simulation_instance')
+
+const State = {
+  EXECUTING: WorkerState.EXECUTING,
+  PAUSED: WorkerState.PAUSED
+}
 
 const workerSchema = Schema({
 
@@ -19,6 +26,11 @@ const workerSchema = Schema({
     type: Number,
     required: true
   },
+  // Internal id
+  uuid: {
+    type: String,
+    required: true
+  },
   runningInstances: {
     type: Number,
     default: 0
@@ -26,7 +38,11 @@ const workerSchema = Schema({
   state: {
     type: Number
   },
-  lastResource: {
+  resource: {
+    outdated: {
+      type: Boolean,
+      default: true
+    },
     cpu: Number,
     memory: Number
   },
@@ -42,29 +58,35 @@ const workerSchema = Schema({
   }
 })
 
-const model = mongoose.model('worker', workerSchema)
+workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) {
+  const filter = {
+    'resource.outdated': false,
+    'resource.cpu': { $gt: cpuThreshold },
+    'resource.memory': { $gt: memoryThreshold },
+    'state': State.EXECUTING
+  }
 
-workerSchema.methods.getAvailables = function (cpuThreshold, memoryThreshold) {
-  const filter = { cpu: { $gt: cpuThreshold }, memory: { $gt: memoryThreshold } }
-
-  return model
+  return this
     .find(filter)
     .then(function (availableWorkers) {
       return availableWorkers
-    }).catch(function (e) {
-
     })
 }
 
+workerSchema.statics.State = State
+
 workerSchema.methods.updateRunningInstances = function () {
+  const worker = this
   return SimulationInstance
-    .count({ _worker: this._id })
+    .count({ worker: worker.uuid })
     .then(function (count) {
-      this.runningInstances = count
-      return this.save
+      worker.runningInstances = count
+      return worker.save()
     })
 }
 
 workerSchema.index({ address: 1, port: 1 }, { unique: true })
+
+const model = mongoose.model('worker', workerSchema)
 
 module.exports = model

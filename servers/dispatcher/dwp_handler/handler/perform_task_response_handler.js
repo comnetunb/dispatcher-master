@@ -9,8 +9,9 @@ const ReturnCode = protocolRequire('dwp/pdu/perform_task_response').ReturnCode
 const log = rootRequire('servers/shared/log')
 const connectionManager = rootRequire('servers/dispatcher/connection_manager')
 
-module.exports.execute = function (pdu, worker) {
+const SimulationInstance = rootRequire('database/models/simulation_instance')
 
+module.exports.execute = function (pdu, worker) {
   if (pdu.code === ReturnCode.EXECUTING) {
     SimulationInstance
       .findById(pdu.taskId)
@@ -19,13 +20,13 @@ module.exports.execute = function (pdu, worker) {
           throw 'Simulation instance not found'
         }
 
-        if (simulationInstance._worker) {
+        if (simulationInstance.worker !== worker.uuid) {
           // There is already a worker executing it
-          connectionManager.send(worker._id, terminateTask.format({ taskId: pdu.taskId }))
+          connectionManager.send(worker.uuid, terminateTask.format({ taskId: pdu.taskId }))
           return false
         }
 
-        simulationInstance._worker = worker._id
+        simulationInstance.worker = worker.uuid
         simulationInstance.save()
         return true
       }).then(function (needsToUpdate) {

@@ -1,9 +1,15 @@
-﻿
+
+// Protocol Related
 const ReturnCode = protocolRequire('dwp/pdu/task_result').ReturnCode
+
+// Database Related
 const SimulationInstance = rootRequire('database/models/simulation_instance')
 const Simulation = rootRequire('database/models/simulation')
 const SimulationGroup = rootRequire('database/models/simulation_group')
+
+// Shared Related
 const mailer = rootRequire('servers/shared/mailer')
+const log = rootRequire('servers/shared/log')
 
 module.exports.execute = function (pdu, worker) {
   if (pdu.code === ReturnCode.SUCCESS) {
@@ -18,7 +24,7 @@ module.exports.execute = function (pdu, worker) {
       result: pdu.output,
       state: SimulationInstance.State.Finished,
       endTime: Date.now(),
-      $unset: { '_worker': 1 }
+      $unset: { worker: 1 }
     }
 
     SimulationInstance
@@ -26,31 +32,25 @@ module.exports.execute = function (pdu, worker) {
       .then(function (simulationInstance) {
         log.info('Worker ' + worker.address + ':' + worker.port + ' has finished simulation instance ' + simulationInstance._id)
 
-        verifyCascadeConclusion(simulationInstance._simulation)
-
+        return cascadeConclusion(simulationInstance._simulation)
       }).catch(function (e) {
         log.fatal(e)
       })
-
   } else {
     // Failed
-    log.error(pdu.task.id + ' executed with failure: ' + pdu.output)
+    log.fatal(pdu.task.id + ' executed with failure: ' + pdu.output)
 
     SimulationInstance
-      .updateToSafeState(pdu.task.id)
+      .updateToDefaultState(pdu.task.id)
       .then(function () {
-        worker.updateRunningInstances()
+        return worker.updateRunningInstances()
       }).catch(function (e) {
         log.fatal(e)
       })
-
-    updateSimulationInstanceById(object.SimulationId, function () {
-      updateWorkerRunningInstances(worker.remoteAddress)
-    })
   }
 }
 
-function verifyCascadeConclusion(simulationGroupId) {
+function cascadeConclusion (simulationGroupId) {
   return SimulationInstance
     .countActive(simulationGroupId)
     .then(function (count) {
@@ -64,7 +64,7 @@ function verifyCascadeConclusion(simulationGroupId) {
         .findByIdAndUpdate(simulationGroupId, simulationUpdate)
     }).then(function (simulation) {
       if (!simulation) {
-        throw 'An error occurred while updating simulation'
+        return
       }
 
       return Simulation
@@ -76,10 +76,12 @@ function verifyCascadeConclusion(simulationGroupId) {
           // All Simulations are done
           return finishSimulationGroup(simulation._simulationGroup)
         })
+    }).catch(function (e) {
+      log.fatal(e)
     })
 }
 
-function finishSimulationGroup(simulationGroupId) {
+function finishSimulationGroup (simulationGroupId) {
   const simulationGroupUpdate = { state: SimulationGroup.State.Finished, endTime: Date.now() }
 
   return SimulationGroup
@@ -92,28 +94,12 @@ function finishSimulationGroup(simulationGroupId) {
     })
 }
 
-function sendSimulationGroupConclusionEmail(simulationGroup) {
-  var elapsedTime = new Date(simulationGroup.endTime - simulationGroup.startTime)
-
-  var hh = elapsedTime.getUTCHours()
-  var mm = elapsedTime.getUTCMinutes()
-  var ss = elapsedTime.getSeconds()
-
-  var dd = elapsedTime.getUTCDay()
-
-  if (hh < 10) { hh = '0' + hh }
-  if (mm < 10) { mm = '0' + mm }
-  if (ss < 10) { ss = '0' + ss }
-
-  // This formats your string to DD HH:MM:SS
-  var t = dd + ' ' + hh + ':' + mm + ':' + ss
-
+function sendSimulationGroupConclusionEmail (simulationGroup) {
   const to = simulationGroup._user.email
-  const subject = 'Simulation Group "' + simulationGroup.name + '" has finished'
+  const subject = 'Simulation group "' + simulationGroup.name + '" has finished'
   const text =
     'Start time: ' + simulationGroup.startTime +
-    '\nEnd time: ' + endTime +
-    '\nElapsed time: ' + t +
+    '\nEnd time: ' + simulationGroup.endTime +
     '\nPriority: ' + simulationGroup.priority +
     '\nSeed amount: ' + simulationGroup.seedAmount +
     '\nMinimum load: ' + simulationGroup.load.minimum +

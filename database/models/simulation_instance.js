@@ -7,11 +7,14 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const SimulationGroup = rootRequire('database/models/simulation_group')
+
 const State = {
   Pending: 0,
   Executing: 1,
   Finished: 2,
-  Canceled: 3
+  Canceled: 3,
+  Sent: 4
 }
 
 const simulationInstanceSchema = Schema({
@@ -21,9 +24,8 @@ const simulationInstanceSchema = Schema({
     ref: 'Simulation',
     required: true
   },
-  _worker: {
-    type: Schema.ObjectId,
-    ref: 'Worker'
+  worker: {
+    type: String
   },
   state: {
     type: Number,
@@ -49,29 +51,28 @@ const simulationInstanceSchema = Schema({
 
 })
 
-const model = mongoose.model('SimulationInstance', simulationInstanceSchema)
-
 simulationInstanceSchema.statics.State = State
 
 // Active = Pending or Executing
 simulationInstanceSchema.statics.countActive = function (simulationId) {
   const condition = {
     _simulation: simulationId,
-    $or: [{ state: SimulationInstance.State.Pending },
-    { state: SimulationInstance.State.Executing }]
+    $or: [{ state: State.Pending },
+    { state: State.Sent },
+    { state: State.Executing }]
   }
 
   return model.count(condition)
 }
 
-simulationInstanceSchema.statics.updateToSafeState = function (simulationInstanceId) {
+simulationInstanceSchema.statics.updateToDefaultState = function (simulationInstanceId) {
   const simulationInstancePopulate = {
     path: '_simulation',
     select: '_simulationGroup',
     populate: { path: '_simulationGroup' }
   }
 
-  model
+  return model
     .findById(simulationInstanceId)
     .populate(simulationInstancePopulate)
     .then(function (simulationInstance) {
@@ -81,9 +82,9 @@ simulationInstanceSchema.statics.updateToSafeState = function (simulationInstanc
       simulationInstance.startTime = undefined
 
       if (simulationGroupState === SimulationGroup.State.Executing) {
-        simulationInstance.state = SimulationInstance.State.Pending
+        simulationInstance.state = State.Pending
       } else {
-        simulationInstance.state = SimulationInstance.State.Canceled
+        simulationInstance.state = State.Canceled
       }
 
       return simulationInstance.save()
@@ -92,6 +93,10 @@ simulationInstanceSchema.statics.updateToSafeState = function (simulationInstanc
 
 simulationInstanceSchema.methods.isPending = function () {
   return this.state === State.Pending
+}
+
+simulationInstanceSchema.methods.isSent = function () {
+  return this.state === State.Sent
 }
 
 simulationInstanceSchema.methods.isExecuting = function () {
@@ -107,5 +112,7 @@ simulationInstanceSchema.methods.isCanceled = function () {
 }
 
 simulationInstanceSchema.index({ _simulation: 1, seed: 1, load: 1 }, { unique: true })
+
+const model = mongoose.model('SimulationInstance', simulationInstanceSchema)
 
 module.exports = model

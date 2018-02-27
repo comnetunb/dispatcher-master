@@ -16,12 +16,13 @@ var transporter = nodemailer.createTransport({
   }
 })
 
-module.exports.sendMail = function (to, subject, text) {
+module.exports.sendMail = function (to, subject, text, attachments) {
   var mailOptions = {
     from: config.transporter.auth.user,
     to: to,
     subject: subject,
-    text: text
+    text: text,
+    attachments: attachments
   }
 
   transporter.sendMail(mailOptions, function (error, info) {

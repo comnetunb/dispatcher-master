@@ -37,6 +37,8 @@
     "passport": "^0.3.2",
     "passport-local": "~1.0.0",
     "rimraf": "^2.6.2",
+    "traceback": "^0.3.1",
+    "uuid": "^3.2.1",
     "validator": "~8.0.0"
   }
 }

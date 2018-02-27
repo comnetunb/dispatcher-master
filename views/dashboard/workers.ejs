@@ -90,6 +90,7 @@
 
                      var runningInstances = document.createElement( 'span' );
                      runningInstances.className = 'badge';
+                     console.log(workers[idx])
                      runningInstances.innerHTML = workers[idx].runningInstances;
                      runningInstances.setAttribute( 'data-toggle', 'tooltip' );
                      runningInstances.setAttribute( 'data-placement', 'top' );
@@ -205,8 +206,8 @@
 
                   var data = google.visualization.arrayToDataTable( [
                      ['Label', 'Value'],
-                     ['Memory', ( 1 - workers[idx].lastResource.memory ) * 100],
-                     ['CPU', ( 1 - workers[idx].lastResource.cpu ) * 100]
+                     ['Memory', ( 1 - workers[idx].resource.memory ) * 100],
+                     ['CPU', (1 - workers[idx].resource.cpu ) * 100]
                   ] );
                   var options = {
                      width: 400, height: 120,

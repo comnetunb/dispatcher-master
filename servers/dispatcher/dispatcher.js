@@ -4,35 +4,56 @@
 //
 /// /////////////////////////////////////////////
 
-const getReport = protocolRequire('dwp/pdu/get_report')
-const Flags = protocolRequire('dwp/common').Flags
+// Dispatcher Related
 const connectionManager = rootRequire('servers/dispatcher/connection_manager')
 const communication = rootRequire('servers/dispatcher/communication')
 const worker_discovery = rootRequire('servers/dispatcher/worker_discovery')
+
+// Shared Related
 const log = rootRequire('servers/shared/log')
+const config = rootRequire('servers/shared/configuration').getConfiguration()
+
+// Database Related
+const SimulationInstance = rootRequire('database/models/simulation_instance')
+const Worker = rootRequire('database/models/worker')
+
+// Protocol Related
+const getReport = protocolRequire('dwp/pdu/get_report')
+const Flags = protocolRequire('dwp/common').Flags
+const performTask = protocolRequire('dwp/pdu/perform_task')
 
 module.exports = function () {
   try {
-    communication.execute()
-    worker_discovery.execute()
+    cleanUp()
+      .then(function () {
+        // After cleanUp, start all services
+        communication.execute()
+        worker_discovery.execute()
 
-    // Routines
-    requestResource()
-    dispatch()
+        // Routines
+        requestResourceRoutine()
+        batchDispatchRoutine()
+      })
   } catch (err) {
-    log.error(err)
+    log.fatal(err)
   }
 }
 
-function requestResource() {
+function requestResourceRoutine() {
+  requestResource()
   setInterval(function () {
-    connectionManager.getAll().forEach(function (connection) {
-      connection.write(getReport.format({ flags: Flags.RESOURCE }))
-    })
+    requestResource()
   }, config.requestResourceInterval * 1000)
 }
 
-function dispatch() {
+function requestResource() {
+  connectionManager.getAll().forEach(function (connection) {
+    connectionManager.send(connection.id, getReport.format({ flags: Flags.RESOURCE }))
+  })
+}
+
+function batchDispatchRoutine() {
+  batchDispatch()
   setInterval(function () {
     batchDispatch()
   }, config.dispatchInterval * 1000)
@@ -45,63 +66,132 @@ function dispatch() {
  */
 
 function batchDispatch() {
-  const availableWorkers = Worker.getAvailables(config.cpu.threshold, config.memory.threshold)
-
-  if (!availableWorkers) {
-    return
-  }
-
-  const simulationInstanceFilter = { state: SimulationInstance.State.Pending }
-  const simulationInstancePopulate = {
-    path: '_simulation',
-    select: '_binary _document _simulationGroup',
-    populate: { path: '_binary _document _simulationGroup _simulationGroup.name' },
-    options: { sort: { '_simulationGroup.priority': -1 } }
-  }
-
-  SimulationInstance.find(simulationInstanceFilter)
-    .populate(simulationInstancePopulate)
-    .sort({ seed: -1, load: 1 })
-    .limit(availableWorkers.length)
-    .then(function (simulationInstances) {
-      if (!simulationInstances) {
-        // No simulations are pending
+  Worker
+    .getAvailables(config.cpu.threshold, config.memory.threshold)
+    .then(function (availableWorkers) {
+      if (!availableWorkers || !availableWorkers.length) {
         return
       }
 
-      return simulationInstances.forEach(function (simulationInstance, idx) {
-        simulationInstance.state = SimulationInstance.State.Executing
-        simulationInstance.worker = availableWorkers[idx].address
-        simulationInstance.startTime = Date.now()
+      const simulationInstanceFilter = { state: SimulationInstance.State.Pending }
+      const simulationInstancePopulate = {
+        path: '_simulation',
+        select: '_binary _document _simulationGroup',
+        populate: { path: '_binary _document _simulationGroup _simulationGroup.name' },
+        options: { sort: { '_simulationGroup.priority': -1 } }
+      }
 
-        var promise = simulationInstance.save()
-
-        return promise.then(function (updatedSimulationInstance) {
-          const workerAddress = updatedSimulationInstance.worker
-
-          workerManager.update(workerAddress, { cpu: undefined, memory: undefined })
-
-          var worker
-
-          for (var workerInstance in workerPool) {
-            if (workerPool[workerInstance].remoteAddress === workerAddress) {
-              worker = workerPool[workerInstance]
-              break
-            }
+      SimulationInstance
+        .find(simulationInstanceFilter)
+        .populate(simulationInstancePopulate)
+        .sort({ seed: -1, load: 1 })
+        .limit(availableWorkers.length)
+        .then(function (simulationInstances) {
+          if (!simulationInstances) {
+            // No simulations are pending
+            return
           }
 
-          const pdu = simulationRequest.format({ Data: updatedSimulationInstance })
+          simulationInstances
+            .forEach(function (simulationInstance, index) {
+              simulationInstance.state = SimulationInstance.State.Sent
+              simulationInstance.worker = availableWorkers[index].uuid
 
-          worker.write(pdu)
+              simulationInstance
+                .save()
+                .then(function () {
 
-          const simulationGroupName = simulationInstance._simulation._simulationGroup.name
+                  // <TODO>: Do it in a way to be generic (from user's input)
+                  const file = 'java'
+                  const arguments = [
+                    '-jar',
+                    simulationInstance._simulation._binary.name,
+                    simulationInstance._simulation._document.name,
+                    simulationInstance.seed,
+                    simulationInstance.load,
+                    simulationInstance.load,
+                    1
+                  ]
 
-          log.info('Dispatched simulation instance with load ' + simulationInstance.load + ' from group ' + log.italic(simulationGroupName) + ' to ' + workerAddress)
+                  const files = [
+                    simulationInstance._simulation._binary,
+                    simulationInstance._simulation._document
+                  ]
+                  // </TODO>
 
-          updateWorkerRunningInstances(workerAddress)
+                  const pdu = performTask.format({
+                    taskId: simulationInstance._id,
+                    exec: {
+                      file: file,
+                      arguments: arguments
+                    },
+                    files: files
+                  })
+
+                  connectionManager.send(availableWorkers[index].uuid, pdu)
+
+                  const simulationGroupName = simulationInstance._simulation._simulationGroup.name
+                  log.info('Dispatched simulation instance with load '
+                    + simulationInstance.load
+                    + ' from group '
+                    + log.italic(simulationGroupName)
+                    + ' to '
+                    + availableWorkers[index].address)
+
+                  // If after X seconds it is still 'Sent', return it to its default state
+                  setTimeout(function () {
+                    SimulationInstance
+                      .findById(simulationInstance._id)
+                      .then(function (simulationInstanceRefreshed) {
+                        if (!simulationInstanceRefreshed) {
+                          throw 'SimulationInstance not found!'
+                        }
+
+                        if (simulationInstanceRefreshed.isSent()) {
+                          log.warn('Timeout from worker ' + availableWorkers[index].address + ':' + availableWorkers[index].port)
+                          SimulationInstance.updateToDefaultState(simulationInstanceRefreshed._id)
+                        }
+                      }).catch(function (err) {
+                        log.fatal(err)
+                      })
+                  }, 10000)
+                }).catch(function (err) {
+                  log.fatal(err)
+                })
+            })
+        }).catch(function (err) {
+          log.error(err)
         })
-      })
-    }).catch(function (err) {
-      log.error(err)
     })
+}
+
+function cleanUp() {
+  // Clean all simulation instances
+  const simulationInstanceFilter = {
+    $or: [{ state: SimulationInstance.State.Sent },
+    { state: SimulationInstance.State.Executing }]
+  }
+
+  const simulationInstanceUpdate = {
+    state: SimulationInstance.State.Pending,
+    $unset: { worker: 1, startTime: 1 }
+  }
+
+  var promises = []
+
+  promises.push(SimulationInstance
+    .update(simulationInstanceFilter, simulationInstanceUpdate, { multi: true })
+    .catch(function (err) {
+      log.fatal(err)
+    }))
+
+
+  // Remove all workers since it is the dispatcher startup
+  promises.push(Worker
+    .remove({})
+    .catch(function (err) {
+      log.fatal(err)
+    }))
+
+  return Promise.all(promises)
 }

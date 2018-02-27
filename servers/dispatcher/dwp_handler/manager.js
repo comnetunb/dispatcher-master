@@ -1,47 +1,82 @@
-﻿
-const communicationEvent = rootRequire('servers/dispatcher/communication').event
-const connectionManager = rootRequire('servers/dispatcher/connection_manager')
+/// /////////////////////////////////////////////
+//
+// Copyright (c) 2017 Matheus Medeiros Sarmento
+//
+/// /////////////////////////////////////////////
+
+// General Requirements
+const uuidv1 = require('uuid/v1')
+
+// Shared Related
 const log = rootRequire('servers/shared/log')
 
-const factory = protocolRequire('dwp/factory')
-
+// Dispatcher Related
+const communicationEvent = rootRequire('servers/dispatcher/communication').event
+const connectionManager = rootRequire('servers/dispatcher/connection_manager')
 const performTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/perform_task_response_handler')
 const reportHandler = rootRequire('servers/dispatcher/dwp_handler/handler/report_handler')
 const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/task_result_handler')
 const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler')
 
+// Database Related
+const SimulationInstance = rootRequire('database/models/simulation_instance')
 const Worker = rootRequire('database/models/worker')
 
+// Protocol Related
+const factory = protocolRequire('dwp/factory')
+const Id = protocolRequire('dwp/factory').Id
+const Flags = protocolRequire('dwp/common').Flags
+const getReport = protocolRequire('dwp/pdu/get_report')
+
 communicationEvent.on('new_connection', function (connection) {
+  const worker = new Worker({
+    address: connection.remoteAddress,
+    port: connection.remotePort,
+    uuid: uuidv1()
+  })
 
-  const filter = { address: connection.remoteAddress, port: connection.remotePort }
-
-  Worker
-    .findOne(filter)
+  worker
+    .save()
     .then(function (worker) {
-      if (!worker) {
-        // Worker doesn't exist. Insert it
-        const newWorker = new Worker({
-          address: socket.remoteAddress,
-          port: socket.remotePort
-        })
-        return newWorker.save()
-      }
-      return worker
-    }).then(function (worker) {
-      connection.id = worker._id
-      connectionManager.add(connection)
+      connectionManager.add(worker.uuid, connection)
+
+      // Ask everything
+      const flags = (Flags.RESOURCE | Flags.TASKS | Flags.STATE | Flags.ALIAS)
+
+      connectionManager.send(worker.uuid, getReport.format({ flags: flags }))
+    }).catch(function (e) {
+      log.fatal(e)
+    })
+})
+
+communicationEvent.on('closed_connection', function (connection) {
+  connectionManager.remove(connection.id)
+
+  const simulationInstanceFilter = { worker: connection.id }
+
+  SimulationInstance
+    .find(simulationInstanceFilter, '_id')
+    .then(function (simulationInstanceIds) {
+      simulationInstanceIds.map(function (simulationInstanceId) {
+        return SimulationInstance.updateToDefaultState(simulationInstanceId)
+      })
     }).catch(function (e) {
       log.fatal(e)
     })
 
+  Worker
+    .find({ uuid: connection.id })
+    .remove()
+    .catch(function (e) {
+      log.fatal(e)
+    })
 })
 
 module.exports.treat = function (packet, socket) {
-
-  const pdu = JSON.parse(packet.toString())
+  var pdu = ''
 
   try {
+    pdu = JSON.parse(packet.toString())
     factory.validate(pdu)
   } catch (e) {
     return log.fatal(e)
@@ -58,18 +93,18 @@ module.exports.treat = function (packet, socket) {
 
       chooseHandler(pdu, worker)
     }).catch(function (e) {
-      log.fatal(e);
+      log.fatal(e)
     })
 }
 
-function chooseHandler(pdu, worker) {
-  switch (pdu.id) {
+function chooseHandler (pdu, worker) {
+  switch (pdu.header.id) {
     case Id.REPORT:
-      performTaskResponseHandler.execute(pdu, worker)
+      reportHandler.execute(pdu, worker)
       break
 
     case Id.PERFORM_TASK_RESPONSE:
-      reportHandler.execute(pdu, worker)
+      performTaskResponseHandler.execute(pdu, worker)
       break
 
     case Id.TASK_RESULT:
