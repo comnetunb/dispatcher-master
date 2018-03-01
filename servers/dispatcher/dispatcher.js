@@ -12,15 +12,17 @@ const worker_discovery = rootRequire('servers/dispatcher/worker_discovery')
 // Shared Related
 const log = rootRequire('servers/shared/log')
 const config = rootRequire('servers/shared/configuration').getConfiguration()
+const interfaceManagerEvent = rootRequire('servers/shared/interface_manager').event
 
 // Database Related
 const SimulationInstance = rootRequire('database/models/simulation_instance')
 const Worker = rootRequire('database/models/worker')
 
 // Protocol Related
-const getReport = protocolRequire('dwp/pdu/get_report')
 const Flags = protocolRequire('dwp/common').Flags
+const getReport = protocolRequire('dwp/pdu/get_report')
 const performTask = protocolRequire('dwp/pdu/perform_task')
+const performCommand = protocolRequire('dwp/pdu/perform_command')
 
 module.exports = function () {
   try {
@@ -97,7 +99,7 @@ function batchDispatch() {
               simulationInstance.state = SimulationInstance.State.Sent
               simulationInstance.worker = availableWorkers[index].uuid
 
-              simulationInstance
+              return simulationInstance
                 .save()
                 .then(function () {
 
@@ -140,7 +142,7 @@ function batchDispatch() {
 
                   // If after X seconds it is still 'Sent', return it to its default state
                   setTimeout(function () {
-                    SimulationInstance
+                    return SimulationInstance
                       .findById(simulationInstance._id)
                       .then(function (simulationInstanceRefreshed) {
                         if (!simulationInstanceRefreshed) {
@@ -149,14 +151,10 @@ function batchDispatch() {
 
                         if (simulationInstanceRefreshed.isSent()) {
                           log.warn('Timeout from worker ' + availableWorkers[index].address + ':' + availableWorkers[index].port)
-                          SimulationInstance.updateToDefaultState(simulationInstanceRefreshed._id)
+                          return SimulationInstance.updateToDefaultState(simulationInstanceRefreshed._id)
                         }
-                      }).catch(function (err) {
-                        log.fatal(err)
                       })
                   }, 10000)
-                }).catch(function (err) {
-                  log.fatal(err)
                 })
             })
         }).catch(function (err) {
@@ -180,18 +178,32 @@ function cleanUp() {
   var promises = []
 
   promises.push(SimulationInstance
-    .update(simulationInstanceFilter, simulationInstanceUpdate, { multi: true })
-    .catch(function (err) {
-      log.fatal(err)
-    }))
-
+    .update(simulationInstanceFilter, simulationInstanceUpdate, { multi: true }))
 
   // Remove all workers since it is the dispatcher startup
   promises.push(Worker
-    .remove({})
-    .catch(function (err) {
-      log.fatal(err)
-    }))
+    .remove({}))
 
   return Promise.all(promises)
 }
+
+// TODO: use uuid instead of address
+interfaceManagerEvent.on('worker_command', function (address, command) {
+  const workerFilter = { address: address }
+
+  Worker
+    .findOne(workerFilter)
+    .then(function (worker) {
+      if (!worker) {
+        throw 'Worker not found'
+      }
+
+      connectionManager.send(worker.uuid, performCommand.format({ command: command }))
+
+      const flags = Flags.STATE | Flags.TASKS
+
+      connectionManager.send(worker.uuid, getReport.format({ flags: flags }))
+    }).catch(function (e) {
+      log.fatal(e)
+    })
+})

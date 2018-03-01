@@ -16,8 +16,8 @@ module.exports.execute = function (pdu, worker) {
     // Succeded
     try {
       JSON.parse(pdu.output)
-    } catch (err) {
-      log.error(err + '\nJSON: ' + pdu.output)
+    } catch (e) {
+      log.fatal(e + '\nJSON: ' + pdu.output)
     }
 
     var simulationInstanceUpdate = {
@@ -33,6 +33,8 @@ module.exports.execute = function (pdu, worker) {
         log.info('Worker ' + worker.address + ':' + worker.port + ' has finished simulation instance ' + simulationInstance._id)
 
         return cascadeConclusion(simulationInstance._simulation)
+      }).then(function () {
+        return worker.updateRunningInstances()
       }).catch(function (e) {
         log.fatal(e)
       })

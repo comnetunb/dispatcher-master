@@ -94,7 +94,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\apis\simulation_group.js" />
-    <Compile Include="servers\web\apis\simulation_instance.js">
+    <Compile Include="servers\web\apis\worker.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\router.js">

@@ -27,6 +27,7 @@ module.exports.execute = function (pdu, worker) {
         }
 
         simulationInstance.worker = worker.uuid
+        simulationInstance.state = SimulationInstance.State.Executing
         simulationInstance.save()
         return true
       }).then(function (needsToUpdate) {

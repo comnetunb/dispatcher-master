@@ -52,17 +52,32 @@ module.exports.execute = function (pdu, worker) {
 
           // Associate this instance to this worker
           simulationInstance.worker = worker.uuid
-          simulationInstance
+          return simulationInstance
             .save()
-            .catch(function (err) {
-              log.fatal(err)
-            })
-        }).catch(function (err) {
-          log.fatal(err)
         })
     })).then(function () {
-      // When all instances were set, update worker running instances
-      // worker.updateRunningInstances()
+      const simulationInstanceFilter = { worker: worker.uuid }
+
+      return SimulationInstance
+        .find(simulationInstanceFilter)
+        .then(function (simulationInstances) {
+          if (simulationInstances === null) {
+            return
+          }
+
+          return Promise.all(simulationInstances
+            .map(function (simulationInstance) {
+              for (const task in pdu.tasks) {
+                if (pdu.tasks[task].id === simulationInstance._id) {
+                  return;
+                }
+              }
+
+              return SimulationInstance.updateToDefaultState(simulationInstance._id)
+            }))
+        })
+    }).then(function () {
+      worker.updateRunningInstances()
     }).catch(function (e) {
       log.fatal(e)
     })
