@@ -43,13 +43,6 @@
     <Compile Include="database\models\worker.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="public\js\bootstrap-confirmation.min.js" />
-    <Compile Include="public\js\bootstrap.js" />
-    <Compile Include="public\js\bootstrap.min.js" />
-    <Compile Include="public\js\jquery-3.2.1.js" />
-    <Compile Include="public\js\sb-admin-2.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="servers\dispatcher\connection_manager.js">
       <SubType>Code</SubType>
     </Compile>
@@ -102,53 +95,44 @@
     </Compile>
     <Compile Include="servers\web\routes\dashboard.js" />
     <Compile Include="servers\web\routes\home.js" />
+    <Compile Include="servers\web\routes\index.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\web\routes\login.js" />
     <Compile Include="servers\web\routes\sign_up.js" />
     <Compile Include="servers\web\routes\simulation.js" />
-    <Compile Include="views\dashboard\logs.ejs">
+    <Compile Include="views\app\dashboard.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="views\dashboard\workers.ejs">
+    <Compile Include="views\css\style.css">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="views\simulation.ejs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="views\template\header.ejs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Content Include="public\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="public\fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="package.json" />
     <Content Include="servers\config\config.json" />
-    <Content Include="views\dashboard\executing-simulation-groups.ejs" />
-    <Content Include="views\dashboard\finished-simulation-groups.ejs" />
-    <Content Include="views\dashboard\new-simulation-group.ejs" />
-    <Content Include="views\dashboard\template\sidebar.ejs">
+    <Content Include="views\dashboard\worker.ejs">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\navigation.ejs">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\index.ejs">
       <SubType>Code</SubType>
     </Content>
     <Content Include="views\login.ejs">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="views\dashboard\navigation.ejs">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\sign_up.ejs" />
-    <Content Include="views\template\footer.ejs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="views\template\head.ejs">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="views\home.ejs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="database\" />
     <Folder Include="database\models\" />
-    <Folder Include="public" />
-    <Folder Include="public\css" />
-    <Folder Include="public\fonts\" />
-    <Folder Include="public\js\" />
     <Folder Include="servers\" />
     <Folder Include="servers\config\" />
     <Folder Include="servers\dispatcher\" />
@@ -159,9 +143,9 @@
     <Folder Include="servers\web\apis\" />
     <Folder Include="servers\web\routes\" />
     <Folder Include="views" />
+    <Folder Include="views\app\" />
+    <Folder Include="views\css\" />
     <Folder Include="views\dashboard\" />
-    <Folder Include="views\dashboard\template\" />
-    <Folder Include="views\template\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

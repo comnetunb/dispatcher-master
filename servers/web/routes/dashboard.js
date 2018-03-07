@@ -27,16 +27,18 @@ module.exports = function (app) {
     res.render('dashboard/new-simulation-group', options)
   })
 
-  app.get('/dashboard/workers', router.authenticationMiddleware(), function (req, res) {
-    const options = { title: 'Dashboard' }
-
-    res.render('dashboard/workers', options)
+  app.get('/dashboard/workers', /*router.authenticationMiddleware(),*/ function (req, res) {
+    res.render('dashboard/worker')
   })
 
   app.get('/dashboard/logs', function (req, res) {
     const options = { title: 'Dashboard' }
 
     res.render('dashboard/logs', options)
+  })
+
+  app.get('/worker', function (req, res) {
+    res.render('dashboard/worker')
   })
 
   app.get('/workers', function (req, res) {

@@ -14,6 +14,7 @@ const login = rootRequire('servers/web/routes/login')
 const dashboard = rootRequire('servers/web/routes/dashboard')
 const sign_up = rootRequire('servers/web/routes/sign_up')
 const simulation = rootRequire('servers/web/routes/simulation')
+const index = rootRequire('servers/web/routes/index')
 
 // APIs
 const api_simulation_group = rootRequire('servers/web/apis/simulation_group')
@@ -26,6 +27,7 @@ module.exports.execute = function (app) {
   dashboard(app)
   sign_up(app)
   simulation(app)
+  index(app)
 
   api_simulation_group(app)
   api_log(app)

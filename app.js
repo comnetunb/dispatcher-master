@@ -34,7 +34,17 @@ const MongoStore = require('connect-mongo')(session)
 const mongoUrl = 'mongodb://localhost/ons'
 const mongoOptions = { useMongoClient: true }
 
-app.use(express.static(__dirname + '/public'))
+app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist/'));
+app.use('/angular', express.static(__dirname + '/node_modules/angular/'));
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist/'));
+app.use('/sb-admin', express.static(__dirname + '/node_modules/startbootstrap-sb-admin/'));
+app.use('/jquery-easing', express.static(__dirname + '/node_modules/jquery.easing/'));
+app.use('/popper', express.static(__dirname + '/node_modules/popper.js/dist/'));
+app.use('/dataTables', express.static(__dirname + '/node_modules/datatables/media/'));
+app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome/'));
+app.use('/angular-gridster', express.static(__dirname + '/node_modules/angular-gridster/dist'));
+app.use('/angularjs-gauge', express.static(__dirname + '/node_modules/angularjs-gauge/dist'));
+app.use('/', express.static(__dirname + '/views/'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(expressValidator())
 app.use(flash())
@@ -91,4 +101,4 @@ dispatcher()
 router.execute(app)
 
 // Listen requests
-app.listen(8080, '0.0.0.0')
+app.listen(80, '0.0.0.0')
