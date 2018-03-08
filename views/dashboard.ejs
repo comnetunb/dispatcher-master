@@ -184,11 +184,28 @@
   <!-- Content -->
   <div class="content-wrapper" ng-controller="workerCtrl">
 
-    <div gridster class="center">
+    <h3 class="text-center">Running [ {{workers.length}} ]</h3>
+    <hr />
+    <div gridster>
+
       <ul>
-        <li gridster-item="item" ng-repeat="item in standardItems">
-          <h6 class="text-center">ORION01 - 192.168.25.1</h6>
-          <div>
+        <li gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 0">
+          <h6 class="text-center running">{{worker.alias}} {{worker.address}}</h6>
+          <div class="center">
+            <ng-gauge size="120" type="semi" thick="5" min="0" max="120" value="( 1 - worker.resource.cpu ) * 100" cap="round" label="CPU" foreground-color="#ffcc66" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+            <ng-gauge size="120" type="semi" thick="5" min="0" max="120" value="worker.resource.memory * 100" cap="round" label="Memory" foreground-color="#ffcc66" background-color="rgba(255,255,255, 0.4)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <h3 class="text-center">Paused [ {{workers.length}} ]</h3>
+    <hr />
+    <div gridster>
+      <ul>
+        <li gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 1">
+          <h6 class="text-center paused">ORION01 - 192.168.25.1</h6>
+          <div class="center">
             <ng-gauge size="120" type="full" thick="5" min="0" max="120" value="30.2" cap="round" label="CPU" foreground-color="#ffcc66" background-color="rgba(255,255,255, 1.0)" append="%"></ng-gauge>
             <ng-gauge size="120" type="full" thick="5" min="0" max="120" value="30.2" cap="round" label="Memory" foreground-color="#ffcc66" background-color="rgba(255,255,255, 0.4)" append="%"></ng-gauge>
           </div>

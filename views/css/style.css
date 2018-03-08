@@ -173,12 +173,18 @@
     background-color: #f0f0f0;
   }
 
-.gridster h6 {
+.gridster .running {
+  background-color: #4cff00;
+}
+
+.gridster .paused {
   background-color: #ffcc66;
 }
 
+.gridster h6 {
+  font-family:Calibri
+}
+
 .center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
 }

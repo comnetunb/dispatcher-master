@@ -27,8 +27,8 @@ module.exports = function (app) {
     res.render('dashboard/new-simulation-group', options)
   })
 
-  app.get('/dashboard/workers', /*router.authenticationMiddleware(),*/ function (req, res) {
-    res.render('dashboard/worker')
+  app.get('/dashboard/', /*router.authenticationMiddleware(),*/ function (req, res) {
+    res.render('dashboard')
   })
 
   app.get('/dashboard/logs', function (req, res) {
