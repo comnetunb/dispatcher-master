@@ -33,9 +33,11 @@ module.exports.execute = function (pdu, worker) {
         log.info('Worker ' + worker.address + ':' + worker.port + ' has finished simulation instance ' + simulationInstance._id)
 
         return cascadeConclusion(simulationInstance._simulation)
-      }).then(function () {
+      })
+      .then(function () {
         return worker.updateRunningInstances()
-      }).catch(function (e) {
+      })
+      .catch(function (e) {
         log.fatal(e)
       })
   } else {
@@ -46,13 +48,14 @@ module.exports.execute = function (pdu, worker) {
       .updateToDefaultState(pdu.task.id)
       .then(function () {
         return worker.updateRunningInstances()
-      }).catch(function (e) {
+      })
+      .catch(function (e) {
         log.fatal(e)
       })
   }
 }
 
-function cascadeConclusion (simulationGroupId) {
+function cascadeConclusion(simulationGroupId) {
   return SimulationInstance
     .countActive(simulationGroupId)
     .then(function (count) {
@@ -64,7 +67,8 @@ function cascadeConclusion (simulationGroupId) {
 
       return Simulation
         .findByIdAndUpdate(simulationGroupId, simulationUpdate)
-    }).then(function (simulation) {
+    })
+    .then(function (simulation) {
       if (!simulation) {
         return
       }
@@ -78,12 +82,13 @@ function cascadeConclusion (simulationGroupId) {
           // All Simulations are done
           return finishSimulationGroup(simulation._simulationGroup)
         })
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 }
 
-function finishSimulationGroup (simulationGroupId) {
+function finishSimulationGroup(simulationGroupId) {
   const simulationGroupUpdate = { state: SimulationGroup.State.Finished, endTime: Date.now() }
 
   return SimulationGroup
@@ -91,12 +96,13 @@ function finishSimulationGroup (simulationGroupId) {
     .populate('_user')
     .then(function (simulationGroup) {
       sendSimulationGroupConclusionEmail(simulationGroup)
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 }
 
-function sendSimulationGroupConclusionEmail (simulationGroup) {
+function sendSimulationGroupConclusionEmail(simulationGroup) {
   const to = simulationGroup._user.email
   const subject = 'Simulation group "' + simulationGroup.name + '" has finished'
   const text =

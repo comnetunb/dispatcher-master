@@ -170,7 +170,7 @@
   }
 
   .gridster li {
-    background-color: #f0f0f0;
+    background-color: #dfdfdf;
   }
 
 .gridster .running {
@@ -181,10 +181,67 @@
   background-color: #ffcc66;
 }
 
-.gridster h6 {
+.gridster h5 {
   font-family:Calibri
 }
 
-.center {
+.sort-icon {
+  font-size: 9px;
+  margin-left: 5px;
+}
+
+th {
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 10px;
+  display: block;
+}
+
+input.ng-invalid.ng-touched {
+  border: 2px solid red;
+}
+
+small.warning {
+  color: red;
+  display: block;
+  text-align: center;
+}
+
+/*.inner-center {
+  width: 80%;
   margin: 0 auto;
+}*/
+
+.outer {
+  width: 100%;
+  text-align: center;
+}
+
+.inner {
+  display: inline-block;
+}
+
+.dropdown-menu {
+  min-width: 100%;
+}
+
+.navbar-bottom {
+  bottom: 0;
+  width: 100%;
+  position: absolute;
+}
+
+footer.sticky-footer {
+  width: 100%;
+}
+
+/* 
+  Allow angular.js to be loaded in body, hiding cloaked elements until 
+  templates compile.  The !important is important given that there may be 
+  other selectors that are more specific or come later and might alter display.  
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
 }

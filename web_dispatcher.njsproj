@@ -43,6 +43,50 @@
     <Compile Include="database\models\worker.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\config\passport.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\home.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\navigation.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\task.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\worker.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\sign_out.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\sign_up.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\views\authentication\forgot_password.html">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\views\navigation.html">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\setup.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\methods\user.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\dashboard.js" />
+    <Compile Include="servers\web\public\js\app.js" />
+    <Compile Include="servers\web\public\views\authentication\sign_in.html">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\sign_in.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\views\authentication\sign_up.html">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\dispatcher\connection_manager.js">
       <SubType>Code</SubType>
     </Compile>
@@ -83,53 +127,42 @@
     </Compile>
     <Compile Include="servers\shared\mailer.js" />
     <Compile Include="servers\shared\simulation_utils.js" />
-    <Compile Include="servers\web\apis\log.js">
+    <Compile Include="servers\web\api\log.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\web\apis\simulation_group.js" />
-    <Compile Include="servers\web\apis\worker.js">
+    <Compile Include="servers\web\api\task.js" />
+    <Compile Include="servers\web\service.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\web\router.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="servers\web\routes\dashboard.js" />
-    <Compile Include="servers\web\routes\home.js" />
-    <Compile Include="servers\web\routes\index.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="servers\web\routes\login.js" />
-    <Compile Include="servers\web\routes\sign_up.js" />
-    <Compile Include="servers\web\routes\simulation.js" />
-    <Compile Include="views\app\dashboard.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="views\css\style.css">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="views\simulation.ejs">
+    <Compile Include="servers\web\api\worker.js">
       <SubType>Code</SubType>
     </Compile>
     <Content Include="package.json" />
+    <Content Include="servers\web\public\views\dashboard\active.html" />
+    <Content Include="servers\web\public\css\style.css" />
+    <Content Include="servers\web\public\views\dashboard\dashboard.html" />
+    <Content Include="servers\web\public\index.html" />
+    <Content Include="servers\web\public\views\dashboard\finished.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\workers.html" />
     <Content Include="servers\config\config.json" />
-    <Content Include="views\dashboard.ejs">
+    <Content Include="servers\web\public\views\home.html">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="views\navigation.ejs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="views\index.ejs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="views\login.ejs">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="views\sign_up.ejs" />
-    <Content Include="views\home.ejs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="database\" />
     <Folder Include="database\models\" />
+    <Folder Include="servers\web\methods\" />
+    <Folder Include="servers\web\config\" />
+    <Folder Include="servers\web\public\" />
+    <Folder Include="servers\web\public\js\" />
+    <Folder Include="servers\web\public\css\" />
+    <Folder Include="servers\web\public\js\controller\" />
+    <Folder Include="servers\web\public\views\" />
+    <Folder Include="servers\web\public\views\dashboard\" />
+    <Folder Include="servers\web\public\views\authentication\" />
     <Folder Include="servers\" />
     <Folder Include="servers\config\" />
     <Folder Include="servers\dispatcher\" />
@@ -137,11 +170,7 @@
     <Folder Include="servers\dispatcher\dwp_handler\handler\" />
     <Folder Include="servers\shared\" />
     <Folder Include="servers\web\" />
-    <Folder Include="servers\web\apis\" />
-    <Folder Include="servers\web\routes\" />
-    <Folder Include="views" />
-    <Folder Include="views\app\" />
-    <Folder Include="views\css\" />
+    <Folder Include="servers\web\api\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

@@ -55,32 +55,35 @@ module.exports.execute = function (pdu, worker) {
           return simulationInstance
             .save()
         })
-    })).then(function () {
-      const simulationInstanceFilter = { worker: worker.uuid }
+    }))
+      .then(function () {
+        const simulationInstanceFilter = { worker: worker.uuid }
 
-      return SimulationInstance
-        .find(simulationInstanceFilter)
-        .then(function (simulationInstances) {
-          if (simulationInstances === null) {
-            return
-          }
+        return SimulationInstance
+          .find(simulationInstanceFilter)
+          .then(function (simulationInstances) {
+            if (simulationInstances === null) {
+              return
+            }
 
-          return Promise.all(simulationInstances
-            .map(function (simulationInstance) {
-              for (const task in pdu.tasks) {
-                if (pdu.tasks[task].id === simulationInstance._id) {
-                  return;
+            return Promise.all(simulationInstances
+              .map(function (simulationInstance) {
+                for (const task in pdu.tasks) {
+                  if (pdu.tasks[task].id === simulationInstance._id) {
+                    return;
+                  }
                 }
-              }
 
-              return SimulationInstance.updateToDefaultState(simulationInstance._id)
-            }))
-        })
-    }).then(function () {
-      worker.updateRunningInstances()
-    }).catch(function (e) {
-      log.fatal(e)
-    })
+                return SimulationInstance.updateToDefaultState(simulationInstance._id)
+              }))
+          })
+      })
+      .then(function () {
+        worker.updateRunningInstances()
+      })
+      .catch(function (e) {
+        log.fatal(e)
+      })
   }
 
   if (pdu.flags & flags.STATE) {

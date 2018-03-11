@@ -157,7 +157,8 @@ function batchDispatch() {
                   }, 10000)
                 })
             })
-        }).catch(function (err) {
+        })
+        .catch(function (err) {
           log.error(err)
         })
     })
@@ -203,7 +204,8 @@ interfaceManagerEvent.on('worker_command', function (address, command) {
       const flags = Flags.STATE | Flags.TASKS
 
       connectionManager.send(worker.uuid, getReport.format({ flags: flags }))
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 })

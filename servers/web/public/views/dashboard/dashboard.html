@@ -7,9 +7,12 @@
 
   <title>Dashboard | WebSimAdmin</title>
 
+  <!--<base href="/" />-->
+
   <!-- Bootstrap CSS CDN -->
   <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="/sb-admin/css/sb-admin.min.css">
+  <link rel="stylesheet" href="/sb-admin/vendor/datatables/dataTables.bootstrap4.css">
   <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css" />
   <link rel="stylesheet" href="/angular-gridster/angular-gridster.min.css" />
   <link rel="stylesheet" type="text/css" href="/css/style.css" />
@@ -19,14 +22,14 @@
 <body class="sticky-footer bg-dark" id="page-top">
   <!-- Navigation-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top" id="mainNav">
-    <a class="navbar-brand" href="index.html">WebSimAdmin</a>
+    <a class="navbar-brand" href="/">WebSimAdmin</a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Workers">
-          <a class="nav-link" href="workers">
+          <a class="nav-link" href="#!workers">
             <i class="fa fa-fw fa-desktop"></i>
             <span class="nav-link-text">Workers</span>
           </a>
@@ -38,7 +41,7 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseComponents">
             <li>
-              <a href="../index"><span class="badge badge-secondary">0</span> Active</a>
+              <a href="#!active"><span class="badge badge-secondary">0</span> Active</a>
             </li>
             <li>
               <a href="navbar.html"><span class="badge badge-secondary">0</span> Finished</a>
@@ -79,7 +82,7 @@
       </ul>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-fw fa-envelope"></i>
             <span class="d-lg-none">
               Messages
@@ -114,7 +117,7 @@
           </div>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-fw fa-bell"></i>
             <span class="d-lg-none">
               Alerts
@@ -160,58 +163,38 @@
             <a class="dropdown-item small" href="#">View all alerts</a>
           </div>
         </li>
-        <li class="nav-item">
-          <form class="form-inline my-2 my-lg-0 mr-lg-2">
-            <div class="input-group">
-              <input class="form-control" type="text" placeholder="Search for...">
-              <span class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                  <i class="fa fa-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-            <i class="fa fa-fw fa-sign-out"></i>Logout
+
+        <!-- User -->
+        <li class="nav-item dropdown" ng-cloak ng-hide="signedUser">
+          <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{signedUser.name}}
           </a>
+          <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+            <a class="dropdown-item" href="#">
+              <span>
+                <strong>
+                  <i class="fa fa-fw fa-user-circle"></i> Profile
+                </strong>
+              </span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" ng-click="signOut()">
+              <span>
+                <strong>
+                  <i class="fa fa-fw fa-sign-out"></i> Sign Out
+                </strong>
+              </span>
+            </a>
+          </div>
         </li>
+        <!-- !User -->
       </ul>
     </div>
   </nav>
 
   <!-- Content -->
-  <div class="content-wrapper" ng-controller="workerCtrl">
-
-    <h3 class="text-center">Running [ {{workers.length}} ]</h3>
-    <hr />
-    <div gridster>
-
-      <ul>
-        <li gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 0">
-          <h6 class="text-center running">{{worker.alias}} {{worker.address}}</h6>
-          <div class="center">
-            <ng-gauge size="120" type="semi" thick="5" min="0" max="120" value="( 1 - worker.resource.cpu ) * 100" cap="round" label="CPU" foreground-color="#ffcc66" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
-            <ng-gauge size="120" type="semi" thick="5" min="0" max="120" value="worker.resource.memory * 100" cap="round" label="Memory" foreground-color="#ffcc66" background-color="rgba(255,255,255, 0.4)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-    <h3 class="text-center">Paused [ {{workers.length}} ]</h3>
-    <hr />
-    <div gridster>
-      <ul>
-        <li gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 1">
-          <h6 class="text-center paused">ORION01 - 192.168.25.1</h6>
-          <div class="center">
-            <ng-gauge size="120" type="full" thick="5" min="0" max="120" value="30.2" cap="round" label="CPU" foreground-color="#ffcc66" background-color="rgba(255,255,255, 1.0)" append="%"></ng-gauge>
-            <ng-gauge size="120" type="full" thick="5" min="0" max="120" value="30.2" cap="round" label="Memory" foreground-color="#ffcc66" background-color="rgba(255,255,255, 0.4)" append="%"></ng-gauge>
-          </div>
-        </li>
-      </ul>
-    </div>
+  <div class="content-wrapper">
+    <main ng-view></main>
 
     <footer class="sticky-footer">
       <div class="container">
@@ -223,10 +206,14 @@
   </div>
 
   <script src="/angular/angular.min.js"></script>
-  <script src="/app/dashboard.js"></script>
+  <script src="/angular-route/angular-route.min.js"></script>
+  <script src="/angular-utils-pagination/dirPagination.js"></script>
+  <script src="/js/dashboard.js"></script>
   <script src="/jquery/jquery.min.js"></script>
   <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/sb-admin/js/sb-admin.min.js"></script>
+  <script src="/sb-admin/vendor/datatables/jquery.dataTables.js"></script>
+  <script src="/sb-admin/vendor/datatables/dataTables.bootstrap4.js"></script>
   <script src="/angular-gridster/angular-gridster.min.js"></script>
   <script src="/angularjs-gauge/angularjs-gauge.min.js"></script>
 </body>

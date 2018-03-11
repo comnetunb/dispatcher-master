@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>Dashboard | WebSimAdmin</title>
+
+  <!--<base href="/" />-->
+
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/sb-admin/css/sb-admin.min.css">
+  <link rel="stylesheet" href="/sb-admin/vendor/datatables/dataTables.bootstrap4.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/angular-gridster/angular-gridster.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+
+<body class="fixed-nav sticky-footer" id="page-top">
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand" href="index.html">WebSimAdmin</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <!-- SideBar -->
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion" ng-cloak ng-show="sidebar">
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Workers">
+          <a class="nav-link" href="#!workers">
+            <i class="fa fa-fw fa-desktop"></i>
+            <span class="nav-link-text">Workers</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Groups" ng-controller="groupCtrl">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" ng-href="#collapseComponents" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-folder"></i>
+            <span class="nav-link-text">Groups</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseComponents">
+            <li>
+              <a href="#!active"><span class="badge badge-secondary">0</span> Active</a>
+            </li>
+            <li>
+              <a href="#!finished"><span class="badge badge-secondary">0</span> Finished</a>
+            </li>
+            <li>
+              <a href="cards.html"><span class="badge badge-secondary">0</span> Paused</a>
+            </li>
+            <li>
+              <a href="cards.html"><i class="fa fa-fw fa-plus"></i> Add</a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Logs">
+          <a class="nav-link" href="charts.html">
+            <i class="fa fa-fw fa-file"></i>
+            <span class="nav-link-text">Logs</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Scheduler">
+          <a class="nav-link" href="tables.html">
+            <i class="fa fa-fw fa-calendar"></i>
+            <span class="nav-link-text">Scheduler</span>
+          </a>
+        </li>
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Configuration">
+          <a class="nav-link" href="tables.html">
+            <i class="fa fa-fw fa-cog"></i>
+            <span class="nav-link-text">Configuration</span>
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav sidenav-toggler" ng-cloak ng-show="sidebar">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fa fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+      <!-- !SideBar -->
+      <!-- Defauld Navbar -->
+      <ul class="navbar-nav ml-auto" ng-cloak ng-if="!signedUser">
+        <li class="nav-item">
+          <a class="nav-link" ng-href="#!sign_up">
+            Sign Up
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" ng-href="#!sign_in">
+            Sign In
+          </a>
+        </li>
+      </ul>
+      <!-- !Defauld Navbar -->
+      <!-- Signed in Navbar -->
+      <ul class="navbar-nav ml-auto" ng-cloak ng-if="signedUser" ng-controller="navigationCtrl">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-fw fa-bell"></i>
+            <span class="d-lg-none">
+              Alerts
+              <span class="badge badge-pill badge-warning">6 New</span>
+            </span>
+            <span class="indicator text-warning d-none d-lg-block">
+              <i class="fa fa-fw fa-circle"></i>
+            </span>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+            <h6 class="dropdown-header">New Alerts:</h6>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <span class="text-success">
+                <strong>
+                  <i class="fa fa-long-arrow-up fa-fw"></i>Status Update
+                </strong>
+              </span>
+              <span class="small float-right text-muted">11:21 AM</span>
+              <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <span class="text-danger">
+                <strong>
+                  <i class="fa fa-long-arrow-down fa-fw"></i>Status Update
+                </strong>
+              </span>
+              <span class="small float-right text-muted">11:21 AM</span>
+              <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <span class="text-success">
+                <strong>
+                  <i class="fa fa-long-arrow-up fa-fw"></i>Status Update
+                </strong>
+              </span>
+              <span class="small float-right text-muted">11:21 AM</span>
+              <div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item small" href="#">View all alerts</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{signedUser.name}}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+            <a class="dropdown-item" href="#">
+              <span>
+                <strong>
+                  <i class="fa fa-fw fa-user-circle"></i> Profile
+                </strong>
+              </span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#!workers">
+              <span>
+                <strong>
+                  <i class="fa fa-fw fa-dashboard"></i> Dashboard
+                </strong>
+              </span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" ng-click="signOut()">
+              <span>
+                <strong>
+                  <i class="fa fa-fw fa-sign-out"></i> Sign Out
+                </strong>
+              </span>
+            </a>
+          </div>
+        </li>
+      </ul>
+      <!-- !Signed in Navbar -->
+
+    </div>
+  </nav>
+
+  <main ng-view>{{sidebar}}</main>
+  <!-- /.container-fluid-->
+  <!-- /.content-wrapper-->
+  <footer class="sticky-footer">
+    <div class="container">
+      <div class="text-center">
+        <small>Copyright © Your Website 2018</small>
+      </div>
+    </div>
+  </footer>
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fa fa-angle-up"></i>
+  </a>
+  <!-- Logout Modal-->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/angular/angular.min.js"></script>
+  <script src="/angular-route/angular-route.min.js"></script>
+  <script src="/angular-utils-pagination/dirPagination.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/controller/sign_in.js"></script>
+  <script src="/js/controller/worker.js"></script>
+  <script src="/js/controller/task.js"></script>
+  <script src="/js/controller/navigation.js"></script>
+  <script src="/js/controller/home.js"></script>
+  <script src="/jquery/jquery.min.js"></script>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/sb-admin/js/sb-admin.min.js"></script>
+  <script src="/sb-admin/vendor/datatables/jquery.dataTables.js"></script>
+  <script src="/sb-admin/vendor/datatables/dataTables.bootstrap4.js"></script>
+  <script src="/angular-gridster/angular-gridster.min.js"></script>
+  <script src="/angularjs-gauge/angularjs-gauge.min.js"></script>
+</body>
+</html>

@@ -44,7 +44,8 @@ communicationEvent.on('new_connection', function (connection) {
       const flags = (Flags.RESOURCE | Flags.TASKS | Flags.STATE | Flags.ALIAS)
 
       connectionManager.send(worker.uuid, getReport.format({ flags: flags }))
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 })
@@ -60,7 +61,8 @@ communicationEvent.on('closed_connection', function (connection) {
       simulationInstanceIds.map(function (simulationInstanceId) {
         return SimulationInstance.updateToDefaultState(simulationInstanceId)
       })
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 
@@ -92,12 +94,13 @@ module.exports.treat = function (packet, socket) {
       }
 
       chooseHandler(pdu, worker)
-    }).catch(function (e) {
+    })
+    .catch(function (e) {
       log.fatal(e)
     })
 }
 
-function chooseHandler (pdu, worker) {
+function chooseHandler(pdu, worker) {
   switch (pdu.header.id) {
     case Id.REPORT:
       reportHandler.execute(pdu, worker)

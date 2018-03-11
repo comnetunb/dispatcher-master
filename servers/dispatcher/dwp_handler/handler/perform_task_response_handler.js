@@ -30,11 +30,13 @@ module.exports.execute = function (pdu, worker) {
         simulationInstance.state = SimulationInstance.State.Executing
         simulationInstance.save()
         return true
-      }).then(function (needsToUpdate) {
+      })
+      .then(function (needsToUpdate) {
         if (needsToUpdate) {
           worker.updateRunningInstances()
         }
-      }).catch(function (e) {
+      })
+      .catch(function (e) {
         log.fatal(e)
       })
   } else if (pdu.code === ReturnCode.DENIED) {
