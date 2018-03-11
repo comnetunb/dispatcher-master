@@ -40,13 +40,13 @@
           </a>
           <ul class="sidenav-second-level collapse" id="collapseComponents">
             <li>
-              <a href="#!active"><span class="badge badge-secondary">0</span> Active</a>
+              <a href="#!active"><span class="badge badge-secondary">{{activeCount}}</span> Active</a>
             </li>
             <li>
-              <a href="#!finished"><span class="badge badge-secondary">0</span> Finished</a>
+              <a href="#!finished"><span class="badge badge-secondary">{{finishedCount}}</span> Finished</a>
             </li>
             <li>
-              <a href="cards.html"><span class="badge badge-secondary">0</span> Paused</a>
+              <a href="cards.html"><span class="badge badge-secondary">{{canceledCount}}</span> Paused</a>
             </li>
             <li>
               <a href="cards.html"><i class="fa fa-fw fa-plus"></i> Add</a>
@@ -147,7 +147,7 @@
           <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {{signedUser.name}}
           </a>
-          <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
             <a class="dropdown-item" href="#">
               <span>
                 <strong>
