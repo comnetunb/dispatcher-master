@@ -46,6 +46,9 @@
     <Compile Include="servers\web\config\passport.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\public\js\controller\authentication.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\web\public\js\controller\home.js">
       <SubType>Code</SubType>
     </Compile>
@@ -140,6 +143,9 @@
     <Content Include="package.json" />
     <Content Include="servers\web\public\views\dashboard\active.html" />
     <Content Include="servers\web\public\css\style.css" />
+    <Content Include="servers\web\public\views\dashboard\add.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="servers\web\public\views\dashboard\dashboard.html" />
     <Content Include="servers\web\public\index.html" />
     <Content Include="servers\web\public\views\dashboard\finished.html">

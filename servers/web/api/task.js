@@ -71,7 +71,7 @@ module.exports = function (app) {
     })
   })
 
-  app.get('/api/task/count_executing', (req, res) => {
+  app.get('/api/task/count_active', (req, res) => {
     const simulationGroupFilter = {
       state: SimulationGroup.State.Executing,
       _user: req.user.id
@@ -80,7 +80,7 @@ module.exports = function (app) {
     var promise = SimulationGroup.count(simulationGroupFilter)
 
     promise.then(function (count) {
-      res.send({ 'result': count })
+      res.send({ 'count': count })
     }).catch(function (e) {
       log.error(e)
       res.sendStatus(500)
@@ -96,7 +96,23 @@ module.exports = function (app) {
     var promise = SimulationGroup.count(simulationGroupFilter)
 
     promise.then(function (count) {
-      res.send({ 'result': count })
+      res.send({ 'count': count })
+    }).catch(function (e) {
+      log.error(e)
+      res.sendStatus(500)
+    })
+  })
+
+  app.get('/api/task/count_canceled', (req, res) => {
+    const simulationGroupFilter = {
+      state: SimulationGroup.State.Canceled,
+      _user: req.user.id
+    }
+
+    var promise = SimulationGroup.count(simulationGroupFilter)
+
+    promise.then(function (count) {
+      res.send({ 'count': count })
     }).catch(function (e) {
       log.error(e)
       res.sendStatus(500)

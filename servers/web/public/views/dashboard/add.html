@@ -1,0 +1,69 @@
+﻿<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="alert alert-danger mx-auto mt-5" ng-if="errorMessage">{{ errorMessage }}</div>
+    <div class="card mx-auto mt-5">
+      <div class="card-header text-center">New task group set</div>
+      <div class="card-body">
+        <form name="addTaskGroupForm" novalidate>
+          <div class="form-group">
+            <label>Task group name</label>
+            <input class="form-control form-control-success" name="name" ng-model="addTaskGroup.name" type="text" ng-required="true">
+            <div ng-show="addTaskGroupForm.name.$touched && addTaskGroupForm.name.$invalid">
+              <small class="warning">Enter a valid task group name</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Seed amount</label>
+            <input class="form-control" name="seedAmount" ng-model="addTaskGroup.seedAmount" type="number" min="1" ng-required="true">
+            <div ng-show="addTaskGroupForm.seedAmount.$touched && addTaskGroupForm.seedAmount.$invalid">
+              <small class="warning">Enter a valid seed amount value<br />Must be greater than zero</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Minimum load</label>
+            <input class="form-control" name="minimumLoad" ng-model="addTaskGroup.minimumLoad" type="number" min="0" max="{{addTaskGroup.maximumLoad}}" ng-required="true">
+            <div ng-show="addTaskGroupForm.minimumLoad.$touched && addTaskGroupForm.minimumLoad.$invalid">
+              <small class="warning">Enter a valid minimum load value<br />Must be greater than zero and lesser than maximum load</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Maximum load</label>
+            <input class="form-control" name="maximumLoad" ng-model="addTaskGroup.maximumLoad" type="number" min="{{addTaskGroup.minimumLoad}}" ng-required="true">
+            <div ng-show="addTaskGroupForm.maximumLoad.$touched && addTaskGroupForm.maximumLoad.$invalid">
+              <small class="warning">Enter a valid maximum load value<br />Must be greater than minimum load</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Step</label>
+            <input class="form-control" name="step" ng-model="addTaskGroup.step" type="number" min="1" ng-required="true">
+            <div ng-show="addTaskGroupForm.step.$touched && addTaskGroupForm.step.$invalid">
+              <small class="warning">Enter a valid step value<br />Must be greater than zero</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" ng-model="addTaskGroupForm.sameSimulator" type="checkbox"> Use same simulator
+              </label>
+            </div>
+          </div>
+
+          <div class="jumbotron jumbotron-fluid">
+            <h1 class="display-5 text-center">Simulation</h1>
+            <div class="input-group" style="margin-top: 10px;">
+              <label class="input-group-btn">
+                <span class="btn btn-outline-primary " style="min-width: 120px;">
+                  Simulator
+                  <input type="file" accept=".jar" style="display: none;" onchange="angular.element(this).scope().simulatorInput(this)">
+                </span>
+              </label>
+              <input type="text" class="form-control" readonly="" value="{{simulator.name}}">
+            </div>
+            <div class="input-group" style="margin-top: 10px;"><label class="input-group-btn"><span class="btn btn-primary" style="min-width: 120px;">Configuration<input type="file" name="configuration" accept=".xml,.json" style="display: none;"></span></label><input type="text" class="form-control" readonly="" name="configurationDisplay"></div>
+            <input class="btn btn-primary btn-block" ng-click="sign_in(signIn)" ng-disabled="addTaskGroupForm.$invalid" value="Submit">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

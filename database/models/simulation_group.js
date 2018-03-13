@@ -9,7 +9,8 @@ const Schema = mongoose.Schema
 
 const State = {
   Executing: 0,
-  Finished: 1
+  Finished: 1,
+  Canceled: 2
 }
 
 const Priority = {

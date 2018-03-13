@@ -12,11 +12,12 @@ app.config(function ($routeProvider, $locationProvider) {
     })
     .when('/sign_up', {
       templateUrl: 'views/authentication/sign_up.html',
+      controller: 'signUpCtrl',
       auth: false
     })
     .when('/sign_in', {
       templateUrl: 'views/authentication/sign_in.html',
-      controller: 'SignInCtrl',
+      controller: 'signInCtrl',
       auth: false
     })
     .when('/forgot_password', {
@@ -37,6 +38,11 @@ app.config(function ($routeProvider, $locationProvider) {
     .when('/finished', {
       templateUrl: 'views/dashboard/finished.html',
       controller: 'finishedTaskGroupCtrl',
+      auth: true
+    })
+    .when('/add', {
+      templateUrl: 'views/dashboard/add.html',
+      controller: 'addCtrl',
       auth: true
     })
     .otherwise({

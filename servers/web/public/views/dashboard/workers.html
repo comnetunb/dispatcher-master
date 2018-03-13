@@ -3,9 +3,13 @@
     <h3 class="text-center">Running</h3>
     <hr />
 
+    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(workers | filter: { state: 0 }).length">
+      You currently have no running workers.
+    </div>
+
     <div gridster>
       <ul>
-        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 0">          
+        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 0">
           <div class="h6 text-center mt-3"><span class="badge badge-primary">{{worker.runningInstances}} Tasks</span> <strong>{{worker.alias}} {{worker.address}}</strong></div>
           <hr />
           <div class="inner">
@@ -18,6 +22,11 @@
 
     <h3 class="text-center">Paused</h3>
     <hr />
+
+    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(workers | filter: { state: 0 }).length">
+      You currently have no paused workers.
+    </div>
+
     <div gridster>
       <ul>
         <li gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 1">
