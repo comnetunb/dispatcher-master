@@ -10,7 +10,6 @@ const Schema = mongoose.Schema
 const bcrypt = require('bcryptjs')
 
 const userSchema = Schema({
-
   email: {
     type: String,
     required: true,
@@ -29,8 +28,11 @@ const userSchema = Schema({
   admin: {
     type: Boolean,
     default: false
+  },
+  permitted: {
+    type: Boolean,
+    default: false
   }
-
 })
 
 const saltRounds = 10

@@ -10,6 +10,7 @@
         $location.path('/workers')
       })
       .catch(function (e) {
+        console.log(e)
         $scope.errorMessage = e.data
       })
   }
@@ -24,16 +25,15 @@ app.controller("signUpCtrl", function ($scope, $http, $window, $rootScope, $loca
       return
     }
 
-
     $http
-      .post('/sign_up', signIn)
+      .post('/sign_up', signUp)
       .then(function (response) {
         $scope.errorMessage = false
         $rootScope.signedUser = response.data
-        $location.path('/workers')
+        $location.path('/')
       })
       .catch(function (e) {
-        $scope.errorMessage = e.data
+        $scope.errorMessage = e.data.reason
       })
   }
 })

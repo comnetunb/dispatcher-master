@@ -24,11 +24,15 @@ module.exports = function (passport) {
       .findOne({ email: email.toLowerCase() })
       .then(function (user) {
         if (!user) {
-          return done(null, false, { message: 'User not found' })
+          return done(null, false, { reason: 'User not found.' })
         }
 
         if (!user.validPassword(password)) {
-          return done(null, false, { message: 'Password do not match' })
+          return done(null, false, { reason: 'Password do not match.' })
+        }
+
+        if (!user.permitted) {
+          return done(null, false, { reason: 'A system administrator must permit you first.' })
         }
 
         user.password = undefined
@@ -37,7 +41,7 @@ module.exports = function (passport) {
         return done(null, user)
       })
       .catch(function (e) {
-        return done(e, false, { message: 'An internal error occurred. Please try again later' })
+        return done(e, false, { reason: 'An internal error occurred. Please try again later' })
       })
   }))
 }
