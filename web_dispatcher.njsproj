@@ -151,6 +151,15 @@
     <Content Include="servers\web\public\views\dashboard\finished.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\executable_file_form.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\number_form.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\text_file_form.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="servers\web\public\views\dashboard\workers.html" />
     <Content Include="servers\config\config.json" />
     <Content Include="servers\web\public\views\home.html">
@@ -177,6 +186,7 @@
     <Folder Include="servers\shared\" />
     <Folder Include="servers\web\" />
     <Folder Include="servers\web\api\" />
+    <Folder Include="servers\web\public\views\dashboard\forms\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

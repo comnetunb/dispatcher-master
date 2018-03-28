@@ -80,11 +80,67 @@ function getAllFinishedTaskGroups($scope, $http) {
     })
 }
 
-app.controller('addCtrl', function ($scope, $rootScope) {
+app.controller('addCtrl', function ($scope, $rootScope, $compile) {
   $rootScope.sidebar = true
 
-  $scope.simulatorInput = function (element) {
-    $scope.simulator = element.files[0]
-  }
-})
+  $scope.clear = function () {
+    var inputs = document.getElementById("inputContainer");
 
+    while (inputs.firstChild) {
+      inputs.removeChild(inputs.firstChild);
+    }
+  }
+
+  $scope.parse = function (commandLine) {
+    $scope.clear()
+
+    if (!commandLine) {
+      commandLine = ''
+    }
+
+    const matches = commandLine.match(/(%tf|%ef|%n)/g)
+
+    if (!matches) {
+      return
+    }
+
+    for (var match in matches) {
+      if (matches[match] === '%tf') {
+        const input = $compile('<textfile id="' + match + '"></textfile>')($scope)
+        angular.element(document.getElementById('inputContainer')).append(input)
+      }
+
+      if (matches[match] === '%ef') {
+        const input = $compile('<executablefile id="' + match + '"></executablefile>')($scope)
+        angular.element(document.getElementById('inputContainer')).append(input)
+      }
+
+      if (matches[match] === '%n') {
+        const input = $compile('<numberform id="' + match + '"></numberform>')($scope)
+        angular.element(document.getElementById('inputContainer')).append(input)
+      }
+    }
+  }
+
+})
+  .directive('numberform', function () {
+    return {
+      restrict: 'E',
+      scope: { 'id': '@' },
+      templateUrl: 'views/dashboard/forms/number_form.html'
+    }
+  })
+  .directive('executablefile', function () {
+    return {
+      restrict: 'E',
+      scope: { 'id': '@' },
+      templateUrl: 'views/dashboard/forms/executable_file_form.html'
+    }
+  })
+  .directive('textfile', function () {
+    return {
+      restrict: 'E',
+      scope: { 'id': '@' },
+      templateUrl: 'views/dashboard/forms/text_file_form.html'
+    }
+  })
