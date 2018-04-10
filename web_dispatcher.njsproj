@@ -151,10 +151,19 @@
     <Content Include="servers\web\public\views\dashboard\finished.html">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\priority.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\radio_box.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="servers\web\public\views\dashboard\forms\executable_file_form.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\forms\number_form.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\forms\submit.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\forms\text_file_form.html">

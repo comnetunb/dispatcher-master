@@ -4,7 +4,7 @@
     <hr />
 
     <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(workers | filter: { state: 0 }).length">
-      You currently have no running workers.
+      <i class="fa fa-fw fa-info-circle"></i> You currently have no running workers.
     </div>
 
     <div gridster>
@@ -24,7 +24,7 @@
     <hr />
 
     <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(workers | filter: { state: 1 }).length">
-      You currently have no paused workers.
+      <i class="fa fa-fw fa-info-circle"></i> You currently have no paused workers.
     </div>
 
     <div gridster>
