@@ -11,6 +11,7 @@
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -151,7 +152,7 @@
     <Content Include="servers\web\public\views\dashboard\finished.html">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="servers\web\public\views\dashboard\forms\priority.html">
+    <Content Include="servers\web\public\views\dashboard\forms\precedence.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\forms\radio_box.html">

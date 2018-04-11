@@ -6,23 +6,31 @@
       <div class="card-body">
         <form name="addTaskGroupForm" novalidate>
           <div class="form-group">
-            <label>Task command line</label>
-            <div>
-              <div class="input-group">
-                <input class="form-control form-control-success" id="commandLine" name="commandLine" ng-model="addTaskForm.commandLine" type="text" ng-change="clear()" ng-required="true">
-                <span class="input-group-btn">
-                  <button class="btn btn-dark" type="button" ng-click="parse(addTaskForm.commandLine)">Parse</button>
-                </span>
-              </div>
-              <div ng-show="addTaskGroupForm.commandLine.$touched && addTaskGroupForm.commandLine.$invalid">
-                <small class="warning">Enter a command line</small>
-              </div>
-              <div class="container-fluid">
-                <span class="badge badge-secondary">Add</span>
-                <button type="button" class="btn btn-link" ng-click="addDirective('%n')">Number</button>
-                <button type="button" class="btn btn-link" ng-click="addDirective('%s')">String</button>
-                <button type="button" class="btn btn-link" ng-click="addDirective('%ef')">Executable File</button>
-                <button type="button" class="btn btn-link" ng-click="addDirective('%tf')">Text File</button>
+            <div class="mb-3">
+              <label>Task executable</label>
+              <ng-include id="test" src="'views/dashboard/forms/executable_file_form.html'">
+
+              </ng-include>
+            </div>
+            <div class="mb-3">
+              <label>Task command line</label>
+              <div>
+                <div class="input-group">
+                  <input class="form-control form-control-success" id="commandLine" name="commandLine" ng-model="addTaskForm.commandLine" type="text" ng-change="clear()" ng-required="true">
+                  <span class="input-group-btn">
+                    <button class="btn btn-dark" type="button" ng-click="parse(addTaskForm.commandLine)"><i class="fa fa-fw fa-check"></i> Parse</button>
+                  </span>
+                </div>
+                <div ng-show="addTaskGroupForm.commandLine.$touched && addTaskGroupForm.commandLine.$invalid">
+                  <small class="warning">Enter a command line</small>
+                </div>
+                <div class="container-fluid">
+                  <span class="badge badge-secondary">Add</span>
+                  <button type="button" class="btn btn-link" ng-click="addDirective('%n')">Number</button>
+                  <button type="button" class="btn btn-link" ng-click="addDirective('%s')">String</button>
+                  <button type="button" class="btn btn-link" ng-click="addDirective('%ef')">Executable File</button>
+                  <button type="button" class="btn btn-link" ng-click="addDirective('%tf')">Text File</button>
+                </div>
               </div>
             </div>
           </div>

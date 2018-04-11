@@ -99,14 +99,10 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
     $scope.clear()
 
     if (!commandLine) {
-      commandLine = ''
+      return
     }
 
     const matches = commandLine.match(/(%tf|%ef|%n|%s)/g)
-
-    if (!matches) {
-      return
-    }
 
     const table = document.createElement("table");
     table.className = "table table-sm"
@@ -130,56 +126,51 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
       table.appendChild(tableRow)
     }
 
-    for (var match in matches) {
+    for (let match in matches) {
       let tableRow = document.createElement("tr");
 
       // Precedence
       {
         let tableCell = document.createElement("td");
-        let precedence = document.createElement("input");
 
-        precedence.className = "form-control form-control-success"
-        precedence.type = "number";
-        precedence.min = 1;
-        precedence.value = 1;
-
-        tableCell.appendChild(precedence)
-        tableRow.appendChild(tableCell);
-      }
-
-
-      if (matches[match] === '%tf') {
-        const input = $compile('<textfile id="' + match + '" ng-required="true"></textfile>')($scope)
-        angular.element(document.getElementById('inputContainer')).append(input)
-      }
-
-      if (matches[match] === '%ef') {
-        let tableCell = document.createElement("td");
-
-        const input = $compile('<executablefile id="' + match + '" ng-required="true"></executablefile>')($scope)
-        angular.element(tableCell).append(input)
+        const precedence = $compile('<precedence></precedence>')($scope)
+        angular.element(tableCell).append(precedence)
 
         tableRow.appendChild(tableCell);
       }
 
-      if (matches[match] === '%n') {
-        let tableCell = document.createElement("td");
+      let tableCell = document.createElement("td");
+      var input;
 
-        const input = $compile('<numberform id="' + match + '"></numberform>')($scope)
-        angular.element(tableCell).append(input)
+      switch (matches[match]) {
+        case "%tf":
+          input = $compile('<textfile id="' + match + '"></textfile>')($scope)
+          angular.element(tableCell).append(input)
+          break;
 
-        tableRow.appendChild(tableCell);
+        case "%ef":
+          input = $compile('<executablefile id="' + match + '"></executablefile>')($scope)
+          angular.element(tableCell).append(input)
+          break;
+
+        case "%n":
+          input = $compile('<numberform id="' + match + '"></numberform>')($scope)
+          angular.element(tableCell).append(input)
+          break;
+
+        case "%s":
+          input = $compile('<stringform id="' + match + '"></stringform>')($scope)
+          angular.element(tableCell).append(input)
+          break;
       }
 
-      if (matches[match] === '%s') {
-        const input = $compile('<stringform id="' + match + '" ng-required="true"></stringform>')($scope)
-        angular.element(document.getElementById('inputContainer')).append(input)
-      }
-
+      tableRow.appendChild(tableCell);
       table.appendChild(tableRow);
     }
 
-    document.getElementById('inputContainer').append(table);
+    if (matches) {
+      document.getElementById('inputContainer').append(table);
+    }
 
     const submit = $compile('<submit></submit>')($scope)
     angular.element(document.getElementById('inputContainer')).append(submit)
@@ -198,6 +189,13 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
   }
 
 })
+  .directive('precedence', function () {
+    return {
+      restrict: 'E',
+      scope: { 'id': '@' },
+      templateUrl: 'views/dashboard/forms/precedence.html'
+    }
+  })
   .directive('numberform', function () {
     return {
       restrict: 'E',
