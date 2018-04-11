@@ -42,8 +42,6 @@ module.exports = function (app, passport) {
               password: hash
             })
 
-            console.log(newUser)
-
             newUser
               .save()
               .catch(function (e) {

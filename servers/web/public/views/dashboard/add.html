@@ -7,13 +7,14 @@
         <form name="addTaskGroupForm" novalidate>
           <div class="form-group">
             <div class="mb-3">
-              <label>Task executable</label>
-              <ng-include id="test" src="'views/dashboard/forms/executable_file_form.html'">
-
-              </ng-include>
+              <label>Task runnable</label>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" fileread="addTaskForm.taskRunnable">
+                <label class="custom-file-label">{{addTaskForm.taskRunnable[0].name}}</label>
+              </div>
             </div>
             <div class="mb-3">
-              <label>Task command line</label>
+              <label>Task arguments</label>
               <div>
                 <div class="input-group">
                   <input class="form-control form-control-success" id="commandLine" name="commandLine" ng-model="addTaskForm.commandLine" type="text" ng-change="clear()" ng-required="true">

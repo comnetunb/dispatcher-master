@@ -84,7 +84,7 @@
       
       <!-- !SideBar -->
       <!-- Defauld Navbar -->
-      <ul class="navbar-nav ml-auto" ng-cloak ng-if="!signedUser">
+      <ul class="navbar-nav ml-auto" ng-if="!signedUser" ng-cloak>
         <li class="nav-item">
           <a class="nav-link" ng-href="#!sign_up">
             Sign Up
@@ -98,7 +98,7 @@
       </ul>
       <!-- !Defauld Navbar -->
       <!-- Signed in Navbar -->
-      <ul class="navbar-nav ml-auto" ng-cloak ng-if="signedUser" ng-controller="navigationCtrl">
+      <ul class="navbar-nav ml-auto" ng-if="signedUser" ng-controller="navigationCtrl" ng-cloak>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-fw fa-bell"></i>

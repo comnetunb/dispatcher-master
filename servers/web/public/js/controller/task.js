@@ -80,7 +80,7 @@ function getAllFinishedTaskGroups($scope, $http) {
     })
 }
 
-app.controller('addCtrl', function ($scope, $rootScope, $compile) {
+app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location) {
   $rootScope.sidebar = true
 
   $scope.clear = function () {
@@ -91,8 +91,23 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
     }
   }
 
+  $scope.submit = function (addTaskForm) {
+    $http
+      .post('/add_task_group_set', addTaskForm)
+      .then(function (response) {
+        $scope.errorMessage = false
+        //$location.path('/active')
+      })
+      .catch(function (e) {
+        console.log(e)
+        $scope.errorMessage = e.data.reason
+      })
+  }
+
   $scope.addTaskForm = {
-    commandLine: ''
+    taskRunnable: [],
+    commandLine: '',
+    inputs: []
   }
 
   $scope.parse = function (commandLine) {
@@ -105,7 +120,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
     const matches = commandLine.match(/(%tf|%ef|%n|%s)/g)
 
     const table = document.createElement("table");
-    table.className = "table table-sm"
+    table.className = "table table-bordered"
 
     {
       let tableRow = document.createElement("tr");
@@ -119,7 +134,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
 
       {
         let tableHeader = document.createElement("th");
-        tableHeader.innerHTML = "Value";
+        tableHeader.innerHTML = "Input";
         tableRow.appendChild(tableHeader);
       }
 
@@ -133,14 +148,16 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
       {
         let tableCell = document.createElement("td");
 
-        const precedence = $compile('<precedence></precedence>')($scope)
+        let defaultValue = Number(match) + 1
+
+        const precedence = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].precedence" type="number" min="1" ng-init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '" ng-required="true"></input>')($scope)
         angular.element(tableCell).append(precedence)
 
         tableRow.appendChild(tableCell);
       }
 
       let tableCell = document.createElement("td");
-      var input;
+      let input;
 
       switch (matches[match]) {
         case "%tf":
@@ -154,7 +171,8 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
           break;
 
         case "%n":
-          input = $compile('<numberform id="' + match + '"></numberform>')($scope)
+          input = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].data" type="text" onkeyup="this.value = this.value.replace(/[^0-9;,]/g, \'\')" ng-required="true"></input>')($scope)
+          $scope.addTaskForm.inputs[match].type = "number"
           angular.element(tableCell).append(input)
           break;
 
@@ -172,7 +190,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
       document.getElementById('inputContainer').append(table);
     }
 
-    const submit = $compile('<submit></submit>')($scope)
+    const submit = $compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskGroupForm.$invalid" value="Submit">')($scope)
     angular.element(document.getElementById('inputContainer')).append(submit)
   }
 
@@ -189,18 +207,45 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile) {
   }
 
 })
+  .directive("fileread", function () {
+    return {
+      scope: {
+        fileread: "="
+      },
+      link: function (scope, element, attributes) {
+        element.bind("change", function (changeEvent) {
+          let files = Array.from(changeEvent.target.files);
+
+          if (!files.length) {
+            scope.fileread = [];
+            return;
+          }
+
+          files.map(function (file) {
+            let reader = new FileReader();
+
+            reader.onload = function (loadEvent) {
+              scope.$apply(function () {
+                let input = {
+                  name: file.name,
+                  data: loadEvent.target.result
+                }
+
+                scope.fileread.push(input)
+              });
+            }
+
+            reader.readAsDataURL(file);
+          })
+        });
+      }
+    }
+  })
   .directive('precedence', function () {
     return {
       restrict: 'E',
       scope: { 'id': '@' },
       templateUrl: 'views/dashboard/forms/precedence.html'
-    }
-  })
-  .directive('numberform', function () {
-    return {
-      restrict: 'E',
-      scope: { 'id': '@' },
-      templateUrl: 'views/dashboard/forms/number_form.html'
     }
   })
   .directive('executablefile', function () {

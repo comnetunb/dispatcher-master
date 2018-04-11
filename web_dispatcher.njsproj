@@ -47,6 +47,9 @@
     <Compile Include="servers\web\config\passport.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\methods\task.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\web\public\js\controller\authentication.js">
       <SubType>Code</SubType>
     </Compile>
@@ -141,6 +144,9 @@
     <Compile Include="servers\web\api\worker.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\utils\task.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="package.json" />
     <Content Include="servers\web\public\views\dashboard\active.html" />
     <Content Include="servers\web\public\css\style.css" />
@@ -181,6 +187,7 @@
     <Folder Include="database\models\" />
     <Folder Include="servers\web\methods\" />
     <Folder Include="servers\web\config\" />
+    <Folder Include="servers\web\utils\" />
     <Folder Include="servers\web\public\" />
     <Folder Include="servers\web\public\js\" />
     <Folder Include="servers\web\public\css\" />

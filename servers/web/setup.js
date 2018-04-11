@@ -7,6 +7,7 @@ const workerApi = rootRequire('servers/web/api/worker')
 const LocalStrategy = require('passport-local').Strategy
 const User = rootRequire('database/models/user')
 const userMethods = rootRequire('servers/web/methods/user')
+const taskMethods = rootRequire('servers/web/methods/task')
 
 module.exports = function (app, passport) {
   setupAPIs(app)
@@ -15,6 +16,7 @@ module.exports = function (app, passport) {
 
 function setupMethods(app, passport) {
   userMethods(app, passport)
+  taskMethods(app)
 }
 
 function setupAPIs(app) {
