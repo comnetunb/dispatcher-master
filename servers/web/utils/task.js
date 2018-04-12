@@ -11,7 +11,7 @@ const buildTasks = function (taskGroupSetData) {
 
   for (let input in inputs) {
     switch (inputs[input].type) {
-      case "number":
+      case "N":
         parsedInputs.push({
           data: parseNumber(inputs[input].data),
           directiveIndex: inputs[input].directiveIndex
@@ -113,6 +113,10 @@ function parseNumber(numberNotation) {
   }
 
   throw "Invalid notation: " + numberNotation
+}
+
+function parseString(stringNotation) {
+  // (["'])(?:(?=(\\?))\2.)*?\1(,(["'])(?:(?=(\\?))\2.)*?\1)*$
 }
 
 module.exports = {

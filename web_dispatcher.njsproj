@@ -155,6 +155,18 @@
     </Content>
     <Content Include="servers\web\public\views\dashboard\dashboard.html" />
     <Content Include="servers\web\public\index.html" />
+    <Content Include="servers\web\public\views\dashboard\directives\interpretive_file.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\directives\interpretive_number.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\directives\interpretive_string.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\directives\precedence.html">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="servers\web\public\views\dashboard\finished.html">
       <SubType>Code</SubType>
     </Content>
@@ -187,6 +199,7 @@
     <Folder Include="database\models\" />
     <Folder Include="servers\web\methods\" />
     <Folder Include="servers\web\config\" />
+    <Folder Include="servers\web\public\views\dashboard\directives\" />
     <Folder Include="servers\web\utils\" />
     <Folder Include="servers\web\public\" />
     <Folder Include="servers\web\public\js\" />

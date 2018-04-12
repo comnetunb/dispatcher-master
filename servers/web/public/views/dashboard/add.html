@@ -14,7 +14,7 @@
               </div>
             </div>
             <div class="mb-3">
-              <label>Task arguments</label>
+              <label>Task arguments template</label>
               <div>
                 <div class="input-group">
                   <input class="form-control form-control-success" id="argumentsTemplate" name="argumentsTemplate" ng-model="addTaskForm.argumentsTemplate" type="text" ng-change="clear()">
@@ -27,9 +27,9 @@
                 </div>
                 <div class="container-fluid">
                   <span class="badge badge-pill badge-secondary">Interpretive Directives</span>
-                  <button type="button" class="btn btn-link" ng-click="addDirective('%n')">Number</button>
-                  <button type="button" class="btn btn-link" ng-click="addDirective('%s')">String</button>
-                  <button type="button" class="btn btn-link" ng-click="addDirective('%f')">File</button>
+                  <button type="button" class="btn btn-link" ng-click="addInterpretiveDirective('%n')">Number</button>
+                  <button type="button" class="btn btn-link" ng-click="addInterpretiveDirective('%s')">String</button>
+                  <button type="button" class="btn btn-link" ng-click="addInterpretiveDirective('%f')">File</button>
                 </div>
               </div>
             </div>
@@ -39,4 +39,5 @@
       </div>
     </div>
   </div>
+  {{addTaskForm}}
 </div>

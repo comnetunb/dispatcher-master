@@ -149,6 +149,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
         let defaultValue = Number(match) + 1
 
         const precedence = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].precedence" type="number" min="1" ng-init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '; addTaskForm.inputs[' + match + '].directiveIndex = ' + match + '" ng-required="true"></input>')($scope)
+        //const precedence = $compile('<precedence model="addTaskForm.inputs[' + match + '].precedence" init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '; addTaskForm.inputs[' + match + '].directiveIndex = ' + match + '"></precedence>')($scope)
         angular.element(tableCell).append(precedence)
 
         tableRow.appendChild(tableCell);
@@ -159,18 +160,20 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
       switch (matches[match]) {
         case "%n":
-          input = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].data" type="text" onkeyup="this.value = this.value.replace(/[^0-9;,]/g, \'\')" ng-required="true"></input>')($scope)
-          $scope.addTaskForm.inputs[match].type = "number"
-          angular.element(tableCell).append(input)
-          break;
-
-        case "%f":
-          input = $compile('<textfile id="' + match + '"></textfile>')($scope)
+          $scope.addTaskForm.inputs[match].type = "N"
+          input = $compile('<interpretive-number model="addTaskForm.inputs[' + match + '].data"></interpretive-number>')($scope)
           angular.element(tableCell).append(input)
           break;
 
         case "%s":
-          input = $compile('<stringform id="' + match + '"></stringform>')($scope)
+          $scope.addTaskForm.inputs[match].type = "S"
+          input = $compile('<interpretive-string model="addTaskForm.inputs[' + match + '].data"></interpretive-string>')($scope)
+          angular.element(tableCell).append(input)
+          break;
+
+        case "%f":
+          $scope.addTaskForm.inputs[match].type = "F"
+          input = $compile('<interpretive-file model="addTaskForm.inputs[' + match + '].data"></interpretive-file>')($scope)
           angular.element(tableCell).append(input)
           break;
       }
@@ -187,7 +190,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     angular.element(document.getElementById('inputContainer')).append(submit)
   }
 
-  $scope.addDirective = function (directive) {
+  $scope.addInterpretiveDirective = function (directive) {
     $scope.clear()
 
     if (!$scope.addTaskForm.argumentsTemplate) {
@@ -214,9 +217,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
             return;
           }
 
-          if (!attributes.multiple) {
-            scope.fileread = [];
-          }
+          scope.fileread = [];
 
           files.map(function (file) {
             let reader = new FileReader();
@@ -228,6 +229,8 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
                   data: loadEvent.target.result
                 }
 
+                console.log(input)
+
                 scope.fileread.push(input)
               });
             }
@@ -238,17 +241,44 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       }
     }
   })
-  .directive('executablefile', function () {
+  .directive('precedence', function () {
     return {
       restrict: 'E',
-      scope: { 'id': '@' },
-      templateUrl: 'views/dashboard/forms/executable_file_form.html'
+      templateUrl: 'views/dashboard/directives/precedence.html',
+      scope: {
+        model: '=',
+        init: '='
+      },
+      replace: true
     }
   })
-  .directive('textfile', function () {
+  .directive('interpretiveNumber', function () {
     return {
       restrict: 'E',
-      scope: { 'id': '@' },
-      templateUrl: 'views/dashboard/forms/text_file_form.html'
+      templateUrl: 'views/dashboard/directives/interpretive_number.html',
+      scope: {
+        model: '='
+      },
+      replace: true
+    }
+  })
+  .directive('interpretiveString', function () {
+    return {
+      restrict: 'E',
+      templateUrl: 'views/dashboard/directives/interpretive_string.html',
+      scope: {
+        model: '='
+      },
+      replace: true
+    }
+  })
+  .directive('interpretiveFile', function () {
+    return {
+      restrict: 'E',
+      templateUrl: 'views/dashboard/directives/interpretive_file.html',
+      scope: {
+        model: '='
+      },
+      replace: true
     }
   })
