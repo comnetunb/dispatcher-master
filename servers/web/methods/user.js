@@ -22,8 +22,7 @@ module.exports = function (app, passport) {
       .findOne(userFilter)
       .then(function (user) {
         if (user) {
-          res.status(409).send({ reason: 'User already exists.' })
-          return
+          return res.status(409).send({ reason: 'User already exists.' })
         }
 
         const email = req.body.email

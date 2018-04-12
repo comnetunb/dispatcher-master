@@ -58,12 +58,15 @@ app.run(function ($rootScope, $location, $window, $http, gridsterConfig) {
 
   $rootScope.signedUser = null
 
-  $http
-    .get('/signed_in')
-    .then(function (response) {
-      $rootScope.signedUser = response.data
+  $rootScope.$on("$routeChangeStart", function (event, next, current) {
+    $http
+      .get('/signed_in')
+      .then(function (response) {
+        $rootScope.signedUser = response.data
 
-      $rootScope.$on("$routeChangeStart", function (event, next, current) {
+
+        console.log(next.auth)
+        console.log($rootScope.signedUser)
         if (next.auth && !$rootScope.signedUser) {
           $location.path('/sign_in')
           return
@@ -74,6 +77,6 @@ app.run(function ($rootScope, $location, $window, $http, gridsterConfig) {
           return
         }
       });
-    })
+  })
 });
 

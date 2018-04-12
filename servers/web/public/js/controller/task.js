@@ -38,7 +38,7 @@ app.controller('activeTaskGroupCtrl', function ($scope, $rootScope, $http, $inte
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
-    $scope.sortKey = keyname;   //set the sortKey to the param passed
+    $scope.sortKey = keyname; //set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; //if true make it false and vice versa
   }
 
@@ -61,7 +61,7 @@ app.controller('finishedTaskGroupCtrl', function ($scope, $rootScope, $http, $in
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
-    $scope.sortKey = keyname;   //set the sortKey to the param passed
+    $scope.sortKey = keyname; //set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; //if true make it false and vice versa
   }
 
@@ -89,6 +89,8 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     while (inputs.firstChild) {
       inputs.removeChild(inputs.firstChild);
     }
+
+    $scope.addTaskForm.inputs = []
   }
 
   $scope.submit = function (addTaskForm) {
@@ -106,18 +108,14 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
   $scope.addTaskForm = {
     taskRunnable: [],
-    commandLine: '',
+    argumentsTemplate: '',
     inputs: []
   }
 
-  $scope.parse = function (commandLine) {
+  $scope.parse = function (argumentsTemplate) {
     $scope.clear()
 
-    if (!commandLine) {
-      return
-    }
-
-    const matches = commandLine.match(/(%tf|%ef|%n|%s)/g)
+    const matches = argumentsTemplate.match(/(%n|%s|%f)/g)
 
     const table = document.createElement("table");
     table.className = "table table-bordered"
@@ -150,7 +148,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
         let defaultValue = Number(match) + 1
 
-        const precedence = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].precedence" type="number" min="1" ng-init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '" ng-required="true"></input>')($scope)
+        const precedence = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].precedence" type="number" min="1" ng-init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '; addTaskForm.inputs[' + match + '].directiveIndex = ' + match + '" ng-required="true"></input>')($scope)
         angular.element(tableCell).append(precedence)
 
         tableRow.appendChild(tableCell);
@@ -160,19 +158,14 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       let input;
 
       switch (matches[match]) {
-        case "%tf":
-          input = $compile('<textfile id="' + match + '"></textfile>')($scope)
-          angular.element(tableCell).append(input)
-          break;
-
-        case "%ef":
-          input = $compile('<executablefile id="' + match + '"></executablefile>')($scope)
-          angular.element(tableCell).append(input)
-          break;
-
         case "%n":
           input = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].data" type="text" onkeyup="this.value = this.value.replace(/[^0-9;,]/g, \'\')" ng-required="true"></input>')($scope)
           $scope.addTaskForm.inputs[match].type = "number"
+          angular.element(tableCell).append(input)
+          break;
+
+        case "%f":
+          input = $compile('<textfile id="' + match + '"></textfile>')($scope)
           angular.element(tableCell).append(input)
           break;
 
@@ -197,13 +190,13 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   $scope.addDirective = function (directive) {
     $scope.clear()
 
-    if (!$scope.addTaskForm.commandLine) {
-      $scope.addTaskForm.commandLine = ''
+    if (!$scope.addTaskForm.argumentsTemplate) {
+      $scope.addTaskForm.argumentsTemplate = ''
     }
 
-    const position = commandLine.selectionStart
+    const position = argumentsTemplate.selectionStart
 
-    $scope.addTaskForm.commandLine = [$scope.addTaskForm.commandLine.slice(0, position), directive, $scope.addTaskForm.commandLine.slice(position)].join('')
+    $scope.addTaskForm.argumentsTemplate = [$scope.addTaskForm.argumentsTemplate.slice(0, position), directive, $scope.addTaskForm.argumentsTemplate.slice(position)].join('')
   }
 
 })
@@ -219,6 +212,10 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
           if (!files.length) {
             scope.fileread = [];
             return;
+          }
+
+          if (!attributes.multiple) {
+            scope.fileread = [];
           }
 
           files.map(function (file) {
@@ -241,13 +238,6 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       }
     }
   })
-  .directive('precedence', function () {
-    return {
-      restrict: 'E',
-      scope: { 'id': '@' },
-      templateUrl: 'views/dashboard/forms/precedence.html'
-    }
-  })
   .directive('executablefile', function () {
     return {
       restrict: 'E',
@@ -260,12 +250,5 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       restrict: 'E',
       scope: { 'id': '@' },
       templateUrl: 'views/dashboard/forms/text_file_form.html'
-    }
-  })
-  .directive('submit', function () {
-    return {
-      restrict: 'E',
-      scope: { 'id': '@' },
-      templateUrl: 'views/dashboard/forms/submit.html'
     }
   })

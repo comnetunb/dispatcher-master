@@ -12,7 +12,7 @@ global.protocolRequire = function (name) {
   return require(__dirname + '/../protocol/' + name)
 }
 
-global.databaseRequire = function (name) {
+global.dispatcherRequire = function (name) {
   return require(__dirname + '/servers/dispatcher/' + name)
 }
 

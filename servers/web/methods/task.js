@@ -8,7 +8,8 @@ module.exports = function (app) {
       res.sendStatus(200)
     }
     catch (e) {
-      res.sendStatus(412).send({ reason: e })
+      console.log(e)
+      res.status(412).send({ reason: e })
     }
   })
 }
