@@ -8,11 +8,13 @@
           <div class="form-group">
             <div class="mb-3">
               <label>Executable</label>
-              <select class="custom-select" ng-model="addTaskForm.executable" ng-options="executable for executable in supportedExecutables"></select>
+              <select class="form-control" ng-model="addTaskForm.executableInfo" ng-options="supportedExecutableInfo.executable for supportedExecutableInfo in supportedExecutablesInfo"></select>
+            </div>
+            <div class="mb-3">
               <label>Task runnable</label>
               <div class="custom-file">
-                <input type="file" class="custom-file-input" fileread="addTaskForm.taskRunnable">
-                <label class="custom-file-label">{{addTaskForm.taskRunnable[0].name}}</label>
+                <input type="file" class="custom-file-input" fileread="addTaskForm.taskRunnable" ng-disabled="!addTaskForm.executableInfo">
+                <label class="custom-file-label" ng-disabled="true">{{addTaskForm.taskRunnable[0].name}}</label>
               </div>
             </div>
             <div class="mb-3">

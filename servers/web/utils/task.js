@@ -1,5 +1,6 @@
 ﻿
 const buildTasks = function (taskGroupSetData) {
+  const executable = taskGroupSetData.executable
   const taskRunnable = taskGroupSetData.taskRunnable[0]
   const argumentsTemplate = taskGroupSetData.argumentsTemplate
   const inputs = taskGroupSetData.inputs
@@ -22,8 +23,19 @@ const buildTasks = function (taskGroupSetData) {
 
   var commandLines = []
 
-  // TODO
-  var prefix = "java -jar " + taskRunnable.name + " "
+  // TODO: Get prefix command on database
+  var prefix = ''
+  switch (executable) {
+    case 'java':
+      prefix += 'java -jar ' + taskRunnable.name + ' '
+      break
+    case 'python':
+      prefix += 'python ' + taskRunnable.name + ' '
+      break
+  }
+
+  console.log(prefix)
+
   // TODO: where does this preprocessing belong?
   var preprocessedArgumentTemplate = argumentsTemplate
   let index = 0
@@ -34,6 +46,8 @@ const buildTasks = function (taskGroupSetData) {
   }
 
   buildTaskCommandLines(prefix, parsedInputs, preprocessedArgumentTemplate, commandLines)
+
+  console.log(commandLines)
 }
 
 //! Recursive method
@@ -57,7 +71,9 @@ function buildTaskCommandLines(prefix, parsedInputs, argumentsTemplate, commandL
         value: values[value],
         index: index
       })
+
       buildTaskCommandLines(prefix, newParsedInputs, argumentsTemplate, commandLines, infos)
+
       infos.splice(-1, 1)
     }
     else {
@@ -75,6 +91,7 @@ function buildTaskCommandLines(prefix, parsedInputs, argumentsTemplate, commandL
 
       commandLine += arguments
       commandLines.push(commandLine)
+
       infos.splice(-1, 1)
     }
   }

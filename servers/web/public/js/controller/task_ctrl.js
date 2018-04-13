@@ -39,8 +39,8 @@ app.controller('activeTaskGroupCtrl', function ($scope, $rootScope, $http, $inte
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
-    $scope.sortKey = keyname; //set the sortKey to the param passed
-    $scope.reverse = !$scope.reverse; //if true make it false and vice versa
+    $scope.sortKey = keyname //set the sortKey to the param passed
+    $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
   getAllActiveTaskGroups($scope, $http)
@@ -63,8 +63,8 @@ app.controller('finishedTaskGroupCtrl', function ($scope, $rootScope, $http, $in
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
-    $scope.sortKey = keyname; //set the sortKey to the param passed
-    $scope.reverse = !$scope.reverse; //if true make it false and vice versa
+    $scope.sortKey = keyname //set the sortKey to the param passed
+    $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
   getAllFinishedTaskGroups($scope, $http)
@@ -89,14 +89,14 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   $http
     .get('/supported_executables')
     .then(function (response) {
-      $scope.supportedExecutables = response.data
+      $scope.supportedExecutablesInfo = response.data
     })
 
   $scope.clear = function () {
-    var inputs = document.getElementById("inputContainer");
+    var inputs = document.getElementById('inputContainer')
 
     while (inputs.firstChild) {
-      inputs.removeChild(inputs.firstChild);
+      inputs.removeChild(inputs.firstChild)
     }
 
     $scope.addTaskForm.inputs = []
@@ -104,7 +104,12 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
   $scope.submit = function (addTaskForm) {
     if (!addTaskForm.taskRunnable.length) {
-      $scope.errorMessage = 'Task runnable was not defined'
+      $scope.errorMessage = 'Task runnable is undefined'
+      return
+    }
+
+    if (!addTaskForm.executableInfo) {
+      $scope.errorMessage = 'Executable is undefined'
       return
     }
 
@@ -131,34 +136,26 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
     const matches = argumentsTemplate.match(/(%n|%s|%f)/g)
 
-    const table = document.createElement("table");
-    table.className = "table table-bordered"
+    const table = document.createElement('table')
+    table.className = 'table table-bordered'
 
     {
-      let tableRow = document.createElement("tr");
+      let tableRow = document.createElement("tr")
 
-      {
-        let tableHeader = document.createElement("th");
-        tableHeader.innerHTML = "Precedence";
-        tableHeader.width = "10%"
-        tableRow.appendChild(tableHeader);
-      }
-
-      {
-        let tableHeader = document.createElement("th");
-        tableHeader.innerHTML = "Input";
-        tableRow.appendChild(tableHeader);
-      }
+      angular
+        .element(tableRow)
+        .append($compile('<th width="10%">Precedence</th>')($scope))
+        .append($compile('<th>Input</th>')($scope))
 
       table.appendChild(tableRow)
     }
 
     for (let match in matches) {
-      let tableRow = document.createElement("tr");
+      let tableRow = document.createElement("tr")
 
       // Precedence
       {
-        let tableCell = document.createElement("td");
+        let tableCell = document.createElement("td")
 
         let defaultValue = Number(match) + 1
 
@@ -167,47 +164,49 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
           directiveIndex: match
         })
 
-        const precedence = $compile('<precedence model="addTaskForm.inputs[' + match + '].precedence"></precedence>')($scope)
-        angular.element(tableCell).append(precedence)
+        angular
+          .element(tableCell)
+          .append($compile('<precedence model="addTaskForm.inputs[' + match + '].precedence"></precedence>')($scope))
 
-        tableRow.appendChild(tableCell);
+        tableRow.appendChild(tableCell)
       }
 
-      let tableCell = document.createElement("td");
-      let input;
-
-      console.log($scope.addTaskForm.inputs)
+      let tableCell = document.createElement("td")
 
       switch (matches[match]) {
-        case "%n":
-          $scope.addTaskForm.inputs[match].type = "N"
-          input = $compile('<interpretive-number model="addTaskForm.inputs[' + match + '].data"></interpretive-number>')($scope)
-          angular.element(tableCell).append(input)
-          break;
+        case '%n':
+          $scope.addTaskForm.inputs[match].type = 'N'
+          angular
+            .element(tableCell)
+            .append($compile('<interpretive-number model="addTaskForm.inputs[' + match + '].data"></interpretive-number>')($scope))
+          break
 
-        case "%s":
-          $scope.addTaskForm.inputs[match].type = "S"
-          input = $compile('<interpretive-string model="addTaskForm.inputs[' + match + '].data"></interpretive-string>')($scope)
-          angular.element(tableCell).append(input)
-          break;
+        case '%s':
+          $scope.addTaskForm.inputs[match].type = 'S'
+          angular
+            .element(tableCell)
+            .append($compile('<interpretive-string model="addTaskForm.inputs[' + match + '].data"></interpretive-string>')($scope))
+          break
 
-        case "%f":
-          $scope.addTaskForm.inputs[match].type = "F"
-          input = $compile('<interpretive-file model="addTaskForm.inputs[' + match + '].data"></interpretive-file>')($scope)
-          angular.element(tableCell).append(input)
-          break;
+        case '%f':
+          $scope.addTaskForm.inputs[match].type = 'F'
+          angular
+            .element(tableCell)
+            .append($compile('<interpretive-file model="addTaskForm.inputs[' + match + '].data"></interpretive-file>')($scope))
+          break
       }
 
-      tableRow.appendChild(tableCell);
-      table.appendChild(tableRow);
+      tableRow.appendChild(tableCell)
+      table.appendChild(tableRow)
     }
 
     if (matches) {
-      document.getElementById('inputContainer').append(table);
+      document.getElementById('inputContainer').append(table)
     }
 
-    const submit = $compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskGroupForm.$invalid" value="Submit">')($scope)
-    angular.element(document.getElementById('inputContainer')).append(submit)
+    angular
+      .element(document.getElementById('inputContainer'))
+      .append($compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskGroupForm.$invalid" value="Submit">')($scope))
   }
 
   $scope.addInterpretiveDirective = function (directive) {
@@ -223,24 +222,24 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   }
 
 })
-  .directive("fileread", function () {
+  .directive('fileread', function () {
     return {
       scope: {
-        fileread: "="
+        fileread: '='
       },
       link: function (scope, element, attributes) {
-        element.bind("change", function (changeEvent) {
-          let files = Array.from(changeEvent.target.files);
+        element.bind('change', function (changeEvent) {
+          let files = Array.from(changeEvent.target.files)
 
           if (!files.length) {
-            scope.fileread = [];
-            return;
+            scope.fileread = []
+            return
           }
 
-          scope.fileread = [];
+          scope.fileread = []
 
           files.map(function (file) {
-            let reader = new FileReader();
+            let reader = new FileReader()
 
             reader.onload = function (loadEvent) {
               scope.$apply(function () {
@@ -250,12 +249,12 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
                 }
 
                 scope.fileread.push(input)
-              });
+              })
             }
 
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file)
           })
-        });
+        })
       }
     }
   })
