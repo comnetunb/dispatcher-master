@@ -12,4 +12,8 @@ module.exports = function (app) {
       res.status(412).send({ reason: e })
     }
   })
+
+  app.get('/supported_executables', function (req, res) {
+    res.send(['java', 'python'])
+  })
 }

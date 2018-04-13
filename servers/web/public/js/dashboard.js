@@ -77,7 +77,6 @@ function getAllActiveTasks($scope, $http) {
     .get('/api/task/get_executing')
     .then(function (response) {
       $scope.tasks = response.data
-      console.log($scope.tasks)
     })
 }
 
@@ -86,7 +85,6 @@ dashboard.run(function ($rootScope, $http, $window) {
     $http
       .post('/sign_out')
       .then(function (response) {
-        console.log('logout')
         $rootScope.signedUser = null
         $window.location.href = '/'
       })

@@ -64,9 +64,6 @@ app.run(function ($rootScope, $location, $window, $http, gridsterConfig) {
       .then(function (response) {
         $rootScope.signedUser = response.data
 
-
-        console.log(next.auth)
-        console.log($rootScope.signedUser)
         if (next.auth && !$rootScope.signedUser) {
           $location.path('/sign_in')
           return

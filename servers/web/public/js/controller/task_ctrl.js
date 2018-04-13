@@ -34,6 +34,7 @@ function getCount($scope, $http) {
   //  })
 }
 
+// ActiveTaskGroup
 app.controller('activeTaskGroupCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
@@ -57,6 +58,7 @@ function getAllActiveTaskGroups($scope, $http) {
     })
 }
 
+// FinishedTaskGroup
 app.controller('finishedTaskGroupCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
@@ -80,8 +82,15 @@ function getAllFinishedTaskGroups($scope, $http) {
     })
 }
 
+// Add
 app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location) {
   $rootScope.sidebar = true
+
+  $http
+    .get('/supported_executables')
+    .then(function (response) {
+      $scope.supportedExecutables = response.data
+    })
 
   $scope.clear = function () {
     var inputs = document.getElementById("inputContainer");
@@ -94,6 +103,11 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   }
 
   $scope.submit = function (addTaskForm) {
+    if (!addTaskForm.taskRunnable.length) {
+      $scope.errorMessage = 'Task runnable was not defined'
+      return
+    }
+
     $http
       .post('/add_task_group_set', addTaskForm)
       .then(function (response) {
@@ -148,8 +162,12 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
         let defaultValue = Number(match) + 1
 
-        const precedence = $compile('<input class="form-control form-control-success" ng-model="addTaskForm.inputs[' + match + '].precedence" type="number" min="1" ng-init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '; addTaskForm.inputs[' + match + '].directiveIndex = ' + match + '" ng-required="true"></input>')($scope)
-        //const precedence = $compile('<precedence model="addTaskForm.inputs[' + match + '].precedence" init="addTaskForm.inputs[' + match + '].precedence = ' + defaultValue + '; addTaskForm.inputs[' + match + '].directiveIndex = ' + match + '"></precedence>')($scope)
+        $scope.addTaskForm.inputs.push({
+          precedence: Number(match) + 1,
+          directiveIndex: match
+        })
+
+        const precedence = $compile('<precedence model="addTaskForm.inputs[' + match + '].precedence"></precedence>')($scope)
         angular.element(tableCell).append(precedence)
 
         tableRow.appendChild(tableCell);
@@ -157,6 +175,8 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
       let tableCell = document.createElement("td");
       let input;
+
+      console.log($scope.addTaskForm.inputs)
 
       switch (matches[match]) {
         case "%n":
@@ -229,8 +249,6 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
                   data: loadEvent.target.result
                 }
 
-                console.log(input)
-
                 scope.fileread.push(input)
               });
             }
@@ -246,8 +264,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       restrict: 'E',
       templateUrl: 'views/dashboard/directives/precedence.html',
       scope: {
-        model: '=',
-        init: '='
+        model: '='
       },
       replace: true
     }
