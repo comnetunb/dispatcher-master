@@ -7,14 +7,30 @@
     '80': { color: 'red' }
   };
 
-  getAllWorkers($scope, $http)
+  var promise
 
-  $interval(function () {
-    getAllWorkers($scope, $http)
-  }, 1500)
+  $scope.start = function () {
+    $scope.stop();
+
+    getAllWorkers($scope, $rootScope, $http, $interval)
+
+    promise = $interval(function () {
+      getAllWorkers($scope, $rootScope, $http, $interval)
+    }, 1500);
+  };
+
+  $scope.stop = function () {
+    $interval.cancel(promise);
+  };
+
+  $scope.start();
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
 })
 
-function getAllWorkers($scope, $http) {
+function getAllWorkers($scope, $rootScope, $http, $interval) {
   $http
     .get('/api/worker/getAll')
     .then(function (response) {

@@ -13,13 +13,13 @@ module.exports = function (app) {
     }
   })
 
-  app.get('/supported_executables', function (req, res) {
+  app.get('/supported_runnables', function (req, res) {
     res.send([{
-      executable: 'java',
+      type: 'java',
       extension: '.jar'
     },
     {
-      executable: 'python',
+      type: 'python',
       extension: '.py'
     }])
   })

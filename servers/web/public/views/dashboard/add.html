@@ -7,14 +7,23 @@
         <form name="addTaskGroupForm" novalidate>
           <div class="form-group">
             <div class="mb-3">
-              <label>Executable</label>
-              <select class="form-control" ng-model="addTaskForm.executableInfo" ng-options="supportedExecutableInfo.executable for supportedExecutableInfo in supportedExecutablesInfo"></select>
+              <label>Name</label>
+              <input class="form-control form-control-success" type="text" ng-model="addTaskForm.name" ng-required="true"/>
             </div>
-            <div class="mb-3">
-              <label>Task runnable</label>
+            <!--<div class="mb-3">
+
+            </div>-->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Runnable type</span>
+              </div>
+              <select class="form-control col-md-1" ng-model="addTaskForm.runnableInfo.info" ng-options="supportedRunnableInfo.type for supportedRunnableInfo in supportedRunnablesInfo"></select>
+              <div class="input-group-prepend">
+                <span class="input-group-text">Runnable</span>
+              </div>
               <div class="custom-file">
-                <input type="file" class="custom-file-input" fileread="addTaskForm.taskRunnable" ng-disabled="!addTaskForm.executableInfo">
-                <label class="custom-file-label" ng-disabled="true">{{addTaskForm.taskRunnable[0].name}}</label>
+                <input type="file" class="custom-file-input" fileread="addTaskForm.runnableInfo.runnable" ng-disabled="!addTaskForm.runnableInfo.info.type">
+                <label class="custom-file-label" ng-disabled="true">{{addTaskForm.runnableInfo.runnable[0].name}}</label>
               </div>
             </div>
             <div class="mb-3">
@@ -43,4 +52,5 @@
       </div>
     </div>
   </div>
+  {{addTaskForm}}
 </div>

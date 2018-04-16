@@ -1,7 +1,7 @@
 ﻿
 const buildTasks = function (taskGroupSetData) {
-  const executable = taskGroupSetData.executable
-  const taskRunnable = taskGroupSetData.taskRunnable[0]
+  const runnableType = taskGroupSetData.runnableInfo.info.type
+  const runnable = taskGroupSetData.runnableInfo.runnable[0]
   const argumentsTemplate = taskGroupSetData.argumentsTemplate
   const inputs = taskGroupSetData.inputs
 
@@ -10,31 +10,28 @@ const buildTasks = function (taskGroupSetData) {
 
   var parsedInputs = []
 
-  for (let input in inputs) {
-    switch (inputs[input].type) {
+  for (let i in inputs) {
+    switch (inputs[i].type) {
       case "N":
         parsedInputs.push({
-          data: parseNumber(inputs[input].data),
-          directiveIndex: inputs[input].directiveIndex
+          data: parseNumber(inputs[i].data),
+          directiveIndex: inputs[i].directiveIndex,
+          fork: inputs[i].fork
         })
         break
     }
   }
 
-  var commandLines = []
-
   // TODO: Get prefix command on database
   var prefix = ''
-  switch (executable) {
+  switch (runnableType) {
     case 'java':
-      prefix += 'java -jar ' + taskRunnable.name + ' '
+      prefix += 'java -jar ' + runnable.name + ' '
       break
     case 'python':
-      prefix += 'python ' + taskRunnable.name + ' '
+      prefix += 'python ' + runnable.name + ' '
       break
   }
-
-  console.log(prefix)
 
   // TODO: where does this preprocessing belong?
   var preprocessedArgumentTemplate = argumentsTemplate
@@ -44,6 +41,8 @@ const buildTasks = function (taskGroupSetData) {
     preprocessedArgumentTemplate = preprocessedArgumentTemplate.replace(match[0], '%' + index)
     ++index
   }
+
+  var commandLines = []
 
   buildTaskCommandLines(prefix, parsedInputs, preprocessedArgumentTemplate, commandLines)
 
@@ -62,26 +61,27 @@ function buildTaskCommandLines(prefix, parsedInputs, argumentsTemplate, commandL
 
   const values = parsedInputs[0].data
   const index = parsedInputs[0].directiveIndex
+  const fork = parsedInputs[0].fork
 
-  for (let value in values) {
+  for (let i in values) {
     if (parsedInputs.length > 1) {
-      let newParsedInputs = parsedInputs.slice(1)
+      if (fork) {
+        console.log('fork' + values[i])
+      }
 
       infos.push({
-        value: values[value],
+        value: values[i],
         index: index
       })
 
-      buildTaskCommandLines(prefix, newParsedInputs, argumentsTemplate, commandLines, infos)
-
-      infos.splice(-1, 1)
+      buildTaskCommandLines(prefix, parsedInputs.slice(1), argumentsTemplate, commandLines, infos)
     }
     else {
       let commandLine = prefix
       let arguments = argumentsTemplate
 
       infos.push({
-        value: values[value],
+        value: values[i],
         index: index
       })
 
@@ -92,8 +92,9 @@ function buildTaskCommandLines(prefix, parsedInputs, argumentsTemplate, commandL
       commandLine += arguments
       commandLines.push(commandLine)
 
-      infos.splice(-1, 1)
     }
+
+    infos.splice(-1, 1)
   }
 }
 

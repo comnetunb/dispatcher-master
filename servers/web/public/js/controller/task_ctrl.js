@@ -87,9 +87,9 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   $rootScope.sidebar = true
 
   $http
-    .get('/supported_executables')
+    .get('/supported_runnables')
     .then(function (response) {
-      $scope.supportedExecutablesInfo = response.data
+      $scope.supportedRunnablesInfo = response.data
     })
 
   $scope.clear = function () {
@@ -103,13 +103,8 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   }
 
   $scope.submit = function (addTaskForm) {
-    if (!addTaskForm.taskRunnable.length) {
-      $scope.errorMessage = 'Task runnable is undefined'
-      return
-    }
-
-    if (!addTaskForm.executableInfo) {
-      $scope.errorMessage = 'Executable is undefined'
+    if (!addTaskForm.runnableInfo.runnable.length) {
+      $scope.errorMessage = 'Runnable is undefined'
       return
     }
 
@@ -126,7 +121,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   }
 
   $scope.addTaskForm = {
-    taskRunnable: [],
+    runnableInfo: {},
     argumentsTemplate: '',
     inputs: []
   }
@@ -144,6 +139,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
       angular
         .element(tableRow)
+        .append($compile('<th width="5%">Fork</th>')($scope))
         .append($compile('<th width="10%">Precedence</th>')($scope))
         .append($compile('<th>Input</th>')($scope))
 
@@ -153,16 +149,28 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     for (let match in matches) {
       let tableRow = document.createElement("tr")
 
+      $scope.addTaskForm.inputs.push({
+        fork: false,
+        precedence: Number(match) + 1,
+        directiveIndex: match
+      })
+
+      // Fork
+      {
+        let tableCell = document.createElement('td')
+
+        angular
+          .element(tableCell)
+          .append($compile('<input type="checkbox" ng-model="addTaskForm.inputs[' + match + '].fork">')($scope))
+
+        tableRow.appendChild(tableCell)
+      }
+
       // Precedence
       {
         let tableCell = document.createElement("td")
 
         let defaultValue = Number(match) + 1
-
-        $scope.addTaskForm.inputs.push({
-          precedence: Number(match) + 1,
-          directiveIndex: match
-        })
 
         angular
           .element(tableCell)
