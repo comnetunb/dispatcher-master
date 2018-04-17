@@ -1,10 +1,5 @@
-﻿/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
-
-const Worker = rootRequire('database/models/worker')
+﻿
+const Worker = databaseRequire('models/worker')
 
 const interfaceManager = rootRequire('servers/shared/interface_manager')
 

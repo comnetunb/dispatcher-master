@@ -28,7 +28,7 @@ dashboard.run(function (gridsterConfig) {
 dashboard.controller('navigationCtrl', function ($scope, $http, $rootScope, $window) {
   $scope.signOut = function () {
     $http
-      .post('/sign_out')
+      .post('/api/user/sign_out')
       .then(function (response) {
         $rootScope.signedUser = null
         $window.location.href = '/'
@@ -83,7 +83,7 @@ function getAllActiveTasks($scope, $http) {
 dashboard.run(function ($rootScope, $http, $window) {
   $rootScope.signOut = function () {
     $http
-      .post('/sign_out')
+      .post('/api/user/sign_out')
       .then(function (response) {
         $rootScope.signedUser = null
         $window.location.href = '/'
@@ -91,7 +91,7 @@ dashboard.run(function ($rootScope, $http, $window) {
   }
 
   $http
-    .get('/signed_in')
+    .get('/api/user/signed_in')
     .then(function (response) {
       $rootScope.signedUser = response.data
 

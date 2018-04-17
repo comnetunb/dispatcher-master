@@ -3,7 +3,7 @@
 
   $scope.sign_in = function (signIn) {
     $http
-      .post('/sign_in', signIn)
+      .post('/api/user/sign_in', signIn)
       .then(function (response) {
         $scope.errorMessage = false
         $rootScope.signedUser = response.data
@@ -26,7 +26,7 @@ app.controller("signUpCtrl", function ($scope, $http, $window, $rootScope, $loca
     }
 
     $http
-      .post('/sign_up', signUp)
+      .post('/api/user/sign_up', signUp)
       .then(function (response) {
         $scope.errorMessage = false
         $rootScope.signedUser = response.data

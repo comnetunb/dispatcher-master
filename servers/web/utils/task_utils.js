@@ -15,8 +15,7 @@ const buildTasks = function (taskGroupSetData) {
       case "N":
         parsedInputs.push({
           data: parseNumber(inputs[i].data),
-          directiveIndex: inputs[i].directiveIndex,
-          fork: inputs[i].fork
+          directiveIndex: inputs[i].directiveIndex
         })
         break
     }
@@ -61,14 +60,9 @@ function buildTaskCommandLines(prefix, parsedInputs, argumentsTemplate, commandL
 
   const values = parsedInputs[0].data
   const index = parsedInputs[0].directiveIndex
-  const fork = parsedInputs[0].fork
 
   for (let i in values) {
     if (parsedInputs.length > 1) {
-      if (fork) {
-        console.log('fork' + values[i])
-      }
-
       infos.push({
         value: values[i],
         index: index

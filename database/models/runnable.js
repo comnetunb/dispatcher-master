@@ -1,4 +1,4 @@
-//!
+﻿//!
 //! Copyright 2017-2018 WebSimAdmin
 //!
 //! Permission is hereby granted, free of charge, to any person obtaining a
@@ -23,42 +23,22 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const bcrypt = require('bcryptjs')
-
-const userSchema = Schema({
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true,
-    unique: true
-  },
-  name: {
-    type: String,
+const runnableSchema = Schema({
+  _user: {
+    type: Schema.ObjectId,
+    ref: 'User',
     required: true
   },
-  password: {
-    type: String,
+  _info: {
+    type: Schema.ObjectId,
+    ref: 'RunnableInfo',
     required: true
   },
-  admin: {
-    type: Boolean,
-    default: false
-  },
-  permitted: {
-    type: Boolean,
-    default: false
+  _file: {
+    type: Schema.ObjectId,
+    ref: 'File',
+    required: true
   }
 })
 
-const saltRounds = 10
-
-userSchema.statics.encryptPassword = function (password, callback) {
-  bcrypt.hash(password, saltRounds, callback)
-}
-
-userSchema.methods.validPassword = function (password) {
-  return bcrypt.compareSync(password, this.password)
-}
-
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('Runnable', runnableSchema)

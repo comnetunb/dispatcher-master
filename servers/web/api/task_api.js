@@ -1,8 +1,8 @@
 ﻿
-const taskUtils = webServerRequire('/utils/task')
+const taskUtils = webServerRequire('/utils/task_utils')
 
 module.exports = function (app) {
-  app.post('/add_task_group_set', function (req, res) {
+  app.post('/api/task/add_task_group_set', function (req, res) {
     try {
       taskUtils.buildTasks(req.body)
       res.sendStatus(200)
@@ -13,7 +13,7 @@ module.exports = function (app) {
     }
   })
 
-  app.get('/supported_runnables', function (req, res) {
+  app.get('/api/task/supported_runnables', function (req, res) {
     res.send([{
       type: 'java',
       extension: '.jar'

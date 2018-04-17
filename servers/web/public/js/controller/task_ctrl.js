@@ -87,7 +87,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   $rootScope.sidebar = true
 
   $http
-    .get('/supported_runnables')
+    .get('/api/task/supported_runnables')
     .then(function (response) {
       $scope.supportedRunnablesInfo = response.data
     })
@@ -109,7 +109,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     }
 
     $http
-      .post('/add_task_group_set', addTaskForm)
+      .post('/api/task/add_task_group_set', addTaskForm)
       .then(function (response) {
         $scope.errorMessage = false
         //$location.path('/active')
@@ -139,7 +139,6 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
       angular
         .element(tableRow)
-        .append($compile('<th width="5%">Fork</th>')($scope))
         .append($compile('<th width="10%">Precedence</th>')($scope))
         .append($compile('<th>Input</th>')($scope))
 
@@ -150,21 +149,9 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       let tableRow = document.createElement("tr")
 
       $scope.addTaskForm.inputs.push({
-        fork: false,
         precedence: Number(match) + 1,
         directiveIndex: match
       })
-
-      // Fork
-      {
-        let tableCell = document.createElement('td')
-
-        angular
-          .element(tableCell)
-          .append($compile('<input type="checkbox" ng-model="addTaskForm.inputs[' + match + '].fork">')($scope))
-
-        tableRow.appendChild(tableCell)
-      }
 
       // Precedence
       {
