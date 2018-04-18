@@ -26,8 +26,29 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const argumentSchema = Schema({
+const Type = {
+  NUMBER: 0,
+  STRING: 1,
+  FILE: 2
+}
 
+const argumentSchema = Schema({
+  type: {
+    type: Number,
+    required: true
+  },
+  number: {
+    type: Number
+  },
+  string: {
+    type: String
+  },
+  _file: {
+    type: Schema.ObjectId,
+    ref: 'File',
+  }
 })
+
+argumentSchema.statics.Type = Type
 
 module.exports = mongoose.model('Argument', argumentSchema)

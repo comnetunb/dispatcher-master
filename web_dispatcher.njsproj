@@ -159,12 +159,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Content Include="package.json" />
-    <Content Include="servers\web\public\views\dashboard\active.html" />
+    <Content Include="servers\web\public\views\dashboard\executing.html" />
     <Content Include="servers\web\public\css\style.css" />
     <Content Include="servers\web\public\views\dashboard\add.html">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="servers\web\public\views\dashboard\dashboard.html" />
     <Content Include="servers\web\public\index.html" />
     <Content Include="servers\web\public\views\dashboard\directives\interpretive_file.html">
       <SubType>Code</SubType>

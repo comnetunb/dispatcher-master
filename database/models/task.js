@@ -43,7 +43,10 @@ const taskSchema = Schema({
   },
   _argument: {
     type: Schema.ObjectId,
-    ref: 'Argument',
+    ref: 'Argument'
+  },
+  commandLine: {
+    type: String,
     required: true
   },
   worker: {

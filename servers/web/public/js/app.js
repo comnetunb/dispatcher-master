@@ -30,14 +30,14 @@ app.config(function ($routeProvider, $locationProvider) {
       controller: 'workerCtrl',
       auth: true
     })
-    .when('/active', {
-      templateUrl: 'views/dashboard/active.html',
-      controller: 'activeTaskGroupCtrl',
+    .when('/executing', {
+      templateUrl: 'views/dashboard/executing.html',
+      controller: 'executingTaskSetCtrl',
       auth: true
     })
     .when('/finished', {
       templateUrl: 'views/dashboard/finished.html',
-      controller: 'finishedTaskGroupCtrl',
+      controller: 'finishedTaskSetCtrl',
       auth: true
     })
     .when('/add', {

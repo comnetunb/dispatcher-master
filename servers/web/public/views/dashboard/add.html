@@ -2,9 +2,9 @@
   <div class="container-fluid">
     <div class="alert alert-danger mx-auto mt-5" ng-if="errorMessage">{{ errorMessage }}</div>
     <div class="card mx-auto mt-5">
-      <div class="card-header text-center">New task group set</div>
+      <div class="card-header text-center">New task set</div>
       <div class="card-body">
-        <form name="addTaskGroupForm" novalidate>
+        <form name="addTaskSetForm" novalidate>
           <div class="form-group">
             <div class="mb-3">
               <label>Name</label>
@@ -35,7 +35,7 @@
                     <button class="btn btn-dark" type="button" ng-click="parse(addTaskForm.argumentsTemplate)"><i class="fa fa-fw fa-check"></i> Parse</button>
                   </span>
                 </div>
-                <div ng-show="addTaskGroupForm.argumentsTemplate.$touched && addTaskGroupForm.commandLine.$invalid">
+                <div ng-show="addTaskSetForm.argumentsTemplate.$touched && addTaskSetForm.commandLine.$invalid">
                   <small class="warning">Enter a command line</small>
                 </div>
                 <div class="container-fluid">
@@ -52,5 +52,4 @@
       </div>
     </div>
   </div>
-  {{addTaskForm}}
 </div>

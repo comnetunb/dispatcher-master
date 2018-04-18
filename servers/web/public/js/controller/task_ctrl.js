@@ -28,12 +28,27 @@ app.controller('groupCtrl', function ($scope, $http, $interval, $rootScope) {
   $scope.finishedCount = 0
   $scope.canceledCount = 0
 
-  getCount($scope, $http)
+  var promise
 
-  $interval(function () {
+  $scope.start = function () {
+    $scope.stop();
+
     getCount($scope, $http)
-  }, 1500)
 
+    promise = $interval(function () {
+      getCount($scope, $http)
+    }, 1500);
+  };
+
+  $scope.stop = function () {
+    $interval.cancel(promise);
+  };
+
+  $scope.start();
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
 })
 
 function getCount($scope, $http) {
@@ -59,8 +74,8 @@ function getCount($scope, $http) {
   //  })
 }
 
-// ActiveTaskGroup
-app.controller('activeTaskGroupCtrl', function ($scope, $rootScope, $http, $interval) {
+// ExecutingTaskSet
+app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
@@ -68,23 +83,39 @@ app.controller('activeTaskGroupCtrl', function ($scope, $rootScope, $http, $inte
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
-  getAllActiveTaskGroups($scope, $http)
+  var promise
 
-  $interval(function () {
-    getAllActiveTaskGroups($scope, $http)
-  }, 1500)
+  $scope.start = function () {
+    $scope.stop();
+
+    getAllExecutingTaskSets($scope, $http)
+
+    promise = $interval(function () {
+      getAllExecutingTaskSets($scope, $http)
+    }, 1500);
+  };
+
+  $scope.stop = function () {
+    $interval.cancel(promise);
+  };
+
+  $scope.start();
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
 })
 
-function getAllActiveTaskGroups($scope, $http) {
+function getAllExecutingTaskSets($scope, $http) {
   $http
     .get('/api/task/get_executing')
     .then(function (response) {
-      $scope.activeTasks = response.data
+      $scope.executingTaskSets = response.data
     })
 }
 
-// FinishedTaskGroup
-app.controller('finishedTaskGroupCtrl', function ($scope, $rootScope, $http, $interval) {
+// FinishedTaskSet
+app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
@@ -92,14 +123,30 @@ app.controller('finishedTaskGroupCtrl', function ($scope, $rootScope, $http, $in
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
-  getAllFinishedTaskGroups($scope, $http)
+  var promise
 
-  $interval(function () {
-    getAllFinishedTaskGroups($scope, $http)
-  }, 1500)
+  $scope.start = function () {
+    $scope.stop();
+
+    getAllFinishedTaskSets($scope, $http)
+
+    promise = $interval(function () {
+      getAllFinishedTaskSets($scope, $http)
+    }, 1500);
+  };
+
+  $scope.stop = function () {
+    $interval.cancel(promise);
+  };
+
+  $scope.start();
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
 })
 
-function getAllFinishedTaskGroups($scope, $http) {
+function getAllFinishedTaskSets($scope, $http) {
   $http
     .get('/api/task/get_finished')
     .then(function (response) {
@@ -137,10 +184,9 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       .post('/api/task/add_task_group_set', addTaskForm)
       .then(function (response) {
         $scope.errorMessage = false
-        //$location.path('/active')
+        $location.path('/executing')
       })
       .catch(function (e) {
-        console.log(e)
         $scope.errorMessage = e.data.reason
       })
   }
@@ -226,7 +272,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
 
     angular
       .element(document.getElementById('inputContainer'))
-      .append($compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskGroupForm.$invalid" value="Submit">')($scope))
+      .append($compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskSetForm.$invalid" value="Submit">')($scope))
   }
 
   $scope.addInterpretiveDirective = function (directive) {

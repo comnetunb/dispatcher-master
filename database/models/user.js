@@ -1,5 +1,8 @@
 //!
-//! Copyright 2017-2018 WebSimAdmin
+//! Version: MIT
+//!
+//! Portions created by Matheus Medeiros are Copyright (c) 2017-2018
+//! Matheus Medeiros. All Rights Reserved.
 //!
 //! Permission is hereby granted, free of charge, to any person obtaining a
 //! copy of this software and associated documentation files(the "Software"),

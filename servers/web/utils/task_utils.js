@@ -28,12 +28,12 @@ const Argument = databaseRequire('models/argument')
 const Task = databaseRequire('models/task')
 const File = databaseRequire('models/file')
 
-const buildTasks = function (taskGroupSetData, user) {
-  const taskSetName = taskGroupSetData.name
-  const runnableType = taskGroupSetData.runnableInfo.info.type
-  const runnable = taskGroupSetData.runnableInfo.runnable[0]
-  const inputs = taskGroupSetData.inputs
-  const argumentsTemplate = taskGroupSetData.argumentsTemplate
+const buildTasks = function (taskSetData, user) {
+  const taskSetName = taskSetData.name
+  const runnableType = taskSetData.runnableInfo.info.type
+  const runnable = taskSetData.runnableInfo.runnable[0]
+  const inputs = taskSetData.inputs
+  const argumentsTemplate = taskSetData.argumentsTemplate
 
   // Sort by precedence
   inputs.sort(function (a, b) { return (a.precedence > b.precedence) ? 1 : ((b.precedence > a.precedence) ? -1 : 0) })
@@ -106,7 +106,7 @@ const buildTasks = function (taskGroupSetData, user) {
       return newTaskSet.save()
     })
     .then(taskSet => {
-      buildTaskSet(commandLineTemplate, parsedInputs)
+      buildTaskSet(commandLineTemplate, parsedInputs, taskSet._id)
     })
     .catch(e => {
       throw 'An internal error occurred. Please try again later.'
@@ -114,40 +114,37 @@ const buildTasks = function (taskGroupSetData, user) {
 }
 
 //! Recursive method
-function buildTaskSet(commandLineTemplate, parsedInputs, infos) {
+function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) {
   if (!parsedInputs.length) {
     return
-  }
-
-  if (!infos) {
-    infos = []
   }
 
   const values = parsedInputs[0].data
   const index = parsedInputs[0].directiveIndex
 
   for (let value in values) {
-    if (parsedInputs.length > 1) {
-      infos.push({
-        value: values[value],
-        index: index
-      })
+    infos.push({
+      value: values[value],
+      index: index,
+      argumentIndex: value
+    })
 
-      buildTaskSet(commandLineTemplate, parsedInputs.slice(1), infos)
+    if (parsedInputs.length > 1) {
+      buildTaskSet(commandLineTemplate, parsedInputs.slice(1), taskSetId, infos)
     }
     else {
-      infos.push({
-        value: values[value],
-        index: index
-      })
-
       let commandLine = commandLineTemplate
 
       for (let info in infos) {
         commandLine = commandLine.replace('%' + infos[info].index, infos[info].value)
       }
 
-      console.log(commandLine)
+      let newTask = new Task({
+        _taskSet: taskSetId,
+        commandLine: commandLine
+      })
+
+      newTask.save()
     }
 
     infos.splice(-1, 1)
