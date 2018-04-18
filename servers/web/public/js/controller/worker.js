@@ -32,7 +32,7 @@
 
 function getAllWorkers($scope, $rootScope, $http, $interval) {
   $http
-    .get('/api/worker/getAll')
+    .get('/api/worker/get_all')
     .then(function (response) {
       $scope.workers = response.data
     })

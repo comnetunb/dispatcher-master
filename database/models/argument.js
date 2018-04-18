@@ -1,5 +1,8 @@
 ﻿//!
-//! Copyright 2017-2018 WebSimAdmin
+//! Version: MIT
+//!
+//! Portions created by Matheus Medeiros are Copyright (c) 2017-2018
+//! Matheus Medeiros. All Rights Reserved.
 //!
 //! Permission is hereby granted, free of charge, to any person obtaining a
 //! copy of this software and associated documentation files(the "Software"),
@@ -23,22 +26,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const runnableSchema = Schema({
-  _user: {
-    type: Schema.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  _info: {
-    type: Schema.ObjectId,
-    ref: 'RunnableInfo',
-    required: true
-  },
-  _file: {
-    type: Schema.ObjectId,
-    ref: 'File',
-    required: true
-  }
+const argumentSchema = Schema({
+
 })
 
-module.exports = mongoose.model('Runnable', runnableSchema)
+module.exports = mongoose.model('Argument', argumentSchema)

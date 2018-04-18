@@ -1,5 +1,8 @@
 ﻿//!
-//! Copyright 2017-2018 WebSimAdmin
+//! Version: MIT
+//!
+//! Portions created by Matheus Medeiros are Copyright (c) 2017-2018
+//! Matheus Medeiros. All Rights Reserved.
 //!
 //! Permission is hereby granted, free of charge, to any person obtaining a
 //! copy of this software and associated documentation files(the "Software"),
@@ -23,12 +26,56 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
+const State = {
+  EXECUTING: 0,
+  FINISHED: 1,
+  CANCELED: 2
+}
+
+const Priority = {
+  MINIMUM: 0,
+  LOW: 1,
+  NORMAL: 2,
+  HIGH: 3,
+  URGENT: 4
+}
+
 const taskSetSchema = Schema({
+  _user: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  _runnable: {
+    type: Schema.ObjectId,
+    ref: 'File',
+    required: true
+  },
   name: {
     type: String,
-    require: true
+    required: true
   },
-
+  argumentTemplate: {
+    type: String
+  },
+  priority: {
+    type: Number,
+    default: Priority.MINIMUM
+  },
+  state: {
+    type: Number,
+    default: State.EXECUTING
+  },
+  startTime: {
+    type: Date,
+    default: Date.now
+  },
+  endTime: {
+    type: Date
+  }
 })
+
+taskSetSchema.statics.State = State
+taskSetSchema.statics.Priority = Priority
 
 module.exports = mongoose.model('TaskSet', taskSetSchema)

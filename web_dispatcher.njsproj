@@ -20,6 +20,9 @@
     <Compile Include="database\db_driver.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="database\models\argument.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="database\models\binary.js">
       <SubType>Code</SubType>
     </Compile>
@@ -30,9 +33,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="database\models\log.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="database\models\runnable.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="database\models\runnable_info.js">

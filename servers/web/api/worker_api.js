@@ -19,7 +19,7 @@ module.exports = function (app) {
     interfaceManager.stopWorker(req.body.address)
   })
 
-  app.get('/api/worker/getAll', function (req, res) {
+  app.get('/api/worker/get_all', function (req, res) {
     Worker
       .find({}, '-_id')
       .then(function (workers) {

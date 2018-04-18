@@ -26,6 +26,11 @@ const Schema = mongoose.Schema
 const parseDataUrl = require('parse-data-url');
 
 const fileSchema = Schema({
+  _user: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
   name: {
     type: String,
     required: true
