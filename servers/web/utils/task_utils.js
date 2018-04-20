@@ -126,7 +126,8 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
     infos.push({
       value: values[value],
       index: index,
-      argumentIndex: value
+      argumentIndex: Number(value),
+      argumentLength: values.length
     })
 
     if (parsedInputs.length > 1) {
@@ -134,14 +135,19 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
     }
     else {
       let commandLine = commandLineTemplate
+      let priority = 0
+      let accumulator = 1
 
       for (let info in infos) {
         commandLine = commandLine.replace('%' + infos[info].index, infos[info].value)
+        priority += infos[info].argumentIndex * accumulator
+        accumulator *= infos[info].argumentLength
       }
 
       let newTask = new Task({
         _taskSet: taskSetId,
-        commandLine: commandLine
+        commandLine: commandLine,
+        priority: priority
       })
 
       newTask.save()
@@ -174,7 +180,7 @@ function parseNumber(numberNotation) {
   }
 
   // Comma separated notation
-  matches = numberNotation.match(/^\d(,\d)*$/g)
+  matches = numberNotation.match(/^\d+(,\d+)*$/g)
 
   if (matches) {
     return matches[0]

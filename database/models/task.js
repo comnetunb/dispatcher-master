@@ -49,6 +49,10 @@ const taskSchema = Schema({
     type: String,
     required: true
   },
+  priority: {
+    type: Number,
+    required: true
+  },
   worker: {
     type: String
   },
