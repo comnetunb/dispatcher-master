@@ -3,9 +3,8 @@
 const ReturnCode = protocolRequire('dwp/pdu/task_result').ReturnCode
 
 // Database Related
-const SimulationInstance = rootRequire('database/models/simulation_instance')
-const Simulation = rootRequire('database/models/simulation')
-const SimulationGroup = rootRequire('database/models/simulation_group')
+const Task = rootRequire('database/models/task')
+const TaskSet = rootRequire('database/models/task_set')
 
 // Shared Related
 const mailer = rootRequire('servers/shared/mailer')
@@ -16,103 +15,86 @@ module.exports.execute = function (pdu, worker) {
     // Succeded
     try {
       JSON.parse(pdu.output)
-    } catch (e) {
+    }
+    catch (e) {
       log.fatal(e + '\nJSON: ' + pdu.output)
     }
 
-    var simulationInstanceUpdate = {
+    var taskUpdate = {
       result: pdu.output,
-      state: SimulationInstance.State.Finished,
+      state: Task.State.FINISHED,
       endTime: Date.now(),
       $unset: { worker: 1 }
     }
 
-    SimulationInstance
-      .findByIdAndUpdate(pdu.task.id, simulationInstanceUpdate, { new: true })
-      .then(function (simulationInstance) {
-        log.info('Worker ' + worker.address + ':' + worker.port + ' has finished simulation instance ' + simulationInstance._id)
+    Task
+      .findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true })
+      .then(task => {
+        log.info('Worker ' + worker.address + ':' + worker.port + ' has finished task ' + task._id)
 
-        return cascadeConclusion(simulationInstance._simulation)
+        return cascadeConclusion(task._taskSet)
       })
-      .then(function () {
+      .then(() => {
         return worker.updateRunningInstances()
       })
-      .catch(function (e) {
+      .catch(e => {
         log.fatal(e)
       })
-  } else {
+  }
+  else {
     // Failed
-    log.fatal(pdu.task.id + ' executed with failure: ' + pdu.output)
+    log.warn(pdu.task.id + ' failed to execute: ' + pdu.output)
 
-    SimulationInstance
+    Task
       .updateToDefaultState(pdu.task.id)
-      .then(function () {
+      .then(() => {
         return worker.updateRunningInstances()
       })
-      .catch(function (e) {
+      .catch(e => {
         log.fatal(e)
       })
   }
 }
 
-function cascadeConclusion(simulationGroupId) {
-  return SimulationInstance
-    .countActive(simulationGroupId)
-    .then(function (count) {
-      if (count > 0) {
-        return null
-      }
-      // All SimulationInstances are done
-      const simulationUpdate = { state: Simulation.State.Finished }
+function cascadeConclusion(taskSetId) {
+  const taskFilter = {
+    _taskSet: taskSetId,
+    state: {
+      $ne: Task.State.FINISHED
+    }
+  }
 
-      return Simulation
-        .findByIdAndUpdate(simulationGroupId, simulationUpdate)
-    })
-    .then(function (simulation) {
-      if (!simulation) {
+  return Task
+    .count(taskFilter)
+    .then(activeCount => {
+      if (activeCount > 0) {
         return
       }
 
-      return Simulation
-        .countActive(simulation._simulationGroup)
-        .then(function (count) {
-          if (count > 0) {
-            return null
-          }
-          // All Simulations are done
-          return finishSimulationGroup(simulation._simulationGroup)
+      // All tasks are done. Finish TaskSet
+      const taskSetUpdate = {
+        state: TaskSet.State.FINISHED,
+        endTime: Date.now()
+      }
+
+      return TaskSet
+        .findByIdAndUpdate(taskSetId, taskSetUpdate, { new: true })
+        .populate('_user')
+        .then(taskSet => {
+          sendConclusionEmail(taskSet)
         })
     })
-    .catch(function (e) {
-      log.fatal(e)
-    })
 }
 
-function finishSimulationGroup(simulationGroupId) {
-  const simulationGroupUpdate = { state: SimulationGroup.State.Finished, endTime: Date.now() }
+function sendConclusionEmail(taskSet) {
+  const to = taskSet._user.email
+  const subject = 'Task set "' + taskSet.name + '" has finished'
 
-  return SimulationGroup
-    .findByIdAndUpdate(simulationGroupId, simulationGroupUpdate, { new: true })
-    .populate('_user')
-    .then(function (simulationGroup) {
-      sendSimulationGroupConclusionEmail(simulationGroup)
-    })
-    .catch(function (e) {
-      log.fatal(e)
-    })
-}
-
-function sendSimulationGroupConclusionEmail(simulationGroup) {
-  const to = simulationGroup._user.email
-  const subject = 'Simulation group "' + simulationGroup.name + '" has finished'
+  // TODO: use template email
   const text =
-    'Start time: ' + simulationGroup.startTime +
-    '\nEnd time: ' + simulationGroup.endTime +
-    '\nPriority: ' + simulationGroup.priority +
-    '\nSeed amount: ' + simulationGroup.seedAmount +
-    '\nMinimum load: ' + simulationGroup.load.minimum +
-    '\nMaximum load: ' + simulationGroup.load.maximum +
-    '\nStep: ' + simulationGroup.load.step
+    'Start time: ' + taskSet.startTime +
+    '\nEnd time: ' + taskSet.endTime +
+    '\nPriority: ' + taskSet.priority
 
   mailer.sendMail(to, subject, text)
 }

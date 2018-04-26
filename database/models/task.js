@@ -49,7 +49,7 @@ const taskSchema = Schema({
     type: String,
     required: true
   },
-  priority: {
+  precedence: {
     type: Number,
     required: true
   },
@@ -71,4 +71,53 @@ const taskSchema = Schema({
   }
 })
 
-module.exports = mongoose.model('Task', taskSchema )
+taskSchema.statics.State = State
+
+taskSchema.statics.updateToDefaultState = function (taskId) {
+  const taskPopulate = { path: '_taskSet' }
+
+  return model
+    .findById(taskId)
+    .populate(taskPopulate)
+    .then(function (task) {
+      const taskSetState = task._taskSet.state
+
+      task.worker = undefined
+      task.startTime = undefined
+
+      const TaskSet = databaseRequire('models/task_set')
+
+      if (taskSetState === TaskSet.State.EXECUTING) {
+        task.state = State.PENDING
+      }
+      else {
+        task.state = State.CANCELED
+      }
+
+      return task.save()
+    })
+}
+
+taskSchema.methods.isPending = function () {
+  return this.state === State.PENDING
+}
+
+taskSchema.methods.isSent = function () {
+  return this.state === State.SENT
+}
+
+taskSchema.methods.isExecuting = function () {
+  return this.state === State.EXECUTING
+}
+
+taskSchema.methods.isFinished = function () {
+  return this.state === State.FINISHED
+}
+
+taskSchema.methods.isCanceled = function () {
+  return this.state === State.CANCELED
+}
+
+const model = mongoose.model('Task', taskSchema)
+
+module.exports = model

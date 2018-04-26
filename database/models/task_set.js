@@ -51,6 +51,13 @@ const taskSetSchema = Schema({
     ref: 'File',
     required: true
   },
+  // [_files] This schema will be used for file arguments for now. Although the
+  // best way to do this is to separate into an hierarchy in order to get only
+  // the files needed to each task.
+  _files: [{
+    type: Schema.ObjectId,
+    ref: 'File'
+  }],
   name: {
     type: String,
     required: true

@@ -6,9 +6,7 @@
 
 const connectionManager = rootRequire('servers/dispatcher/connection_manager')
 
-const SimulationInstance = rootRequire('database/models/simulation_instance')
-const Simulation = rootRequire('database/models/simulation')
-const SimulationGroup = rootRequire('database/models/simulation_group')
+const Task = rootRequire('database/models/task')
 
 const log = rootRequire('servers/shared/log')
 
@@ -23,65 +21,65 @@ module.exports.execute = function (pdu, worker) {
   }
 
   if (pdu.flags & flags.TASKS) {
-    Promise.all(pdu.tasks.map(function (task) {
+    Promise.all(pdu.tasks.map(function (taskReceived) {
       // Go through all tasks
-      return SimulationInstance
-        .findById(task.id)
-        .then(function (simulationInstance) {
-          if (!simulationInstance) {
+      return Task
+        .findById(taskReceived.id)
+        .then(function (task) {
+          if (!task) {
             return
           }
 
-          if (simulationInstance.isFinished() || simulationInstance.isCanceled()) {
+          if (task.isFinished() || task.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker.uuid, terminateTask.format({ taskId: task.id }))
+            connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id }))
             return
           }
 
-          if (simulationInstance.worker) {
+          if (task.worker) {
             // There is a worker executing this instance already
-            if (simulationInstance.startTime < task.startTime) {
+            if (task.startTime < taskReceived.startTime) {
               // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker.uuid, terminateTask.format({ taskId: task.id }))
+              connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id }))
               return
             }
 
             // Evaluating by the time they started, the 'newer' worker will finish faster
-            connectionManager.send(simulationInstance.worker, terminateTask.format({ taskId: task.id }))
+            connectionManager.send(task.worker, terminateTask.format({ taskId: taskReceived.id }))
           }
 
           // Associate this instance to this worker
-          simulationInstance.worker = worker.uuid
-          return simulationInstance
-            .save()
+          task.worker = worker.uuid
+          return task.save()
         })
     }))
-      .then(function () {
-        const simulationInstanceFilter = { worker: worker.uuid }
+      .then(() => {
+        const taskFilter = { worker: worker.uuid }
 
-        return SimulationInstance
-          .find(simulationInstanceFilter)
-          .then(function (simulationInstances) {
-            if (simulationInstances === null) {
+        return Task
+          .find(taskFilter)
+          .then(function (tasks) {
+            if (tasks === null) {
               return
             }
 
-            return Promise.all(simulationInstances
-              .map(function (simulationInstance) {
-                for (const task in pdu.tasks) {
-                  if (pdu.tasks[task].id === simulationInstance._id) {
-                    return;
+            return Promise
+              .all(tasks
+                .map(task => {
+                  for (const taskReceived in pdu.tasks) {
+                    if (pdu.tasks[taskReceived].id === task._id) {
+                      return;
+                    }
                   }
-                }
 
-                return SimulationInstance.updateToDefaultState(simulationInstance._id)
-              }))
+                  return Task.updateToDefaultState(task._id)
+                }))
           })
       })
-      .then(function () {
+      .then(() => {
         worker.updateRunningInstances()
       })
-      .catch(function (e) {
+      .catch(e => {
         log.fatal(e)
       })
   }
@@ -96,7 +94,7 @@ module.exports.execute = function (pdu, worker) {
 
   worker
     .save()
-    .catch(function (err) {
-      log.fatal(err)
+    .catch(e => {
+      log.fatal(e)
     })
 }

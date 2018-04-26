@@ -15,6 +15,8 @@ const config = rootRequire('servers/shared/configuration').getConfiguration()
 const interfaceManagerEvent = rootRequire('servers/shared/interface_manager').event
 
 // Database Related
+const Task = databaseRequire('models/task')
+const TaskSet = databaseRequire('models/task_set')
 const SimulationInstance = rootRequire('database/models/simulation_instance')
 const Worker = rootRequire('database/models/worker')
 
@@ -27,7 +29,7 @@ const performCommand = protocolRequire('dwp/pdu/perform_command')
 module.exports = function () {
   try {
     cleanUp()
-      .then(function () {
+      .then(() => {
         // After cleanUp, start all services
         communication.execute()
         worker_discovery.execute()
@@ -36,8 +38,9 @@ module.exports = function () {
         requestResourceRoutine()
         batchDispatchRoutine()
       })
-  } catch (err) {
-    log.fatal(err)
+  }
+  catch (e) {
+    log.fatal(e)
   }
 }
 
@@ -62,9 +65,9 @@ function batchDispatchRoutine() {
 }
 
 /**
- * Retrieve number of workers that fit in cpu and memory threshold.
- * With this number (n) in hands, make a top 'n' select of pending simulation instances
- * and dispatch it to all those workers
+ * Retrieve number of workers that fit in cpu and memory threshold. With this
+ * number (n) in hands, make a top 'n' select of pending tasks and dispatch it
+ * to all those workers
  */
 
 function batchDispatch() {
@@ -75,83 +78,69 @@ function batchDispatch() {
         return
       }
 
-      const simulationInstanceFilter = { state: SimulationInstance.State.Pending }
-      const simulationInstancePopulate = {
-        path: '_simulation',
-        select: '_binary _document _simulationGroup',
-        populate: { path: '_binary _document _simulationGroup _simulationGroup.name' },
-        options: { sort: { '_simulationGroup.priority': -1 } }
+      const taskFilter = {
+        state: Task.State.PENDING
       }
 
-      SimulationInstance
-        .find(simulationInstanceFilter)
-        .populate(simulationInstancePopulate)
-        .sort({ seed: -1, load: 1 })
+      const taskPopulate = {
+        path: '_taskSet',
+        select: '_runnable name _files',
+        populate: { path: '_runnable _files' },
+        options: { sort: { '_taskSet.priority': -1 } }
+      }
+
+      Task
+        .find(taskFilter)
+        .populate(taskPopulate)
+        .sort({ precedence: 1 })
         .limit(availableWorkers.length)
-        .then(function (simulationInstances) {
-          if (!simulationInstances) {
-            // No simulations are pending
+        .then(function (tasks) {
+          if (!tasks) {
+            // No tasks are pending
             return
           }
 
-          simulationInstances
-            .forEach(function (simulationInstance, index) {
-              simulationInstance.state = SimulationInstance.State.Sent
-              simulationInstance.worker = availableWorkers[index].uuid
+          tasks
+            .forEach(function (task, index) {
+              task.state = Task.State.SENT
+              task.worker = availableWorkers[index].uuid
 
-              return simulationInstance
+              return task
                 .save()
                 .then(function () {
 
-                  // <TODO>: Do it in a way to be generic (from user's input)
-                  const file = 'java'
-                  const arguments = [
-                    '-jar',
-                    simulationInstance._simulation._binary.name,
-                    simulationInstance._simulation._document.name,
-                    simulationInstance.seed,
-                    simulationInstance.load,
-                    simulationInstance.load,
-                    1
-                  ]
-
-                  const files = [
-                    simulationInstance._simulation._binary,
-                    simulationInstance._simulation._document
-                  ]
-                  // </TODO>
+                  let files = task._taskSet._files
+                  files.push(task._taskSet._runnable)
 
                   const pdu = performTask.format({
-                    taskId: simulationInstance._id,
-                    exec: {
-                      file: file,
-                      arguments: arguments
-                    },
+                    task: { id: task._id },
+                    commandLine: task.commandLine,
                     files: files
                   })
 
                   connectionManager.send(availableWorkers[index].uuid, pdu)
 
-                  const simulationGroupName = simulationInstance._simulation._simulationGroup.name
-                  log.info('Dispatched simulation instance with load '
-                    + simulationInstance.load
-                    + ' from group '
-                    + log.italic(simulationGroupName)
+                  const taskSetName = task._taskSet.name
+
+                  log.info('Dispatched task with precedence '
+                    + task.precedence
+                    + ' from set '
+                    + log.italic(taskSetName)
                     + ' to '
                     + availableWorkers[index].address)
 
                   // If after X seconds it is still 'Sent', return it to its default state
                   setTimeout(function () {
-                    return SimulationInstance
-                      .findById(simulationInstance._id)
-                      .then(function (simulationInstanceRefreshed) {
-                        if (!simulationInstanceRefreshed) {
-                          throw 'SimulationInstance not found!'
+                    return Task
+                      .findById(task._id)
+                      .then(function (taskRefreshed) {
+                        if (!taskRefreshed) {
+                          throw 'Task not found!'
                         }
 
-                        if (simulationInstanceRefreshed.isSent()) {
+                        if (taskRefreshed.isSent()) {
                           log.warn('Timeout from worker ' + availableWorkers[index].address + ':' + availableWorkers[index].port)
-                          return SimulationInstance.updateToDefaultState(simulationInstanceRefreshed._id)
+                          return Task.updateToDefaultState(taskRefreshed._id)
                         }
                       })
                   }, 10000)
@@ -165,25 +154,25 @@ function batchDispatch() {
 }
 
 function cleanUp() {
-  // Clean all simulation instances
-  const simulationInstanceFilter = {
-    $or: [{ state: SimulationInstance.State.Sent },
-    { state: SimulationInstance.State.Executing }]
+  // Clean all tasks
+  const taskFilter = {
+    $or: [{ state: Task.State.SENT },
+    { state: Task.State.EXECUTING }]
   }
 
-  const simulationInstanceUpdate = {
-    state: SimulationInstance.State.Pending,
+  const taskUpdate = {
+    state: Task.State.PENDING,
     $unset: { worker: 1, startTime: 1 }
   }
 
   var promises = []
 
-  promises.push(SimulationInstance
-    .update(simulationInstanceFilter, simulationInstanceUpdate, { multi: true }))
+  promises
+    .push(Task
+      .update(taskFilter, taskUpdate, { multi: true }))
 
   // Remove all workers since it is the dispatcher startup
-  promises.push(Worker
-    .remove({}))
+  promises.push(Worker.remove({}))
 
   return Promise.all(promises)
 }

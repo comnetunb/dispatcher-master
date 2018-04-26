@@ -9,7 +9,7 @@ const Schema = mongoose.Schema
 
 const WorkerState = protocolRequire('dwp/common').WorkerState
 
-const SimulationInstance = rootRequire('database/models/simulation_instance')
+const Task = rootRequire('database/models/task')
 
 const State = {
   EXECUTING: WorkerState.EXECUTING,
@@ -17,7 +17,6 @@ const State = {
 }
 
 const workerSchema = Schema({
-
   address: {
     type: String,
     required: true
@@ -77,7 +76,7 @@ workerSchema.statics.State = State
 
 workerSchema.methods.updateRunningInstances = function () {
   const worker = this
-  return SimulationInstance
+  return Task
     .count({ worker: worker.uuid })
     .then(function (count) {
       worker.runningInstances = count

@@ -38,7 +38,8 @@ const buildTasks = function (taskSetData, user) {
   // Sort by precedence
   inputs.sort(function (a, b) { return (a.precedence > b.precedence) ? 1 : ((b.precedence > a.precedence) ? -1 : 0) })
 
-  var parsedInputs = []
+  let newFiles = []
+  let parsedInputs = []
 
   for (let input in inputs) {
     switch (inputs[input].type) {
@@ -55,6 +56,14 @@ const buildTasks = function (taskSetData, user) {
 
         for (let file in files) {
           data.push(files[file].name)
+
+          const newFile = new File({
+            _user: user._id,
+            name: files[file].name,
+            dataURL: files[file].data
+          })
+
+          newFiles.push(newFile)
         }
 
         parsedInputs.push({
@@ -87,23 +96,35 @@ const buildTasks = function (taskSetData, user) {
 
   commandLineTemplate = prefix + preProcessedArgumentsTemplate
 
-  const newRunnable = new File({
-    _user: user._id,
-    name: runnable.name,
-    dataURL: runnable.data
-  })
 
-  newRunnable
-    .save()
-    .then(runnable => {
-      const newTaskSet = new TaskSet({
+  File
+    .insertMany(newFiles)
+    .then(files => {
+      let fileIds = []
+
+      for (let file in files) {
+        fileIds.push(files[file]._id)
+      }
+
+      const newRunnable = new File({
         _user: user._id,
-        _runnable: runnable._id,
-        name: taskSetName,
-        argumentsTemplate: argumentsTemplate
+        name: runnable.name,
+        dataURL: runnable.data
       })
 
-      return newTaskSet.save()
+      return newRunnable
+        .save()
+        .then(runnable => {
+          const newTaskSet = new TaskSet({
+            _user: user._id,
+            _runnable: runnable._id,
+            _files: fileIds,
+            name: taskSetName,
+            argumentsTemplate: argumentsTemplate
+          })
+
+          return newTaskSet.save()
+        })
     })
     .then(taskSet => {
       buildTaskSet(commandLineTemplate, parsedInputs, taskSet._id)
@@ -135,19 +156,19 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
     }
     else {
       let commandLine = commandLineTemplate
-      let priority = 0
+      let precedence = 0
       let accumulator = 1
 
       for (let info in infos) {
         commandLine = commandLine.replace('%' + infos[info].index, infos[info].value)
-        priority += infos[info].argumentIndex * accumulator
+        precedence += infos[info].argumentIndex * accumulator
         accumulator *= infos[info].argumentLength
       }
 
       let newTask = new Task({
         _taskSet: taskSetId,
         commandLine: commandLine,
-        priority: priority
+        precedence: precedence
       })
 
       newTask.save()
