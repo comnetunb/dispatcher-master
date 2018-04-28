@@ -24,7 +24,6 @@
 //!
 
 const TaskSet = databaseRequire('models/task_set')
-const Argument = databaseRequire('models/argument')
 const Task = databaseRequire('models/task')
 const File = databaseRequire('models/file')
 
@@ -36,7 +35,7 @@ const buildTasks = function (taskSetData, user) {
   const argumentsTemplate = taskSetData.argumentsTemplate
 
   // Sort by precedence
-  inputs.sort(function (a, b) { return (a.precedence > b.precedence) ? 1 : ((b.precedence > a.precedence) ? -1 : 0) })
+  inputs.sort((first, second) => { return (first.precedence > second.precedence) ? 1 : ((second.precedence > first.precedence) ? -1 : 0) })
 
   let newFiles = []
   let parsedInputs = []
@@ -95,7 +94,6 @@ const buildTasks = function (taskSetData, user) {
   }
 
   commandLineTemplate = prefix + preProcessedArgumentsTemplate
-
 
   File
     .insertMany(newFiles)
@@ -158,15 +156,18 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
       let commandLine = commandLineTemplate
       let precedence = 0
       let accumulator = 1
+      let indexes = []
 
       for (let info in infos) {
         commandLine = commandLine.replace('%' + infos[info].index, infos[info].value)
         precedence += infos[info].argumentIndex * accumulator
         accumulator *= infos[info].argumentLength
+        indexes.push(infos[info].argumentIndex)
       }
 
       let newTask = new Task({
         _taskSet: taskSetId,
+        indexes: indexes,
         commandLine: commandLine,
         precedence: precedence
       })

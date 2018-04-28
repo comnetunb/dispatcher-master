@@ -41,10 +41,10 @@ const taskSchema = Schema({
     ref: 'TaskSet',
     required: true
   },
-  _argument: {
-    type: Schema.ObjectId,
-    ref: 'Argument'
-  },
+  indexes: [{
+    type: Number,
+    required: true
+  }],
   commandLine: {
     type: String,
     required: true
