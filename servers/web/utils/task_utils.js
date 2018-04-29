@@ -125,7 +125,15 @@ const buildTasks = function (taskSetData, user) {
         })
     })
     .then(taskSet => {
-      buildTaskSet(commandLineTemplate, parsedInputs, taskSet._id)
+      var promises = []
+
+      buildTaskSet(commandLineTemplate, parsedInputs, taskSet._id, promises)
+
+      Promise
+        .all(promises)
+        .then(function () {
+          TaskSet.UpdateRemainingTasksCount(taskSet._id)
+        })
     })
     .catch(e => {
       throw 'An internal error occurred. Please try again later.'
@@ -133,7 +141,7 @@ const buildTasks = function (taskSetData, user) {
 }
 
 //! Recursive method
-function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) {
+function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, promises, infos = []) {
   if (!parsedInputs.length) {
     return
   }
@@ -150,7 +158,7 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
     })
 
     if (parsedInputs.length > 1) {
-      buildTaskSet(commandLineTemplate, parsedInputs.slice(1), taskSetId, infos)
+      buildTaskSet(commandLineTemplate, parsedInputs.slice(1), taskSetId, promises, infos)
     }
     else {
       let commandLine = commandLineTemplate
@@ -172,7 +180,7 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, infos = []) 
         precedence: precedence
       })
 
-      newTask.save()
+      promises.push(newTask.save())
     }
 
     infos.splice(-1, 1)

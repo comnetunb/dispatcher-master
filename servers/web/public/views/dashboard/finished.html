@@ -17,10 +17,6 @@
               Group
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='group'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
             </th>
-            <th ng-click="sort('seed_amount')">
-              Seed Amount
-              <i class="fa fa-fw fa-sort" ng-show="sortKey=='seed_amount'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
-            </th>
             <th ng-click="sort('start_time')">
               Start Time
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='start_time'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
@@ -36,9 +32,8 @@
         <tbody>
           <tr dir-paginate="finishedTask in finishedTasks | orderBy: sortKey:reverse | filter: search | itemsPerPage: 10 track by finishedTask._id">
             <td>{{finishedTask.name}}</td>
-            <td>{{finishedTask.seedAmount}}</td>
-            <td>{{finishedTask.startTime}}</td>
-            <td>{{finishedTask.endTime}}</td>
+            <td>{{finishedTask.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+            <td>{{finishedTask.endTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
             <td><button class="btn btn-large btn-primary"><span class="fa fa-fw fa-arrow-down"></span> Export</button></td>
             <td><button class="btn btn-large btn-danger" data-toggle="modal" data-target="#confirmationModal"><span class="fa fa-fw fa-trash"></span> Remove</button></td>
           </tr>

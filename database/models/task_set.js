@@ -79,10 +79,37 @@ const taskSetSchema = Schema({
   },
   endTime: {
     type: Date
+  },
+  remainingTasksCount: {
+    type: Number
   }
 })
 
 taskSetSchema.statics.State = State
 taskSetSchema.statics.Priority = Priority
 
-module.exports = mongoose.model('TaskSet', taskSetSchema)
+taskSetSchema.statics.UpdateRemainingTasksCount = (id) => {
+  const Task = databaseRequire('models/task')
+
+  const taskFilter = {
+    _taskSet: id,
+    $or: [
+      { state: Task.State.PENDING },
+      { state: Task.State.SENT },
+      { state: Task.State.EXECUTING }
+    ]
+  }
+
+  return Task
+    .count(taskFilter)
+    .then(count => {
+      const taskSetFilter = { _id: id }
+      const taskSetUpdate = { remainingTasksCount: count }
+
+      return model.update(taskSetFilter, taskSetUpdate)
+    })
+}
+
+const model = mongoose.model('TaskSet', taskSetSchema)
+
+module.exports = model

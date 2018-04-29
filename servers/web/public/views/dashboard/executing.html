@@ -17,6 +17,10 @@
               Name
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='name'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
             </th>
+            <th ng-click="sort('remaining_tasks')">
+              Remaining Tasks
+              <i class="fa fa-fw fa-sort" ng-show="sortKey=='remaining_tasks'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
+            </th>
             <th ng-click="sort('start_time')">
               Start Time
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='start_time'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
@@ -26,7 +30,8 @@
         <tbody>
           <tr dir-paginate="executingTaskSet in executingTaskSets | orderBy: sortKey:reverse | filter: search | itemsPerPage: 10 track by executingTaskSet._id">
             <td>{{executingTaskSet.name}}</td>
-            <td>{{executingTaskSet.startTime}}</td>
+            <td>{{executingTaskSet.remainingTasksCount}}</td>
+            <td>{{executingTaskSet.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
           </tr>
         </tbody>
       </table>

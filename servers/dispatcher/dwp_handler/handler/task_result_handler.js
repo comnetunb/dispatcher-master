@@ -32,6 +32,8 @@ module.exports.execute = function (pdu, worker) {
       .then(task => {
         log.info('Worker ' + worker.address + ':' + worker.port + ' has finished task ' + task._id)
 
+        TaskSet.UpdateRemainingTasksCount(task._taskSet)
+
         return cascadeConclusion(task._taskSet)
       })
       .then(() => {

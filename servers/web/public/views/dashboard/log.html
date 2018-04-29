@@ -17,7 +17,7 @@
           <span class="badge badge-danger" ng-switch-when="4">ERROR</span>
           <span class="badge badge-dark" ng-switch-when="5">FATAL</span>
         </td>
-        <td>{{log.date}}</td>
+        <td>{{log.date | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
         <td>{{log.log}}</td>
       </tr>
     </tbody>

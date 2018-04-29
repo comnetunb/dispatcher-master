@@ -10,6 +10,7 @@ const log = rootRequire('servers/shared/log')
 const connectionManager = rootRequire('servers/dispatcher/connection_manager')
 
 const Task = rootRequire('database/models/task')
+const TaskSet = rootRequire('database/models/task_set')
 
 module.exports.execute = function (pdu, worker) {
   if (pdu.code === ReturnCode.EXECUTING) {
@@ -31,6 +32,7 @@ module.exports.execute = function (pdu, worker) {
         task.worker = worker.uuid
         task.state = Task.State.EXECUTING
         task.save()
+
         return true
       })
       .then(needsToUpdate => {
