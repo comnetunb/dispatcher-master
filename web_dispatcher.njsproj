@@ -20,9 +20,6 @@
     <Compile Include="database\db_driver.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="database\models\argument.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="database\models\binary.js">
       <SubType>Code</SubType>
     </Compile>
@@ -59,6 +56,9 @@
     <Compile Include="database\models\worker.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\api\log_api.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\web\config\passport.js">
       <SubType>Code</SubType>
     </Compile>
@@ -68,10 +68,13 @@
     <Compile Include="servers\web\api\worker_api.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\web\public\js\controller\authentication.js">
+    <Compile Include="servers\web\public\js\controller\authentication_ctrl.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\js\controller\home.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\log_ctrl.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\js\controller\navigation.js">
@@ -83,16 +86,10 @@
     <Compile Include="servers\web\public\js\controller\worker.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\web\public\js\sign_out.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="servers\web\public\js\sign_up.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\views\authentication\forgot_password.html">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="servers\web\public\views\navigation.html">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\setup.js">
@@ -104,9 +101,6 @@
     <Compile Include="servers\web\public\js\dashboard.js" />
     <Compile Include="servers\web\public\js\app.js" />
     <Compile Include="servers\web\public\views\authentication\sign_in.html">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="servers\web\public\js\controller\sign_in.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\views\authentication\sign_up.html">
@@ -178,6 +172,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\finished.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\log.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\workers.html" />

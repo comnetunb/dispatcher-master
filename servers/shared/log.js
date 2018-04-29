@@ -21,7 +21,7 @@ log4js.configure({
 
 const logger = log4js.getLogger()
 
-module.exports.getAllLogs = function () {
+module.exports.getAll = function () {
   const logFilter = { 'session': Log.SessionId }
 
   return Log.find(logFilter).limit(500).sort({ date: -1 }).exec()
@@ -68,25 +68,9 @@ module.exports.error = function (message) {
 }
 
 module.exports.fatal = function (message) {
-  // const tb = traceback()[1];
-
-  // message = bold('[ ' + tb.file + ' - ' + tb.method + ':' + tb.line + ' ] ') + message
-
   const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal })
 
   log.save()
 
   logger.fatal(message)
-}
-
-module.exports.bold = function bold (text) {
-  return tag(text, 'b')
-}
-
-module.exports.italic = function italic (text) {
-  return tag(text, 'i')
-}
-
-function tag (text, attribute) {
-  return '<' + attribute + '>' + text + '</' + attribute + '>'
 }

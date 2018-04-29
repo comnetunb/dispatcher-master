@@ -12,7 +12,7 @@ var add = function (id, connection) {
   connection.id = id
   connections.push(connection)
 
-  log.info(log.bold(connection.remoteAddress + ':' + connection.remotePort) + ' connected')
+  log.info(connection.remoteAddress + ':' + connection.remotePort + ' connected')
 }
 
 var remove = function (id) {
@@ -20,7 +20,7 @@ var remove = function (id) {
     if (connection.id === id) {
       object.splice(index, 1)
 
-      log.warn(log.bold(connection.remoteAddress + ':' + connection.remotePort) + ' left the pool')
+      log.warn(connection.remoteAddress + ':' + connection.remotePort + ' left the pool')
 
       if (!connections.length) {
         log.warn('There are no connections left')

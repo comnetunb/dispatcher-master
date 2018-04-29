@@ -45,6 +45,11 @@ app.config(function ($routeProvider, $locationProvider) {
       controller: 'addCtrl',
       auth: true
     })
+    .when('/log', {
+      templateUrl: 'views/dashboard/log.html',
+      controller: 'logCtrl',
+      auth: true
+    })
     .otherwise({
       redirectTo: '/'
     })

@@ -1,5 +1,4 @@
 ﻿app.controller("signInCtrl", function ($scope, $http, $window, $rootScope, $location) {
-  $scope.hide_navbar = true
 
   $scope.sign_in = function (signIn) {
     $http
@@ -17,7 +16,6 @@
 })
 
 app.controller("signUpCtrl", function ($scope, $http, $window, $rootScope, $location) {
-  $scope.hide_navbar = true
 
   $scope.sign_up = function (signUp) {
     if (signUp.password !== signUp.confirmPassword) {

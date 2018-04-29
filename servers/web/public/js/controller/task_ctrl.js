@@ -184,7 +184,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       .post('/api/task/add_task_group_set', addTaskForm)
       .then(function (response) {
         $scope.errorMessage = false
-        //$location.path('/executing')
+        $location.path('/executing')
       })
       .catch(function (e) {
         $scope.errorMessage = e.data.reason

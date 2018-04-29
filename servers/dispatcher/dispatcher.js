@@ -125,7 +125,7 @@ function batchDispatch() {
                   log.info('Dispatched task with precedence '
                     + task.precedence
                     + ' from set '
-                    + log.italic(taskSetName)
+                    + taskSetName
                     + ' to '
                     + availableWorkers[index].address)
 

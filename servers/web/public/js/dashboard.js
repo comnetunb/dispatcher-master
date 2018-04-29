@@ -36,7 +36,6 @@ dashboard.controller('navigationCtrl', function ($scope, $http, $rootScope, $win
   }
 })
 
-
 dashboard.controller('workerCtrl', function ($scope, $http, $interval) {
   $scope.threshold = {
     '0': { color: 'green' },
