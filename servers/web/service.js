@@ -23,8 +23,8 @@ app.use(passport.session());
 
 //Body-parser
 const bodyParser = require('body-parser');
-app.use(bodyParser.json()); //for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb'})); //for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 module.exports = function () {
   app.use('/bootstrap', express.static(__dirname + '/../../node_modules/bootstrap/dist/'));
@@ -39,7 +39,6 @@ module.exports = function () {
   app.use('/font-awesome', express.static(__dirname + '/../../node_modules/font-awesome/'));
   app.use('/angular-gridster', express.static(__dirname + '/../../node_modules/angular-gridster/dist'));
   app.use('/angularjs-gauge', express.static(__dirname + '/../../node_modules/angularjs-gauge/dist'));
-
   //router(app)
 
   setup(app, passport)
