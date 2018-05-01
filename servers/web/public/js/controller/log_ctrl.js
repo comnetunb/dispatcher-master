@@ -1,15 +1,19 @@
 ﻿app.controller('logCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
+  $scope.toggle = false
+  $scope.logs = []
+  $scope.lastDate = Date.now()
+
   var promise
 
   $scope.start = () => {
     $scope.stop();
 
-    getLogs($scope, $http)
+    getAllLogs($scope, $http)
 
     promise = $interval(() => {
-      getLogs($scope, $http)
+      getAllLogsFromDate($scope, $http)
     }, 1500);
   };
 
@@ -24,10 +28,29 @@
   });
 })
 
-const getLogs = ($scope, $http) => {
+const getAllLogs = ($scope, $http) => {
   $http
     .get('/api/log/get_all')
     .then(response => {
-      $scope.logs = response.data
+      updateLog($scope, response)
     })
+}
+
+const getAllLogsFromDate = ($scope, $http) => {
+  $http
+    .get('/api/log/get_all_from_date', {
+      params: { lastDate: $scope.lastDate }
+    })
+    .then(response => {
+      updateLog($scope, response)
+    })
+}
+
+const updateLog = ($scope, response) => {
+  if (!response.data.length) {
+    return
+  }
+
+  $scope.logs = $scope.logs.concat(response.data)
+  $scope.lastDate = $scope.logs[$scope.logs.length - 1].date
 }

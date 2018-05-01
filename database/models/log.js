@@ -19,7 +19,6 @@ const Level = {
 const SessionId = mongoose.Types.ObjectId()
 
 const logSchema = Schema({
-
   log: {
     type: String,
     required: true
@@ -36,7 +35,6 @@ const logSchema = Schema({
     type: Schema.Types.ObjectId,
     default: SessionId
   }
-
 })
 
 logSchema.statics.Level = Level

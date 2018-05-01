@@ -20,12 +20,6 @@
     <Compile Include="database\db_driver.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="database\models\binary.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="database\models\document.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="database\models\file.js">
       <SubType>Code</SubType>
     </Compile>
@@ -33,15 +27,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="database\models\runnable_info.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="database\models\simulation_instance.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="database\models\simulation_group.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="database\models\simulation.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="database\models\task.js">
@@ -128,16 +113,10 @@
     <Compile Include="servers\dispatcher\dwp_handler\handler\terminate_task_response_handler.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="servers\dispatcher\simulation_handler.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="servers\dispatcher\worker_discovery.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\shared\configuration.js" />
-    <Compile Include="servers\shared\exportation.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="servers\shared\interface_manager.js">
       <SubType>Code</SubType>
     </Compile>
@@ -145,7 +124,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\shared\mailer.js" />
-    <Compile Include="servers\shared\simulation_utils.js" />
     <Compile Include="servers\web\service.js">
       <SubType>Code</SubType>
     </Compile>

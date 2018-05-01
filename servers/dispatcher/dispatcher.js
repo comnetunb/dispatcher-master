@@ -17,7 +17,6 @@ const interfaceManagerEvent = rootRequire('servers/shared/interface_manager').ev
 // Database Related
 const Task = databaseRequire('models/task')
 const TaskSet = databaseRequire('models/task_set')
-const SimulationInstance = rootRequire('database/models/simulation_instance')
 const Worker = rootRequire('database/models/worker')
 
 // Protocol Related

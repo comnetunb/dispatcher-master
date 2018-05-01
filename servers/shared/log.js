@@ -21,10 +21,21 @@ log4js.configure({
 
 const logger = log4js.getLogger()
 
-module.exports.getAll = function () {
-  const logFilter = { 'session': Log.SessionId }
+module.exports.getAll = () => {
+  const logFilter = { session: Log.SessionId }
 
-  return Log.find(logFilter).limit(500).sort({ date: -1 }).exec()
+  return Log.find(logFilter).sort({ date: -1 })
+}
+
+module.exports.getAllFromDate = (date) => {
+  const logFilter = {
+    session: Log.SessionId,
+    date: {
+      $gt: date
+    }
+  }
+
+  return Log.find(logFilter).sort({ date: -1 })
 }
 
 module.exports.trace = function (message) {

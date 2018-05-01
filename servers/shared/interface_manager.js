@@ -1,9 +1,3 @@
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//
-// Interface Manager
-//
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 /*
  * This module is responsible for every
  * direct communication between the interface
@@ -18,18 +12,6 @@ const EventEmitter = require('events')
 var event = new EventEmitter()
 
 module.exports.event = event
-
-module.exports.newSimulationGroup = function (simulationGroup, simulators, configurationFiles, useSameSimulator) {
-  // data.files
-  // data.user
-  // data.seedAmount
-  // data.simulationGroup.name
-  // data.simulationGroup.seedAmount
-  // data.simulationGroup.load.minimum
-  // data.simulationGroup.load.maximum
-  // data.simulationGroup.load.seed
-
-}
 
 module.exports.pauseWorker = function (address) {
   event.emit('worker_command', address, Command.PAUSE)

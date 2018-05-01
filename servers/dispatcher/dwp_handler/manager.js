@@ -19,7 +19,7 @@ const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/ta
 const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler')
 
 // Database Related
-const SimulationInstance = rootRequire('database/models/simulation_instance')
+const Task = rootRequire('database/models/task')
 const Worker = rootRequire('database/models/worker')
 
 // Protocol Related
@@ -53,13 +53,13 @@ communicationEvent.on('new_connection', function (connection) {
 communicationEvent.on('closed_connection', function (connection) {
   connectionManager.remove(connection.id)
 
-  const simulationInstanceFilter = { worker: connection.id }
+  const taskFilter = { worker: connection.id }
 
-  SimulationInstance
-    .find(simulationInstanceFilter, '_id')
-    .then(function (simulationInstanceIds) {
-      simulationInstanceIds.map(function (simulationInstanceId) {
-        return SimulationInstance.updateToDefaultState(simulationInstanceId)
+  Task
+    .find(taskFilter, '_id')
+    .then((taskIds) => {
+      taskIds.map((taskId) => {
+        return Task.updateToDefaultState(taskId)
       })
     })
     .catch(function (e) {

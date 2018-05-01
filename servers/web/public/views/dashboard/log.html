@@ -1,14 +1,14 @@
 ﻿<div class="content-wrapper">
   <table class="table table-striped table-hover">
     <thead>
-      <tr>
+      <tr ng-click="toggle=!toggle">
         <th style='width:10%'>Level</th>
         <th>Date</th>
         <th style='width:65%'>Log</th>
       </tr>
     </thead>
     <tbody>
-      <tr dir-paginate="log in logs | orderBy:'-' | itemsPerPage: 15 track by log._id">
+      <tr dir-paginate="log in logs |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by log._id">
         <td ng-switch="log.level">
           <span class="badge badge-primary" ng-switch-when="0">TRACE</span>
           <span class="badge badge-success" ng-switch-when="1">DEBUG</span>
