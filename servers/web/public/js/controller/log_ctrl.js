@@ -1,7 +1,6 @@
 ﻿app.controller('logCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true
 
-  $scope.toggle = false
   $scope.logs = []
   $scope.lastDate = Date.now()
 

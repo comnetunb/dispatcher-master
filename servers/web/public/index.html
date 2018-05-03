@@ -7,8 +7,6 @@
 
   <title>Dashboard | WebSimAdmin</title>
 
-  <!--<base href="/" />-->
-
   <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="/sb-admin/css/sb-admin.min.css">
   <link rel="stylesheet" href="/sb-admin/vendor/datatables/dataTables.bootstrap4.css">
@@ -26,7 +24,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <!-- SideBar -->
-      <div ng-show="sidebar" ng-cloak>
+      <div ng-show="sidebar && signedUser" ng-cloak>
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
           <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Workers">
             <a class="nav-link" href="#!workers">
@@ -34,7 +32,7 @@
               <span class="nav-link-text">Workers</span>
             </a>
           </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Groups" ng-controller="groupCtrl">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Task Sets" ng-controller="groupCtrl">
             <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" ng-href="#collapseComponents" data-parent="#exampleAccordion">
               <i class="fa fa-fw fa-folder"></i>
               <span class="nav-link-text">Task Sets</span>
@@ -46,9 +44,9 @@
               <li>
                 <a ng-href="#!finished"><!--<span class="badge badge-secondary">{{finishedCount}}</span>--> Finished</a>
               </li>
-              <li>
-                <a ng-href="#!paused"><!--<span class="badge badge-secondary">{{canceledCount}}</span>--> Paused</a>
-              </li>
+              <!--<li>
+                <a ng-href="#!paused"><span class="badge badge-secondary">{{canceledCount}}</span> Paused</a>
+              </li>-->
               <li>
                 <a ng-href="#!add"><i class="fa fa-fw fa-plus"></i> Add</a>
               </li>
@@ -60,18 +58,18 @@
               <span class="nav-link-text">Logs</span>
             </a>
           </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Scheduler">
+          <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Scheduler">
             <a class="nav-link" href="tables.html">
               <i class="fa fa-fw fa-calendar"></i>
               <span class="nav-link-text">Scheduler</span>
             </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Configuration">
+          </li>-->
+          <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Configuration">
             <a class="nav-link" href="tables.html">
               <i class="fa fa-fw fa-cog"></i>
               <span class="nav-link-text">Configuration</span>
             </a>
-          </li>
+          </li>-->
         </ul>
         <ul class="navbar-nav sidenav-toggler">
           <li class="nav-item">
@@ -81,7 +79,6 @@
           </li>
         </ul>
       </div>
-
       <!-- !SideBar -->
       <!-- Defauld Navbar -->
       <ul class="navbar-nav ml-auto" ng-if="!signedUser" ng-cloak>
@@ -202,12 +199,15 @@
   <script src="/js/controller/navigation.js"></script>
   <script src="/js/controller/home.js"></script>
   <script src="/js/controller/log_ctrl.js"></script>
+  <script src="/js/controller/graph_ctrl.js"></script>
   <script src="/jquery/jquery.min.js"></script>
   <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/sb-admin/js/sb-admin.min.js"></script>
   <script src="/sb-admin/vendor/datatables/jquery.dataTables.js"></script>
   <script src="/sb-admin/vendor/datatables/dataTables.bootstrap4.js"></script>
   <script src="/angular-gridster/angular-gridster.min.js"></script>
-  <script src="/angularjs-gauge/angularjs-gauge.min.js"></script>
+  <script src="/angularjs-gauge/angularjs-gauge.min.js"></script>  
+  <script src="/angularjs-chartjs/node_modules/chart.js/dist/Chart.min.js"></script>
+  <script src="/angularjs-chartjs/dist/angular-chart.min.js"></script>
 </body>
 </html>

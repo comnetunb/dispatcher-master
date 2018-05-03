@@ -1,4 +1,10 @@
-﻿var app = angular.module('app', ['ngRoute', 'gridster', 'angularjs-gauge', 'angularUtils.directives.dirPagination'])
+﻿var app = angular.module('app', [
+  'ngRoute',
+  'gridster',
+  'angularjs-gauge',
+  'angularUtils.directives.dirPagination',
+  'chart.js'
+])
 
 app.config(function ($routeProvider, $locationProvider) {
   // Initialize data
@@ -48,6 +54,11 @@ app.config(function ($routeProvider, $locationProvider) {
     .when('/log', {
       templateUrl: 'views/dashboard/log.html',
       controller: 'logCtrl',
+      auth: true
+    })
+    .when('/graph/:task_set_id', {
+      templateUrl: 'views/dashboard/graph.html',
+      controller: 'graphCtrl',
       auth: true
     })
     .otherwise({

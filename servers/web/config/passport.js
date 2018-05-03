@@ -31,9 +31,9 @@ module.exports = function (passport) {
           return done(null, false, { reason: 'Password do not match.' })
         }
 
-        if (!user.permitted) {
-          return done(null, false, { reason: 'A system administrator must permit you first.' })
-        }
+        //if (!user.permitted) {
+        //  return done(null, false, { reason: 'A system administrator must permit you first.' })
+        //}
 
         user.password = undefined
 

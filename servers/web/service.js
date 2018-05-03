@@ -39,6 +39,7 @@ module.exports = function () {
   app.use('/font-awesome', express.static(__dirname + '/../../node_modules/font-awesome/'));
   app.use('/angular-gridster', express.static(__dirname + '/../../node_modules/angular-gridster/dist'));
   app.use('/angularjs-gauge', express.static(__dirname + '/../../node_modules/angularjs-gauge/dist'));
+  app.use('/angularjs-chartjs', express.static(__dirname + '/../../node_modules/angular-chart.js'));
   //router(app)
 
   setup(app, passport)

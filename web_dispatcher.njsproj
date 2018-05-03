@@ -41,6 +41,9 @@
     <Compile Include="database\models\worker.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="servers\web\api\graph_api.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="servers\web\api\log_api.js">
       <SubType>Code</SubType>
     </Compile>
@@ -54,6 +57,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\js\controller\authentication_ctrl.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="servers\web\public\js\controller\graph_ctrl.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="servers\web\public\js\controller\home.js">
@@ -150,6 +156,9 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\finished.html">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="servers\web\public\views\dashboard\graph.html">
       <SubType>Code</SubType>
     </Content>
     <Content Include="servers\web\public\views\dashboard\log.html">
