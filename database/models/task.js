@@ -45,6 +45,10 @@ const taskSchema = Schema({
     type: Number,
     required: true
   }],
+  arguments: [{
+    type: String,
+    required: true
+  }],
   commandLine: {
     type: String,
     required: true

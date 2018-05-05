@@ -83,6 +83,18 @@ app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $int
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
+  $scope.removeTaskSet = (taskSetId) => {
+    $http
+      .post('/api/task/remove_task_set', { id: taskSetId })
+      .then(function (response) {
+        $scope.errorMessage = false
+        getAllExecutingTaskSets($scope, $http)
+      })
+      .catch(function (e) {
+        $scope.errorMessage = e.data.reason
+      })
+  }
+
   var promise
 
   $scope.start = function () {
@@ -123,6 +135,19 @@ app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $inte
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
+  $scope.removeTaskSet = (taskSetId) => {
+    console.log(taskSetId)
+    $http
+      .post('/api/task/remove_task_set', { id: taskSetId })
+      .then(function (response) {
+        $scope.errorMessage = false
+        getAllFinishedTaskSets($scope, $http)
+      })
+      .catch(function (e) {
+        $scope.errorMessage = e.data.reason
+      })
+  }
+
   var promise
 
   $scope.start = function () {
@@ -150,7 +175,7 @@ function getAllFinishedTaskSets($scope, $http) {
   $http
     .get('/api/task/get_finished')
     .then(function (response) {
-      $scope.finishedTasks = response.data
+      $scope.finishedTaskSets = response.data
     })
 }
 

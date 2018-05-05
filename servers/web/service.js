@@ -40,10 +40,11 @@ module.exports = function () {
   app.use('/angular-gridster', express.static(__dirname + '/../../node_modules/angular-gridster/dist'));
   app.use('/angularjs-gauge', express.static(__dirname + '/../../node_modules/angularjs-gauge/dist'));
   app.use('/angularjs-chartjs', express.static(__dirname + '/../../node_modules/angular-chart.js'));
+  app.use('/angular-ui-bootstrap', express.static(__dirname + '/../../node_modules/angular-ui-bootstrap/dist'));
   //router(app)
 
   setup(app, passport)
 
   // Listen requests
-  app.listen(80, '0.0.0.0')
+  app.listen(8080, '0.0.0.0')
 }

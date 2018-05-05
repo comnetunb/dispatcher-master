@@ -118,7 +118,7 @@ const buildTasks = function (taskSetData, user) {
             _runnable: runnable._id,
             _files: fileIds,
             name: taskSetName,
-            argumentsTemplate: argumentsTemplate
+            argumentTemplate: argumentsTemplate
           })
 
           return newTaskSet.save()
@@ -136,7 +136,7 @@ const buildTasks = function (taskSetData, user) {
         })
     })
     .catch(e => {
-      throw 'An internal error occurred. Please try again later.'
+      throw 'An internal error occurred. Please try again later.' + e
     })
 }
 
@@ -165,19 +165,24 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, promises, in
       let precedence = 0
       let accumulator = 1
       let indexes = []
+      let arguments = []
 
       for (let info in infos) {
         commandLine = commandLine.replace('%' + infos[info].index, infos[info].value)
         precedence += infos[info].argumentIndex * accumulator
         accumulator *= infos[info].argumentLength
         indexes.push(infos[info].argumentIndex)
+        arguments.push(infos[info].value)
       }
+
+      console.log(arguments)
 
       let newTask = new Task({
         _taskSet: taskSetId,
         indexes: indexes,
         commandLine: commandLine,
-        precedence: precedence
+        precedence: precedence,
+        arguments: arguments
       })
 
       promises.push(newTask.save())

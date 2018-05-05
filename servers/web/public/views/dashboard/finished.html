@@ -1,10 +1,10 @@
 ﻿<div class="content-wrapper">
   <div class="container-fluid">
-    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!finishedTasks.length">
+    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!finishedTaskSets.length">
       <i class="fa fa-fw fa-info-circle"></i> You currently have no finished groups.
     </div>
 
-    <div ng-if="finishedTasks.length">
+    <div ng-if="finishedTaskSets.length">
       <form class="form-inline">
         <div class="form-group mb-3">
           <input type="text" ng-model="search" class="form-control" placeholder="Search">
@@ -13,9 +13,9 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th ng-click="sort('group')">
-              Group
-              <i class="fa fa-fw fa-sort" ng-show="sortKey=='group'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
+            <th ng-click="sort('name')">
+              Name
+              <i class="fa fa-fw fa-sort" ng-show="sortKey=='name'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
             </th>
             <th ng-click="sort('start_time')">
               Start Time
@@ -30,37 +30,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr dir-paginate="finishedTask in finishedTasks | orderBy: sortKey:reverse | filter: search | itemsPerPage: 10 track by finishedTask._id">
-            <td>{{finishedTask.name}}</td>
-            <td>{{finishedTask.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
-            <td>{{finishedTask.endTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+          <tr dir-paginate="finishedTaskSet in finishedTaskSets | orderBy: sortKey:reverse | filter: search | itemsPerPage: 10 track by finishedTaskSet._id">
+            <td><a ng-href="#!graph/{{finishedTaskSet._id}}">{{finishedTaskSet.name}}</a></td>
+            <td>{{finishedTaskSet.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+            <td>{{finishedTaskSet.endTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
             <td><button class="btn btn-large btn-primary"><span class="fa fa-fw fa-arrow-down"></span> Export</button></td>
-            <td><button class="btn btn-large btn-danger" data-toggle="modal" data-target="#confirmationModal"><span class="fa fa-fw fa-trash"></span> Remove</button></td>
+            <td><button class="btn btn-large btn-danger" ng-click="removeTaskSet(finishedTaskSet._id)"><span class="fa fa-fw fa-trash"></span> Remove</button></td>
           </tr>
         </tbody>
       </table>
       <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true"></dir-pagination-controls>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="Confirmation" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Do you wish to remove this task group set?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          By removing this task set you will not be able to recover it
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-danger">Remove</button>
-        </div>
-      </div>
     </div>
   </div>
 </div>

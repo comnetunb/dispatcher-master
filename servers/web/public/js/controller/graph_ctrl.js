@@ -1,20 +1,20 @@
 ﻿app.controller("graphCtrl", function ($scope, $http, $interval, $rootScope, $routeParams) {
   $rootScope.sidebar = true
 
-  $scope.labels = []
-  $scope.data = []
-
   $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
   $scope.options = {
     scales: {
-      yAxes: [
-        {
-          id: 'y-axis-1',
-          type: 'linear',
-          display: true,
-          position: 'left'
-        }
-      ]
+      yAxes: [{
+        id: 'y-axis-1',
+        type: 'linear',
+        display: true,
+        position: 'left'
+      }]
+    },
+    elements: {
+      line: {
+        fill: false
+      }
     }
   };
 
@@ -27,6 +27,7 @@
     .then(response => {
       $scope.axes = response.data.axes
       $scope.curves = response.data.curves
+      $scope.argumentTemplate = response.data.argumentTemplate
     })
 
   $scope.getPlotData = (graph) => {

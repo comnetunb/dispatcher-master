@@ -9,6 +9,7 @@ module.exports = (app) => {
 
     Task
       .findOne(taskFilter)
+      .populate('_taskSet')
       .then(task => {
         let info = {
           axes: [],
@@ -20,6 +21,7 @@ module.exports = (app) => {
           return
         }
 
+        info.argumentTemplate = task._taskSet.argumentTemplate
         info.axes = Object.getOwnPropertyNames(JSON.parse(task.result))
 
         for (let i = 0; i < task.indexes.length; ++i) {

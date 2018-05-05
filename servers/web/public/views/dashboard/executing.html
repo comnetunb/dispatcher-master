@@ -10,7 +10,7 @@
           <input type="text" ng-model="search" class="form-control" placeholder="Search">
         </div>
       </form>
-      <table class="table table-striped table-hover">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th ng-click="sort('name')">
@@ -25,6 +25,8 @@
               Start Time
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='start_time'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
             </th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +34,7 @@
             <td><a ng-href="#!graph/{{executingTaskSet._id}}">{{executingTaskSet.name}}</a></td>
             <td>{{executingTaskSet.remainingTasksCount}}</td>
             <td>{{executingTaskSet.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+            <td><button class="btn btn-large btn-danger" ng-click="removeTaskSet(executingTaskSet._id)"><span class="fa fa-fw fa-trash"></span> Remove</button></td>
           </tr>
         </tbody>
       </table>

@@ -3,7 +3,8 @@
   'gridster',
   'angularjs-gauge',
   'angularUtils.directives.dirPagination',
-  'chart.js'
+  'chart.js',
+  'ui.bootstrap'
 ])
 
 app.config(function ($routeProvider, $locationProvider) {
