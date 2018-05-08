@@ -4,6 +4,8 @@ const taskUtils = webServerRequire('utils/task_utils')
 const TaskSet = databaseRequire('models/task_set')
 const Task = databaseRequire('models/task')
 
+const tmp = require('tmp')
+
 module.exports = function (app) {
   app.get('/api/task/get_executing', (req, res) => {
     const taskSetFilter = { state: TaskSet.State.EXECUTING }
@@ -71,5 +73,16 @@ module.exports = function (app) {
       type: 'python',
       extension: '.py'
     }])
+  })
+
+  app.get('/api/task/export', (req, res) => {
+    taskUtils.exportTaskSet(req.query.taskSetId, req.query.format, (zipPath) => {
+      if (!zipPath) {
+        res.status(500)
+      }
+      else {
+        res.sendFile(zipPath)
+      }
+    })
   })
 }

@@ -75,7 +75,7 @@ function getCount($scope, $http) {
 }
 
 // ExecutingTaskSet
-app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $interval) {
+app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
@@ -83,16 +83,8 @@ app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $int
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
-  $scope.removeTaskSet = (taskSetId) => {
-    $http
-      .post('/api/task/remove_task_set', { id: taskSetId })
-      .then(function (response) {
-        $scope.errorMessage = false
-        getAllExecutingTaskSets($scope, $http)
-      })
-      .catch(function (e) {
-        $scope.errorMessage = e.data.reason
-      })
+  $scope.openConfirmation = (taskSetId) => {
+    openConfirmation($uibModal, taskSetId, $http, $scope, getAllExecutingTaskSets)
   }
 
   var promise
@@ -127,7 +119,7 @@ function getAllExecutingTaskSets($scope, $http) {
 }
 
 // FinishedTaskSet
-app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $interval) {
+app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true
 
   $scope.sort = function (keyname) {
@@ -135,17 +127,8 @@ app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $inte
     $scope.reverse = !$scope.reverse //if true make it false and vice versa
   }
 
-  $scope.removeTaskSet = (taskSetId) => {
-    console.log(taskSetId)
-    $http
-      .post('/api/task/remove_task_set', { id: taskSetId })
-      .then(function (response) {
-        $scope.errorMessage = false
-        getAllFinishedTaskSets($scope, $http)
-      })
-      .catch(function (e) {
-        $scope.errorMessage = e.data.reason
-      })
+  $scope.openConfirmation = (taskSetId) => {
+    openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets)
   }
 
   var promise
@@ -177,6 +160,51 @@ function getAllFinishedTaskSets($scope, $http) {
     .then(function (response) {
       $scope.finishedTaskSets = response.data
     })
+}
+
+app.controller('removalModalCtrl', function ($uibModalInstance, taskSetId) {
+  var $ctrl = this;
+  $ctrl.taskSetId = taskSetId;
+
+  $ctrl.ok = function () {
+    $uibModalInstance.dismiss('ok');
+  };
+
+  $ctrl.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
+})
+
+function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
+  var modalInstance = $uibModal.open({
+    animation: false,
+    ariaLabelledBy: 'modal-title',
+    ariaDescribedBy: 'modal-body',
+    templateUrl: 'views/dashboard/modals/task_set_removal.html',
+    controller: 'removalModalCtrl',
+    controllerAs: '$ctrl',
+    resolve: {
+      taskSetId: function () {
+        return taskSetId
+      }
+    }
+  });
+
+  modalInstance.result.then(function () {
+  }, function (option) {
+    console.log(option + taskSetId)
+    if (option === 'ok') {
+      $http
+        .post('/api/task/remove_task_set', { id: taskSetId })
+        .then(function (response) {
+          $scope.errorMessage = false
+          callback($scope, $http)
+        })
+        .catch(function (e) {
+          $scope.errorMessage = e.data.reason
+        })
+    }
+  });
 }
 
 // Add

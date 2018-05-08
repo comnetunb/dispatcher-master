@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 module.exports = function () {
   app.use('/bootstrap', express.static(__dirname + '/../../node_modules/bootstrap/dist/'));
   app.use('/angular', express.static(__dirname + '/../../node_modules/angular/'));
+  app.use('/angular-animate', express.static(__dirname + '/../../node_modules/angular-animate/'));
   app.use('/angular-route', express.static(__dirname + '/../../node_modules/angular-route/'));
   app.use('/angular-utils-pagination', express.static(__dirname + '/../../node_modules/angular-utils-pagination/'));
   app.use('/jquery', express.static(__dirname + '/../../node_modules/jquery/dist/'));

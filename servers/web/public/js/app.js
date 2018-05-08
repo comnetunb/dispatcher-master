@@ -4,6 +4,7 @@
   'angularjs-gauge',
   'angularUtils.directives.dirPagination',
   'chart.js',
+  'ngAnimate',
   'ui.bootstrap'
 ])
 

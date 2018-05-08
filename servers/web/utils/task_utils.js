@@ -23,6 +23,13 @@
 //! DEALINGS IN THE SOFTWARE.
 //!
 
+const tmp = require('tmp')
+const path = require('path')
+const mkdirp = require('mkdirp');
+const fs = require('fs');
+const zipFolder = require('zip-folder');
+const Json2csvParser = require('json2csv').Parser;
+
 const TaskSet = databaseRequire('models/task_set')
 const Task = databaseRequire('models/task')
 const File = databaseRequire('models/file')
@@ -175,8 +182,6 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, promises, in
         arguments.push(infos[info].value)
       }
 
-      console.log(arguments)
-
       let newTask = new Task({
         _taskSet: taskSetId,
         indexes: indexes,
@@ -232,6 +237,95 @@ function parseString(stringNotation) {
   // (["'])(?:(?=(\\?))\2.)*?\1(,(["'])(?:(?=(\\?))\2.)*?\1)*$
 }
 
+const exportTaskSet = (taskSetId, format, callback) => {
+  const taskFilter = {
+    _taskSet: taskSetId,
+    state: Task.State.FINISHED
+  }
+
+  return Task
+    .find(taskFilter)
+    .populate('_taskSet')
+    .then(tasks => {
+      if (tasks.length < 1) {
+        return callback(null)
+      }
+
+      return tmp.dir((err, tmpPath) => {
+        if (err) {
+          return callback(null)
+        }
+
+        let rootPath = tmpPath + '/' + tasks[0]._taskSet.name
+
+        let promises = []
+
+        for (let task in tasks) {
+          let taskPath = {
+            dir: rootPath,
+            base: ''
+          }
+
+          const arguments = tasks[task].arguments
+
+          for (let i = 0; i < arguments.length; ++i) {
+            if (i === arguments.length - 1) {
+              taskPath.base = arguments[i] + (format === 'csv' ? '.csv' : '.json')
+              continue
+            }
+
+            taskPath.dir += '/' + arguments[i]
+          }
+
+          const filePath = path.posix.format(taskPath)
+
+          switch (format) {
+            case 'json':
+              promises.push(writeFile(filePath, tasks[task].result))
+              break
+
+            case 'csv':
+              const result = JSON.parse(tasks[task].result)
+              const fields = Object.getOwnPropertyNames(result)
+              const json2csvParser = new Json2csvParser({ fields });
+              const csv = json2csvParser.parse(result);
+              promises.push(writeFile(filePath, csv))
+              break
+          }
+        }
+
+        return Promise
+          .all(promises)
+          .then(() => {
+            const zipPath = tmpPath + '/' + tasks[0]._taskSet.name + '.zip'
+            zipFolder(rootPath, zipPath, function (err) {
+              if (err) {
+                return callback(null)
+              }
+
+              return callback(zipPath)
+            });
+          })
+      })
+    })
+    .catch(e => {
+      throw "An internal error occurred. Please try again later."
+    })
+}
+
+function writeFile(filePath, contents) {
+  return new Promise((resolve, reject) => {
+    mkdirp(path.dirname(filePath), e => {
+      if (e) {
+        return reject(e)
+      }
+
+      fs.writeFile(filePath, contents, resolve);
+    });
+  })
+}
+
 module.exports = {
-  buildTasks: buildTasks
+  buildTasks: buildTasks,
+  exportTaskSet: exportTaskSet
 }
