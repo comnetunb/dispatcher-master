@@ -17,6 +17,7 @@ const performTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/h
 const reportHandler = rootRequire('servers/dispatcher/dwp_handler/handler/report_handler')
 const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/task_result_handler')
 const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler')
+const languageHandler = rootRequire('servers/dispatcher/dwp_handler/handler/language_handler')
 
 // Database Related
 const Task = rootRequire('database/models/task')
@@ -116,6 +117,10 @@ function chooseHandler(pdu, worker) {
 
     case Id.TERMINATE_TASK_RESPONSE:
       terminateTaskResponseHandler.execute(pdu, worker)
+      break
+
+    case Id.GET_LANGUAGE_COMMAND:
+      languageHandler.getCommands(pdu, worker)
       break
   }
 }
