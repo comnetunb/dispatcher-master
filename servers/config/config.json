@@ -1,9 +1,9 @@
 ﻿{
    "cpu": {
-      "threshold": 0.5
+      "threshold": 0
    },
    "memory": {
-      "threshold": 0.5
+      "threshold": 0
    },
    "workerPerformance": {
       "threshold": 0.25

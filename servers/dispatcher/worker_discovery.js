@@ -1,68 +1,64 @@
-﻿////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 //
 // Copyright (c) 2017 Matheus Medeiros Sarmento
 //
-////////////////////////////////////////////////
+/// /////////////////////////////////////////////
 
-const dgram = require( 'dgram' );
-const EventEmitter = require( 'events' );
-const ip = require( 'ip' );
+const dgram = require('dgram')
+const EventEmitter = require('events')
+const ip = require('ip')
 
-const communication = rootRequire( 'servers/dispatcher/communication' );
-const log = rootRequire( 'servers/shared/log' );
+const communication = rootRequire('servers/dispatcher/communication')
+const log = rootRequire('servers/shared/log')
 
 // UDP socket which will receive workers requests
-const socket = dgram.createSocket( 'udp4' );
+const socket = dgram.createSocket('udp4')
 
 // List which is necessary for UDP lack of error treatment
-var pendingList = [];
+var pendingList = []
 
-const event = new EventEmitter();
+const event = new EventEmitter()
 
-event.on( 'event', ( workerInfo ) => {
+event.on('event', (workerInfo) => {
+  log.info('Sending response to ' + workerInfo.address + ':' + workerInfo.port)
 
-   log.info( 'Sending response to ' + workerInfo.address + ':' + workerInfo.port )
+  // Send response to worker
+  socket.send(socket.address().address, workerInfo.port, workerInfo.address)
 
-   // Send response to worker
-   socket.send( socket.address().address, workerInfo.port, workerInfo.address );
-
-   pendingList.push( workerInfo.address );
-} );
+  pendingList.push(workerInfo.address)
+})
 
 module.exports.execute = function () {
+  // Remove from local cache
+  communication.event.on('new_connection', (connection) => {
+    var idx = pendingList.indexOf(connection.remoteAddress)
 
-   // Remove from local cache
-   communication.event.on( 'new_worker', ( workerAddress ) => {
+    if (idx > -1) {
+      pendingList.splice(idx, 1)
+    }
+  })
 
-      var idx = pendingList.indexOf( workerAddress );
+  socket.on('error', (err) => {
+    log.error(err.stack)
+    socket.close()
+  })
 
-      if ( idx > -1 ) {
-         pendingList.splice( idx, 1 );
-      }
-   } );
+  socket.on('message', (message, rinfo) => {
+    if (message.indexOf('NewWorker') <= -1) {
+      // Discard this message
+      log.error('Invalid message! ' + message + ' from ' + rinfo.address)
+      return
+    }
 
-   socket.on( 'error', ( err ) => {
-      log.error( err.stack );
-      socket.close();
-   } );
+    if (pendingList.indexOf(rinfo.address) === -1) {
+      // New worker identified
+      event.emit('event', rinfo)
+    }
+  })
 
-   socket.on( 'message', ( message, rinfo ) => {
+  socket.on('listening', () => {
+    log.info('UDP socket listening ' + socket.address().address + ':' + socket.address().port)
+  })
 
-      if ( message.indexOf( 'NewWorker' ) <= -1 ) {
-         // Discard this message
-         log.error( 'Invalid message! ' + message + ' from ' + rinfo.address );
-         return;
-      }
-
-      if ( pendingList.indexOf( rinfo.address ) === -1 ) {
-         // New worker identified
-         event.emit( 'event', rinfo );
-      }
-   } );
-
-   socket.on( 'listening', () => {
-      log.info( 'UDP socket listening ' + socket.address().address + ':' + socket.address().port );
-   } );
-
-   socket.bind( 16180 );
+  socket.bind(16180)
 }
