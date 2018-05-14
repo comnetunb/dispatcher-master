@@ -18,6 +18,9 @@
       2,
       "nofunc"
     ],
+    "no-param-reassign": [
+      0
+    ],
     "no-bitwise": [
       0
     ],
