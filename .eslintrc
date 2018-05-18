@@ -17,6 +17,9 @@
     "no-undef": [
       0
     ],
+    "no-case-declarations": [
+      0
+    ],
     "no-use-before-define": [
       2,
       "nofunc"
