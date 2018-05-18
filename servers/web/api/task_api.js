@@ -1,70 +1,64 @@
-﻿
-const taskUtils = webServerRequire('utils/task_utils')
 
-const TaskSet = databaseRequire('models/task_set')
-const Task = databaseRequire('models/task')
+const taskUtils = webServerRequire('utils/task_utils');
+const log = rootRequire('servers/shared/log');
+const TaskSet = databaseRequire('models/task_set');
+const Task = databaseRequire('models/task');
 
-const tmp = require('tmp')
-
-module.exports = function (app) {
+module.exports = (app) => {
   app.get('/api/task/get_executing', (req, res) => {
-    const taskSetFilter = { state: TaskSet.State.EXECUTING }
+    const taskSetFilter = { state: TaskSet.State.EXECUTING };
 
     TaskSet
       .find(taskSetFilter)
-      .then(taskSet => {
-        res.send(taskSet)
+      .then((taskSet) => {
+        res.send(taskSet);
       })
-      .catch(e => {
-        res.status(412).send({ reason: e })
-      })
-  })
+      .catch((e) => {
+        res.status(412).send({ reason: e });
+      });
+  });
 
   app.get('/api/task/get_finished', (req, res) => {
-    const taskSetFilter = { state: TaskSet.State.FINISHED }
+    const taskSetFilter = { state: TaskSet.State.FINISHED };
 
     TaskSet
       .find(taskSetFilter)
-      .then(taskSet => {
-        res.send(taskSet)
+      .then((taskSet) => {
+        res.send(taskSet);
       })
-      .catch(e => {
-        res.status(412).send({ reason: e })
-      })
-  })
+      .catch((e) => {
+        res.status(412).send({ reason: e });
+      });
+  });
 
-  app.post('/api/task/add_task_group_set', function (req, res) {
+  app.post('/api/task/add_task_group_set', (req, res) => {
     try {
-      taskUtils.buildTasks(req.body, req.user)
-      res.sendStatus(200)
+      taskUtils.buildTasks(req.body, req.user);
+      res.sendStatus(200);
+    } catch (e) {
+      log.error(e);
+      res.status(412).send({ reason: e });
     }
-    catch (e) {
-      console.log(e)
-      res.status(412).send({ reason: e })
-    }
-  })
+  });
 
-  app.post('/api/task/remove_task_set', function (req, res) {
+  app.post('/api/task/remove_task_set', (req, res) => {
     try {
       const taskFilter = { _taskSet: req.body.id };
 
-      Task
-        .remove(taskFilter, () => { })
+      Task.remove(taskFilter, () => { });
 
       const taskSetFilter = { _id: req.body.id };
 
-      TaskSet
-        .remove(taskSetFilter, () => { })
+      TaskSet.remove(taskSetFilter, () => { });
 
-      res.sendStatus(200)
+      res.sendStatus(200);
+    } catch (e) {
+      log.error(e);
+      res.status(412).send({ reason: e });
     }
-    catch (e) {
-      console.log(e)
-      res.status(412).send({ reason: e })
-    }
-  })
+  });
 
-  app.get('/api/task/supported_runnables', function (req, res) {
+  app.get('/api/task/supported_runnables', (req, res) => {
     res.send([{
       type: 'java',
       extension: '.jar'
@@ -72,17 +66,16 @@ module.exports = function (app) {
     {
       type: 'python',
       extension: '.py'
-    }])
-  })
+    }]);
+  });
 
   app.get('/api/task/export', (req, res) => {
     taskUtils.exportTaskSet(req.query.taskSetId, req.query.format, (zipPath) => {
       if (!zipPath) {
-        res.status(500)
+        res.status(500);
+      } else {
+        res.sendFile(zipPath);
       }
-      else {
-        res.sendFile(zipPath)
-      }
-    })
-  })
-}
+    });
+  });
+};

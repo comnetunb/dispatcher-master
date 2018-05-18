@@ -1,35 +1,35 @@
-﻿const log = rootRequire('servers/shared/log')
+const log = rootRequire('servers/shared/log');
 
-module.exports = (app, passport) => {
+module.exports = (app) => {
   app.get('/api/log/get_all', (req, res) => {
     log
       .getAll()
-      .then(logs => {
+      .then((logs) => {
         if (!logs) {
-          throw 'Failed to get logs'
+          throw String('Failed to get logs');
         }
 
-        res.send(logs.reverse())
+        res.send(logs.reverse());
       })
-      .catch(e => {
-        log.error(e)
-        res.status(500).send({ reason: e })
-      })
-  })
+      .catch((e) => {
+        log.error(e);
+        res.status(500).send({ reason: e });
+      });
+  });
 
   app.get('/api/log/get_all_from_date', (req, res) => {
     log
       .getAllFromDate(req.query.lastDate)
-      .then(logs => {
+      .then((logs) => {
         if (!logs) {
-          throw 'Failed to get logs'
+          throw String('Failed to get logs');
         }
 
-        res.send(logs.reverse())
+        res.send(logs.reverse());
       })
-      .catch(e => {
-        log.error(e)
-        res.status(500).send({ reason: e })
-      })
-  })
-}
+      .catch((e) => {
+        log.error(e);
+        res.status(500).send({ reason: e });
+      });
+  });
+};

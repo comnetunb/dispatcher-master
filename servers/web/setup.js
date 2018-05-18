@@ -1,4 +1,4 @@
-﻿// APIs
+// APIs
 const userAPI = webServerRequire('api/user_api');
 const taskAPI = webServerRequire('api/task_api');
 const workerAPI = webServerRequire('api/worker_api');

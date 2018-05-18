@@ -1,8 +1,8 @@
-﻿var dashboard = angular.module('dashboard', ['ngRoute', 'gridster', 'angularjs-gauge', 'angularUtils.directives.dirPagination'])
+const dashboard = angular.module('dashboard', ['ngRoute', 'gridster', 'angularjs-gauge', 'angularUtils.directives.dirPagination']);
 
-dashboard.config(function ($routeProvider, $locationProvider) {
+dashboard.config(($routeProvider /* , $locationProvider */) => {
   // Initialize data
-  //$locationProvider.html5Mode(true)
+  // $locationProvider.html5Mode(true)
 
   $routeProvider
     .when('/workers', {
@@ -15,100 +15,98 @@ dashboard.config(function ($routeProvider, $locationProvider) {
     })
     .otherwise({
       redirectTo: '/workers'
-    })
-})
+    });
+});
 
-dashboard.run(function (gridsterConfig) {
+dashboard.run((gridsterConfig) => {
   gridsterConfig.defaultSizeX = 1;
   gridsterConfig.defaultSizeY = 1;
   gridsterConfig.resizable.enabled = false;
   gridsterConfig.columns = 5;
 });
 
-dashboard.controller('navigationCtrl', function ($scope, $http, $rootScope, $window) {
-  $scope.signOut = function () {
+dashboard.controller('navigationCtrl', ($scope, $http, $rootScope, $window) => {
+  $scope.signOut = () => {
     $http
       .post('/api/user/sign_out')
-      .then(function (response) {
-        $rootScope.signedUser = null
-        $window.location.href = '/'
-      })
-  }
-})
+      .then(() => {
+        $rootScope.signedUser = null;
+        $window.location.href = '/';
+      });
+  };
+});
 
-dashboard.controller('workerCtrl', function ($scope, $http, $interval) {
+dashboard.controller('workerCtrl', ($scope, $http, $interval) => {
   $scope.threshold = {
-    '0': { color: 'green' },
-    '50': { color: 'orange' },
-    '80': { color: 'red' }
+    0: { color: 'green' },
+    50: { color: 'orange' },
+    80: { color: 'red' }
   };
 
-  getAllWorkers($scope, $http)
+  getAllWorkers($scope, $http);
 
-  $interval(function () {
-    getAllWorkers($scope, $http)
-  }, 1500)
-})
+  $interval(() => {
+    getAllWorkers($scope, $http);
+  }, 1500);
+});
 
 function getAllWorkers($scope, $http) {
   $http
     .get('/api/worker/getAll')
-    .then(function (response) {
-      $scope.workers = response.data
-    })
+    .then((response) => {
+      $scope.workers = response.data;
+    });
 }
 
-dashboard.controller('taskCtrl', function ($scope, $http, $interval) {
-  $scope.sort = function (keyname) {
-    $scope.sortKey = keyname;   //set the sortKey to the param passed
-    $scope.reverse = !$scope.reverse; //if true make it false and vice versa
-  }
+dashboard.controller('taskCtrl', ($scope, $http, $interval) => {
+  $scope.sort = (keyname) => {
+    $scope.sortKey = keyname; // set the sortKey to the param passed
+    $scope.reverse = !$scope.reverse; // if true make it false and vice versa
+  };
 
-  getAllActiveTasks($scope, $http)
+  getAllActiveTasks($scope, $http);
 
-  $interval(function () {
-    getAllActiveTasks($scope, $http)
-  }, 1500)
-})
+  $interval(() => {
+    getAllActiveTasks($scope, $http);
+  }, 1500);
+});
 
 function getAllActiveTasks($scope, $http) {
   $http
     .get('/api/task/get_executing')
-    .then(function (response) {
-      $scope.tasks = response.data
-    })
+    .then((response) => {
+      $scope.tasks = response.data;
+    });
 }
 
-dashboard.run(function ($rootScope, $http, $window) {
-  $rootScope.signOut = function () {
+dashboard.run(($rootScope, $http, $window) => {
+  $rootScope.signOut = () => {
     $http
       .post('/api/user/sign_out')
-      .then(function (response) {
-        $rootScope.signedUser = null
-        $window.location.href = '/'
-      })
-  }
+      .then(() => {
+        $rootScope.signedUser = null;
+        $window.location.href = '/';
+      });
+  };
 
   $http
     .get('/api/user/signed_in')
-    .then(function (response) {
-      $rootScope.signedUser = response.data
+    .then((response) => {
+      $rootScope.signedUser = response.data;
 
       if (!$rootScope.signedUser) {
-        $window.location.href = '/'
+        $window.location.href = '/';
       }
-    })
+    });
 
-  $rootScope.$on("$routeChangeStart", function (event, next, current) {
+  $rootScope.$on('$routeChangeStart', (event, next) => {
     if (next.auth && !$rootScope.signedUser) {
-      $location.path('/sign_in')
-      return
+      $location.path('/sign_in');
+      return;
     }
 
     if (next.route) {
-      $window.location.href = next.route
-      return
+      $window.location.href = next.route;
     }
   });
-})
-
+});

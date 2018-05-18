@@ -1,4 +1,4 @@
-﻿
+
 const LocalStrategy = require('passport-local').Strategy;
 
 const User = rootRequire('database/models/user');

@@ -1,5 +1,5 @@
-﻿app.controller("graphCtrl", function ($scope, $http, $interval, $rootScope, $routeParams) {
-  $rootScope.sidebar = true
+app.controller('graphCtrl', ($scope, $http, $window, $rootScope /* , $location */) => {
+  $rootScope.sidebar = true;
 
   $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
   $scope.options = {
@@ -18,42 +18,42 @@
     }
   };
 
-  const taskSetId = $routeParams.task_set_id
+  const taskSetId = $routeParams.task_set_id;
 
   $http
     .get('/api/graph/plot_info', {
-      params: { taskSetId: taskSetId }
+      params: { taskSetId }
     })
-    .then(response => {
-      $scope.axes = response.data.axes
-      $scope.curves = response.data.curves
-      $scope.argumentTemplate = response.data.argumentTemplate
-    })
+    .then((response) => {
+      $scope.axes = response.data.axes;
+      $scope.curves = response.data.curves;
+      $scope.argumentTemplate = response.data.argumentTemplate;
+    });
 
   $scope.getPlotData = (graph) => {
-    var promise
+    let promise;
 
-    $scope.start = function () {
+    $scope.start = () => {
       $scope.stop();
 
-      plotData(graph, taskSetId, $http, $scope)
+      plotData(graph, taskSetId, $http, $scope);
 
-      promise = $interval(function () {
-        plotData(graph, taskSetId, $http, $scope)
+      promise = $interval(() => {
+        plotData(graph, taskSetId, $http, $scope);
       }, 1500);
     };
 
-    $scope.stop = function () {
+    $scope.stop = () => {
       $interval.cancel(promise);
     };
 
     $scope.start();
 
-    $scope.$on('$destroy', function () {
+    $scope.$on('$destroy', () => {
       $scope.stop();
     });
-  }
-})
+  };
+});
 
 function plotData(graph, taskSetId, $http, $scope) {
   $http
@@ -62,39 +62,39 @@ function plotData(graph, taskSetId, $http, $scope) {
         index: graph.curve,
         xAxis: graph.xAxis,
         yAxis: graph.yAxis,
-        taskSetId: taskSetId
+        taskSetId
       }
     })
-    .then(response => {
-      const curves = response.data
+    .then((response) => {
+      const curves = response.data;
 
-      let labels = []
-      let data = []
+      const labels = [];
+      const data = [];
 
-      for (let curve in curves) {
-        let curveData = []
-        for (let xAxis in curves[curve]) {
+      for (let curve in curves) { // eslint-disable-line
+        const curveData = [];
+        for (let xAxis in curves[curve]) { // eslint-disable-line
           if (labels.indexOf(xAxis) === -1) {
             // Push if doesn't exist already
-            labels.push(xAxis)
+            labels.push(xAxis);
           }
 
-          // TODO: here, get here the 
+          // TODO: here, get here the
           let yAxisValue = 0;
 
-          for (let i = 0; i < curves[curve][xAxis].length; ++i) {
+          for (let i = 0; i < curves[curve][xAxis].length; i += 1) {
             yAxisValue += curves[curve][xAxis][i];
           }
 
-          yAxisValue = yAxisValue / curves[curve][xAxis].length;
+          yAxisValue /= curves[curve][xAxis].length;
 
-          curveData.push(yAxisValue)
+          curveData.push(yAxisValue);
         }
 
-        data.push(curveData)
+        data.push(curveData);
       }
 
-      $scope.data = data
-      $scope.labels = labels
-    })
+      $scope.data = data;
+      $scope.labels = labels;
+    });
 }

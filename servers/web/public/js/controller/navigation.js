@@ -1,10 +1,10 @@
-﻿app.controller('navigationCtrl', function ($scope, $rootScope, $http, $location) {
-  $scope.signOut = function () {
+app.controller('navigationCtrl', ($scope, $rootScope, $http, $location) => {
+  $scope.signOut = () => {
     $http
       .post('/api/user/sign_out')
-      .then(function (response) {
-        $rootScope.signedUser = null
-        $location.path('/')
-      })
-  }
-})
+      .then(() => {
+        $rootScope.signedUser = null;
+        $location.path('/');
+      });
+  };
+});

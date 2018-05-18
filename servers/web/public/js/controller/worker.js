@@ -1,39 +1,39 @@
-﻿app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
-  $rootScope.sidebar = true
+app.controller('workerCtrl', ($scope, $rootScope, $http, $interval) => {
+  $rootScope.sidebar = true;
 
   $scope.threshold = {
-    '0': { color: 'green' },
-    '50': { color: 'orange' },
-    '80': { color: 'red' }
+    0: { color: 'green' },
+    50: { color: 'orange' },
+    80: { color: 'red' }
   };
 
-  var promise
+  let promise;
 
-  $scope.start = function () {
+  $scope.start = () => {
     $scope.stop();
 
-    getAllWorkers($scope, $rootScope, $http, $interval)
+    getAllWorkers($scope, $rootScope, $http, $interval);
 
-    promise = $interval(function () {
-      getAllWorkers($scope, $rootScope, $http, $interval)
+    promise = $interval(() => {
+      getAllWorkers($scope, $rootScope, $http, $interval);
     }, 1500);
   };
 
-  $scope.stop = function () {
+  $scope.stop = () => {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', function () {
+  $scope.$on('$destroy', () => {
     $scope.stop();
   });
-})
+});
 
-function getAllWorkers($scope, $rootScope, $http, $interval) {
+function getAllWorkers($scope, $rootScope, $http) {
   $http
     .get('/api/worker/get_all')
-    .then(function (response) {
-      $scope.workers = response.data
-    })
+    .then((response) => {
+      $scope.workers = response.data;
+    });
 }

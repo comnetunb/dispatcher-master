@@ -1,4 +1,4 @@
-﻿var app = angular.module('app', [
+const app = angular.module('app', [
   'ngRoute',
   'gridster',
   'angularjs-gauge',
@@ -6,11 +6,11 @@
   'chart.js',
   'ngAnimate',
   'ui.bootstrap'
-])
+]);
 
-app.config(function ($routeProvider, $locationProvider) {
+app.config(($routeProvider /* , $locationProvider */) => {
   // Initialize data
-  //$locationProvider.html5Mode(true)
+  // $locationProvider.html5Mode(true)
 
   $routeProvider
     .when('/', {
@@ -65,33 +65,31 @@ app.config(function ($routeProvider, $locationProvider) {
     })
     .otherwise({
       redirectTo: '/'
-    })
-})
+    });
+});
 
-app.run(function ($rootScope, $location, $window, $http, gridsterConfig) {
+app.run(($rootScope, $location, $window, $http, gridsterConfig) => {
   gridsterConfig.defaultSizeX = 2;
   gridsterConfig.defaultSizeY = 1;
   gridsterConfig.resizable.enabled = false;
   gridsterConfig.columns = 6;
 
-  $rootScope.signedUser = null
+  $rootScope.signedUser = null;
 
-  $rootScope.$on("$routeChangeStart", function (event, next, current) {
+  $rootScope.$on('$routeChangeStart', (event, next) => {
     $http
       .get('/api/user/signed_in')
-      .then(function (response) {
-        $rootScope.signedUser = response.data
+      .then((response) => {
+        $rootScope.signedUser = response.data;
 
         if (next.auth && !$rootScope.signedUser) {
-          $location.path('/sign_in')
-          return
+          $location.path('/sign_in');
+          return;
         }
 
         if (next.route) {
-          $window.location.href = next.route
-          return
+          $window.location.href = next.route;
         }
       });
-  })
+  });
 });
-

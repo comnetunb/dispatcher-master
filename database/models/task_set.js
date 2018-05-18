@@ -1,4 +1,4 @@
-﻿// !
+// !
 // ! Version: MIT
 // !
 // ! Portions created by Matheus Medeiros are Copyright (c) 2017-2018

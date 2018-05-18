@@ -1,56 +1,53 @@
-﻿
-const User = rootRequire('database/models/user')
 
-module.exports = function (app, passport) {
-  app.post('/api/user/sign_in', passport.authenticate('local'), function (req, res) {
-    res.json(req.user)
-  })
+const User = rootRequire('database/models/user');
 
-  app.get('/api/user/signed_in', function (req, res) {
-    res.send(req.isAuthenticated() ? req.user : null)
-  })
+module.exports = (app, passport) => {
+  app.post('/api/user/sign_in', passport.authenticate('local'), (req, res) => {
+    res.json(req.user);
+  });
 
-  app.post('/api/user/sign_out', function (req, res) {
-    req.logOut()
-    res.sendStatus(200)
-  })
+  app.get('/api/user/signed_in', (req, res) => {
+    res.send(req.isAuthenticated() ? req.user : null);
+  });
 
-  app.post('/api/user/sign_up', function (req, res) {
-    const userFilter = { email: req.body.email }
+  app.post('/api/user/sign_out', (req, res) => {
+    req.logOut();
+    res.sendStatus(200);
+  });
+
+  app.post('/api/user/sign_up', (req, res) => {
+    const userFilter = { email: req.body.email };
 
     User
       .findOne(userFilter)
-      .then(function (user) {
+      .then((user) => {
         if (user) {
-          return res.status(409).send({ reason: 'User already exists.' })
+          res.status(409).send({ reason: 'User already exists.' });
+          return;
         }
 
-        const email = req.body.email
-        const name = req.body.username
-        const password = req.body.password
+        const { email, name, password } = req.body;
 
-        User
-          .encryptPassword(password, function (e, hash) {
-            if (e) {
-              throw e
-            }
+        User.encryptPassword(password, (e, hash) => {
+          if (e) {
+            throw e;
+          }
 
-            const newUser = new User({
-              email: email,
-              name: name,
-              password: hash
-            })
+          const newUser = new User({
+            email,
+            name,
+            password: hash
+          });
 
-            newUser
-              .save()
-              .catch(function (e) {
-                res.status(500).send({ reason: 'An internal error occurred. Please try again later.' })
-              })
-          })
-
+          newUser
+            .save()
+            .catch(() => {
+              res.status(500).send({ reason: 'An internal error occurred. Please try again later.' });
+            });
+        });
       })
-      .catch(function (e) {
-        res.status(500).send({ reason: 'An internal error occurred. Please try again later.' })
-      })
-  })
-}
+      .catch(() => {
+        res.status(500).send({ reason: 'An internal error occurred. Please try again later.' });
+      });
+  });
+};

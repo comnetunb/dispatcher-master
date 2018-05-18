@@ -1,4 +1,4 @@
-﻿
+
 const setup = rootRequire('servers/web/setup');
 const express = require('express');
 
