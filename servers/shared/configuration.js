@@ -1,85 +1,85 @@
-/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
+/*
+ *
+ * Copyright (c) 2017 Matheus Medeiros Sarmento
+ *
+ */
 
-var fs = require('fs')
+const fs = require('fs');
 
-var configuration = {}
+let configuration = {};
 
-load()
+load();
 
-module.exports.getConfiguration = function () {
+module.exports.getConfiguration = () => {
   if (Object.keys(configuration).length === 0) {
-    load()
+    load();
   }
 
-  return configuration
-}
+  return configuration;
+};
 
-function load () {
+function load() {
   try {
-    configuration = JSON.parse(fs.readFileSync(__dirname + '/../config/config.json', 'utf8').replace(/^\uFEFF/, ''))
+    configuration = JSON.parse(fs.readFileSync(`${__dirname}/../config/config.json`, 'utf8').replace(/^\uFEFF/, ''));
   } catch (err) {
-
+    // empty
   }
 
-  treatDefaultValues()
+  treatDefaultValues();
 }
 
-function treatDefaultValues () {
+function treatDefaultValues() {
   if (configuration.cpu === undefined) {
-    configuration.cpu = {}
+    configuration.cpu = {};
   }
 
   if (configuration.memory === undefined) {
-    configuration.memory = {}
+    configuration.memory = {};
   }
 
   if (configuration.workerPerformance === undefined) {
-    configuration.workerPerformance = {}
+    configuration.workerPerformance = {};
   }
 
   if (configuration.transporter === undefined) {
-    configuration.transporter = {}
-    configuration.transporter.auth = {}
+    configuration.transporter = {};
+    configuration.transporter.auth = {};
   }
 
-   // Prevent user's stupidity
+  // Prevent user's stupidity
   if (configuration.cpu.threshold === undefined || typeof configuration.cpu.threshold === 'string') {
-    configuration.cpu.threshold = 0.5
+    configuration.cpu.threshold = 0.5;
   } else if (configuration.cpu.threshold > 1) {
-    configuration.cpu.threshold = 1
+    configuration.cpu.threshold = 1;
   } else if (configuration.cpu.threshold < 0) {
-    configuration.cpu.threshold = 0
+    configuration.cpu.threshold = 0;
   }
 
   if (configuration.memory.threshold === undefined || typeof configuration.memory.threshold === 'string') {
-    configuration.memory.threshold = 0.5
+    configuration.memory.threshold = 0.5;
   } else if (configuration.memory.threshold > 1) {
-    configuration.memory.threshold = 1
+    configuration.memory.threshold = 1;
   } else if (configuration.memory.threshold < 0) {
-    configuration.memory.threshold = 0
+    configuration.memory.threshold = 0;
   }
 
   if (configuration.workerPerformance.threshold === undefined || typeof configuration.workerPerformance.threshold === 'string') {
-    configuration.workerPerformance.threshold = 0.25
+    configuration.workerPerformance.threshold = 0.25;
   } else if (configuration.workerPerformance.threshold > 1) {
-    configuration.workerPerformance.threshold = 1
+    configuration.workerPerformance.threshold = 1;
   } else if (configuration.workerPerformance.threshold < 0) {
-    configuration.workerPerformance.threshold = 0
+    configuration.workerPerformance.threshold = 0;
   }
 
   if (configuration.requestResourceInterval === undefined || typeof configuration.requestResourceInterval === 'string') {
-    configuration.requestResourceInterval = 1
+    configuration.requestResourceInterval = 1;
   } else if (configuration.requestResourceInterval < 1) {
-    configuration.requestResourceInterval = 1
+    configuration.requestResourceInterval = 1;
   }
 
   if (configuration.dispatchInterval === undefined || typeof configuration.dispatchInterval === 'string') {
-    configuration.dispatchInterval = 3
+    configuration.dispatchInterval = 3;
   } else if (configuration.dispatchInterval < 3) {
-    configuration.dispatchInterval = 3
+    configuration.dispatchInterval = 3;
   }
 }

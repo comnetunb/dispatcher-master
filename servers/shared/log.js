@@ -1,13 +1,12 @@
-/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
+/*
+ *
+ * Copyright (c) 2017 Matheus Medeiros Sarmento
+ *
+ */
 
-const log4js = require('log4js')
-const traceback = require('traceback')
+const log4js = require('log4js');
 
-const Log = rootRequire('database/models/log')
+const Log = rootRequire('database/models/log');
 
 log4js.configure({
   appenders: {
@@ -17,15 +16,15 @@ log4js.configure({
   categories: {
     default: { appenders: ['out', 'app'], level: 'debug' }
   }
-})
+});
 
-const logger = log4js.getLogger()
+const logger = log4js.getLogger();
 
 module.exports.getAll = () => {
-  const logFilter = { session: Log.SessionId }
+  const logFilter = { session: Log.SessionId };
 
-  return Log.find(logFilter).sort({ date: -1 })
-}
+  return Log.find(logFilter).sort({ date: -1 });
+};
 
 module.exports.getAllFromDate = (date) => {
   const logFilter = {
@@ -33,55 +32,55 @@ module.exports.getAllFromDate = (date) => {
     date: {
       $gt: date
     }
-  }
+  };
 
-  return Log.find(logFilter).sort({ date: -1 })
-}
+  return Log.find(logFilter).sort({ date: -1 });
+};
 
-module.exports.trace = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Trace })
+module.exports.trace = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Trace });
 
-  log.save()
+  log.save();
 
-  logger.trace(message)
-}
+  logger.trace(message);
+};
 
-module.exports.debug = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Debug })
+module.exports.debug = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Debug });
 
-  log.save()
+  log.save();
 
-  logger.debug(message)
-}
+  logger.debug(message);
+};
 
-module.exports.info = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Info })
+module.exports.info = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Info });
 
-  log.save()
+  log.save();
 
-  logger.info(message)
-}
+  logger.info(message);
+};
 
-module.exports.warn = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Warn })
+module.exports.warn = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Warn });
 
-  log.save()
+  log.save();
 
-  logger.warn(message)
-}
+  logger.warn(message);
+};
 
-module.exports.error = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Error })
+module.exports.error = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Error });
 
-  log.save()
+  log.save();
 
-  logger.error(message)
-}
+  logger.error(message);
+};
 
-module.exports.fatal = function (message) {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal })
+module.exports.fatal = (message) => {
+  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal });
 
-  log.save()
+  log.save();
 
-  logger.fatal(message)
-}
+  logger.fatal(message);
+};

@@ -1,20 +1,21 @@
-/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
+/*
+ *
+ * Copyright (c) 2017 Matheus Medeiros Sarmento
+ *
+ */
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
 
-const WorkerState = protocolRequire('dwp/common').WorkerState
+const { Schema } = mongoose;
 
-const Task = rootRequire('database/models/task')
+const { WorkerState } = protocolRequire('dwp/common'); // eslint-disable-line no-undef
+
+const Task = rootRequire('database/models/task'); // eslint-disable-line no-undef
 
 const State = {
   EXECUTING: WorkerState.EXECUTING,
   PAUSED: WorkerState.PAUSED
-}
+};
 
 const workerSchema = Schema({
   address: {
@@ -55,37 +56,37 @@ const workerSchema = Schema({
   alias: {
     type: String
   }
-})
+});
 
-workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) {
+workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { // eslint-disable-line
   const filter = {
     'resource.outdated': false,
     'resource.cpu': { $gt: cpuThreshold },
     'resource.memory': { $gt: memoryThreshold },
-    'state': State.EXECUTING
-  }
+    'state': State.EXECUTING // eslint-disable-line quote-props
+  };
 
   return this
     .find(filter)
-    .then(function (availableWorkers) {
-      return availableWorkers
-    })
-}
+    .then((availableWorkers) => {
+      return availableWorkers;
+    });
+};
 
-workerSchema.statics.State = State
+workerSchema.statics.State = State;
 
-workerSchema.methods.updateRunningInstances = function () {
-  const worker = this
+workerSchema.methods.updateRunningInstances = function () { // eslint-disable-line func-names
+  const worker = this;
   return Task
     .count({ worker: worker.uuid })
-    .then(function (count) {
-      worker.runningInstances = count
-      return worker.save()
-    })
-}
+    .then((count) => {
+      worker.runningInstances = count;
+      return worker.save();
+    });
+};
 
-workerSchema.index({ address: 1, port: 1 }, { unique: true })
+workerSchema.index({ address: 1, port: 1 }, { unique: true });
 
-const model = mongoose.model('worker', workerSchema)
+const model = mongoose.model('worker', workerSchema);
 
-module.exports = model
+module.exports = model;

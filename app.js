@@ -1,42 +1,46 @@
-/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
+/*
+ *
+ * Copyright (c) 2017 Matheus Medeiros Sarmento
+ *
+ */
 
-global.rootRequire = function (name) {
-  return require(__dirname + '/' + name)
-}
+/* eslint global-require: 0 */
+/* eslint import/no-dynamic-require: 0 */
 
-global.protocolRequire = function (name) {
-  return require(__dirname + '/../protocol/' + name)
-}
+global.rootRequire = (name) => {
+  return require(`${__dirname}/${name}`);
+};
 
-global.dispatcherRequire = function (name) {
-  return require(__dirname + '/servers/dispatcher/' + name)
-}
+global.protocolRequire = (name) => {
+  return require(`${__dirname}/../protocol/${name}`);
+};
 
-global.webServerRequire = function (name) {
-  return require(__dirname + '/servers/web/' + name)
-}
+global.dispatcherRequire = (name) => {
+  return require(`${__dirname}/servers/dispatcher/${name}`);
+};
 
-global.databaseRequire = function (name) {
-  return require(__dirname + '/database/' + name)
-}
+global.webServerRequire = (name) => {
+  return require(`${__dirname}/servers/web/${name}`);
+};
 
-const webServer = rootRequire('servers/web/service')
-const dbDriver = rootRequire('database/db_driver')
-const dispatcher = rootRequire('servers/dispatcher/dispatcher')
+global.databaseRequire = (name) => {
+  return require(`${__dirname}/database/${name}`);
+};
+
+const webServer = rootRequire('servers/web/service'); // eslint-disable-line
+const dbDriver = rootRequire('database/db_driver'); // eslint-disable-line
+const dispatcher = rootRequire('servers/dispatcher/dispatcher'); // eslint-disable-line
 
 // Setup Database Driver
 dbDriver()
-  .then(function () {
+  .then(() => {
     // Initialize dispatcher
-    dispatcher()
+    dispatcher();
 
     // Initialize WEB Server
-    webServer()
+    webServer();
   })
-  .catch(function (e) {
-    console.log(e)
-  })
+  .catch((e) => {
+    console.log(e); // eslint-disable-line
+  });
+

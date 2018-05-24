@@ -1,11 +1,12 @@
-/// /////////////////////////////////////////////
-//
-// Copyright (c) 2017 Matheus Medeiros Sarmento
-//
-/// /////////////////////////////////////////////
+/*
+ *
+ * Copyright (c) 2017 Matheus Medeiros Sarmento
+ *
+ */
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
 
 const Level = {
   Trace: 0,
@@ -14,9 +15,9 @@ const Level = {
   Warn: 3,
   Error: 4,
   Fatal: 5
-}
+};
 
-const SessionId = mongoose.Types.ObjectId()
+const SessionId = mongoose.Types.ObjectId();
 
 const logSchema = Schema({
   log: {
@@ -35,9 +36,9 @@ const logSchema = Schema({
     type: Schema.Types.ObjectId,
     default: SessionId
   }
-})
+});
 
-logSchema.statics.Level = Level
-logSchema.statics.SessionId = SessionId
+logSchema.statics.Level = Level;
+logSchema.statics.SessionId = SessionId;
 
-module.exports = mongoose.model('Log', logSchema)
+module.exports = mongoose.model('Log', logSchema);

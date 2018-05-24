@@ -5,22 +5,22 @@
  * This communication is done through Events
  */
 
-const Command = protocolRequire('dwp/pdu/perform_command').Command
+const { Command } = protocolRequire('dwp/pdu/perform_command');
 
-const EventEmitter = require('events')
+const EventEmitter = require('events');
 
-var event = new EventEmitter()
+const event = new EventEmitter();
 
-module.exports.event = event
+module.exports.event = event;
 
-module.exports.pauseWorker = function (address) {
-  event.emit('worker_command', address, Command.PAUSE)
-}
+module.exports.pauseWorker = (address) => {
+  event.emit('worker_command', address, Command.PAUSE);
+};
 
-module.exports.resumeWorker = function (address) {
-  event.emit('worker_command', address, Command.RESUME)
-}
+module.exports.resumeWorker = (address) => {
+  event.emit('worker_command', address, Command.RESUME);
+};
 
-module.exports.stopWorker = function (address) {
-  event.emit('worker_command', address, Command.STOP)
-}
+module.exports.stopWorker = (address) => {
+  event.emit('worker_command', address, Command.STOP);
+};

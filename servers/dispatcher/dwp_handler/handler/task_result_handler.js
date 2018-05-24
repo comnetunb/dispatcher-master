@@ -1,62 +1,60 @@
 
 // Protocol Related
-const ReturnCode = protocolRequire('dwp/pdu/task_result').ReturnCode
+const { ReturnCode } = protocolRequire('dwp/pdu/task_result');
 
 // Database Related
-const Task = rootRequire('database/models/task')
-const TaskSet = rootRequire('database/models/task_set')
+const Task = rootRequire('database/models/task');
+const TaskSet = rootRequire('database/models/task_set');
 
 // Shared Related
-const mailer = rootRequire('servers/shared/mailer')
-const log = rootRequire('servers/shared/log')
+const mailer = rootRequire('servers/shared/mailer');
+const log = rootRequire('servers/shared/log');
 
-module.exports.execute = function (pdu, worker) {
+module.exports.execute = (pdu, worker) => {
   if (pdu.code === ReturnCode.SUCCESS) {
     // Succeded
     try {
-      JSON.parse(pdu.output)
-    }
-    catch (e) {
-      log.fatal(e + '\nJSON: ' + pdu.output)
+      JSON.parse(pdu.output);
+    } catch (e) {
+      log.fatal(`${e}\nJSON: ${pdu.output}`);
     }
 
-    var taskUpdate = {
+    const taskUpdate = {
       result: pdu.output,
       state: Task.State.FINISHED,
       endTime: Date.now(),
       $unset: { worker: 1 }
-    }
+    };
 
     Task
       .findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true })
-      .then(task => {
-        log.info('Worker ' + worker.address + ':' + worker.port + ' has finished task ' + task._id)
+      .then((task) => {
+        log.info(`Worker ${worker.address}:${worker.port} has finished task ${task._id}`);
 
-        TaskSet.UpdateRemainingTasksCount(task._taskSet)
+        TaskSet.UpdateRemainingTasksCount(task._taskSet);
 
-        return cascadeConclusion(task._taskSet)
+        return cascadeConclusion(task._taskSet);
       })
       .then(() => {
-        return worker.updateRunningInstances()
+        return worker.updateRunningInstances();
       })
-      .catch(e => {
-        log.fatal(e)
-      })
-  }
-  else {
+      .catch((e) => {
+        log.fatal(e);
+      });
+  } else {
     // Failed
-    log.warn(pdu.task.id + ' failed to execute: ' + pdu.output)
+    log.warn(`${pdu.task.id} failed to execute: ${pdu.output}`);
 
     Task
       .updateToDefaultState(pdu.task.id)
       .then(() => {
-        return worker.updateRunningInstances()
+        return worker.updateRunningInstances();
       })
-      .catch(e => {
-        log.fatal(e)
-      })
+      .catch((e) => {
+        log.fatal(e);
+      });
   }
-}
+};
 
 function cascadeConclusion(taskSetId) {
   const taskFilter = {
@@ -64,39 +62,39 @@ function cascadeConclusion(taskSetId) {
     state: {
       $ne: Task.State.FINISHED
     }
-  }
+  };
 
   return Task
     .count(taskFilter)
-    .then(activeCount => {
+    .then((activeCount) => {
       if (activeCount > 0) {
-        return
+        return;
       }
 
       // All tasks are done. Finish TaskSet
       const taskSetUpdate = {
         state: TaskSet.State.FINISHED,
         endTime: Date.now()
-      }
+      };
 
-      return TaskSet
+      TaskSet
         .findByIdAndUpdate(taskSetId, taskSetUpdate, { new: true })
         .populate('_user')
-        .then(taskSet => {
-          sendConclusionEmail(taskSet)
-        })
-    })
+        .then((taskSet) => {
+          sendConclusionEmail(taskSet);
+        });
+    });
 }
 
 function sendConclusionEmail(taskSet) {
-  const to = taskSet._user.email
-  const subject = 'Task set "' + taskSet.name + '" has finished'
+  const to = taskSet._user.email;
+  const subject = `Task set "${taskSet.name}" has finished`;
 
   // TODO: use template email
   const text =
-    'Start time: ' + taskSet.startTime +
-    '\nEnd time: ' + taskSet.endTime +
-    '\nPriority: ' + taskSet.priority
+    `Start time: ${taskSet.startTime}` +
+    `\nEnd time: ${taskSet.endTime}` +
+    `\nPriority: ${taskSet.priority}`;
 
-  mailer.sendMail(to, subject, text)
+  mailer.sendMail(to, subject, text);
 }
