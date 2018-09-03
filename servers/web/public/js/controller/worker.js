@@ -1,4 +1,4 @@
-app.controller('workerCtrl', ($scope, $rootScope, $http, $interval) => {
+app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true;
 
   $scope.threshold = {
@@ -9,23 +9,23 @@ app.controller('workerCtrl', ($scope, $rootScope, $http, $interval) => {
 
   let promise;
 
-  $scope.start = () => {
+  $scope.start = function () {
     $scope.stop();
 
     getAllWorkers($scope, $rootScope, $http, $interval);
 
-    promise = $interval(() => {
+    promise = $interval(function () {
       getAllWorkers($scope, $rootScope, $http, $interval);
     }, 1500);
   };
 
-  $scope.stop = () => {
+  $scope.stop = function () {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', () => {
+  $scope.$on('$destroy', function () {
     $scope.stop();
   });
 });

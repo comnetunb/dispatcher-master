@@ -14,6 +14,12 @@
         "named": "never"
       }
     ],
+    "func-names": [
+      0
+    ],
+    "prefer-arrow-callback": [
+      0
+    ],
     "no-undef": [
       0
     ],

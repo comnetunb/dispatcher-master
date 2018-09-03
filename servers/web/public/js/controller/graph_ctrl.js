@@ -1,4 +1,4 @@
-app.controller('graphCtrl', ($scope, $http, $window, $rootScope /* , $location */) => {
+app.controller('graphCtrl', function ($scope, $http, $window, $rootScope /* , $location */) {
   $rootScope.sidebar = true;
 
   $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
@@ -24,32 +24,32 @@ app.controller('graphCtrl', ($scope, $http, $window, $rootScope /* , $location *
     .get('/api/graph/plot_info', {
       params: { taskSetId }
     })
-    .then((response) => {
+    .then(function (response) {
       $scope.axes = response.data.axes;
       $scope.curves = response.data.curves;
       $scope.argumentTemplate = response.data.argumentTemplate;
     });
 
-  $scope.getPlotData = (graph) => {
+  $scope.getPlotData = function (graph) {
     let promise;
 
-    $scope.start = () => {
+    $scope.start = function () {
       $scope.stop();
 
       plotData(graph, taskSetId, $http, $scope);
 
-      promise = $interval(() => {
+      promise = $interval(function () {
         plotData(graph, taskSetId, $http, $scope);
       }, 1500);
     };
 
-    $scope.stop = () => {
+    $scope.stop = function () {
       $interval.cancel(promise);
     };
 
     $scope.start();
 
-    $scope.$on('$destroy', () => {
+    $scope.$on('$destroy', function () {
       $scope.stop();
     });
   };
@@ -65,7 +65,7 @@ function plotData(graph, taskSetId, $http, $scope) {
         taskSetId
       }
     })
-    .then((response) => {
+    .then(function (response) {
       const curves = response.data;
 
       const labels = [];

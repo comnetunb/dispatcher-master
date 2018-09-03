@@ -1,21 +1,21 @@
-app.controller('signInCtrl', ($scope, $http, $window, $rootScope, $location) => {
-  $scope.sign_in = (signIn) => {
+app.controller('signInCtrl', function ($scope, $http, $window, $rootScope, $location) {
+  $scope.sign_in = function (signIn) {
     $http
       .post('/api/user/sign_in', signIn)
-      .then((response) => {
+      .then(function (response) {
         $scope.errorMessage = false;
         $rootScope.signedUser = response.data;
         $location.path('/workers');
       })
-      .catch((e) => {
+      .catch(function (e) {
         console.log(e); // eslint-disable-line no-console
         $scope.errorMessage = e.data;
       });
   };
 });
 
-app.controller('signUpCtrl', ($scope, $http, $window, $rootScope, $location) => {
-  $scope.sign_up = (signUp) => {
+app.controller('signUpCtrl', function ($scope, $http, $window, $rootScope, $location) {
+  $scope.sign_up = function (signUp) {
     if (signUp.password !== signUp.confirmPassword) {
       $scope.errorMessage = 'Passwords must match!';
       return;
@@ -23,12 +23,12 @@ app.controller('signUpCtrl', ($scope, $http, $window, $rootScope, $location) => 
 
     $http
       .post('/api/user/sign_up', signUp)
-      .then((response) => {
+      .then(function (response) {
         $scope.errorMessage = false;
         $rootScope.signedUser = response.data;
         $location.path('/');
       })
-      .catch((e) => {
+      .catch(function (e) {
         $scope.errorMessage = e.data.reason;
       });
   };

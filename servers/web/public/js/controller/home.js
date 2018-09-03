@@ -1,3 +1,3 @@
-app.controller('HomeCtrl', ($rootScope) => {
+app.controller('HomeCtrl', function ($rootScope) {
   $rootScope.sidebar = false;
 });

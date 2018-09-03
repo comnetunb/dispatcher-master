@@ -1,4 +1,4 @@
-const updateLog = ($scope, response) => {
+const updateLog = function ($scope, response) {
   if (!response.data.length) {
     return;
   }
@@ -7,25 +7,25 @@ const updateLog = ($scope, response) => {
   $scope.lastDate = $scope.logs[$scope.logs.length - 1].date;
 };
 
-const getAllLogs = ($scope, $http) => {
+const getAllLogs = function ($scope, $http) {
   $http
     .get('/api/log/get_all')
-    .then((response) => {
+    .then(function (response) {
       updateLog($scope, response);
     });
 };
 
-const getAllLogsFromDate = ($scope, $http) => {
+const getAllLogsFromDate = function ($scope, $http) {
   $http
     .get('/api/log/get_all_from_date', {
       params: { lastDate: $scope.lastDate }
     })
-    .then((response) => {
+    .then(function (response) {
       updateLog($scope, response);
     });
 };
 
-app.controller('logCtrl', ($scope, $rootScope, $http, $interval) => {
+app.controller('logCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true;
 
   $scope.logs = [];
@@ -33,23 +33,23 @@ app.controller('logCtrl', ($scope, $rootScope, $http, $interval) => {
 
   let promise;
 
-  $scope.start = () => {
+  $scope.start = function () {
     $scope.stop();
 
     getAllLogs($scope, $http);
 
-    promise = $interval(() => {
+    promise = $interval(function () {
       getAllLogsFromDate($scope, $http);
     }, 1500);
   };
 
-  $scope.stop = () => {
+  $scope.stop = function () {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', () => {
+  $scope.$on('$destroy', function () {
     $scope.stop();
   });
 });

@@ -1,6 +1,6 @@
 const dashboard = angular.module('dashboard', ['ngRoute', 'gridster', 'angularjs-gauge', 'angularUtils.directives.dirPagination']);
 
-dashboard.config(($routeProvider /* , $locationProvider */) => {
+dashboard.config(function ($routeProvider /* , $locationProvider */) {
   // Initialize data
   // $locationProvider.html5Mode(true)
 
@@ -18,25 +18,25 @@ dashboard.config(($routeProvider /* , $locationProvider */) => {
     });
 });
 
-dashboard.run((gridsterConfig) => {
+dashboard.run(function (gridsterConfig) {
   gridsterConfig.defaultSizeX = 1;
   gridsterConfig.defaultSizeY = 1;
   gridsterConfig.resizable.enabled = false;
   gridsterConfig.columns = 5;
 });
 
-dashboard.controller('navigationCtrl', ($scope, $http, $rootScope, $window) => {
-  $scope.signOut = () => {
+dashboard.controller('navigationCtrl', function ($scope, $http, $rootScope, $window) {
+  $scope.signOut = function () {
     $http
       .post('/api/user/sign_out')
-      .then(() => {
+      .then(function () {
         $rootScope.signedUser = null;
         $window.location.href = '/';
       });
   };
 });
 
-dashboard.controller('workerCtrl', ($scope, $http, $interval) => {
+dashboard.controller('workerCtrl', function ($scope, $http, $interval) {
   $scope.threshold = {
     0: { color: 'green' },
     50: { color: 'orange' },
@@ -45,7 +45,7 @@ dashboard.controller('workerCtrl', ($scope, $http, $interval) => {
 
   getAllWorkers($scope, $http);
 
-  $interval(() => {
+  $interval(function () {
     getAllWorkers($scope, $http);
   }, 1500);
 });
@@ -53,20 +53,20 @@ dashboard.controller('workerCtrl', ($scope, $http, $interval) => {
 function getAllWorkers($scope, $http) {
   $http
     .get('/api/worker/getAll')
-    .then((response) => {
+    .then(function (response) {
       $scope.workers = response.data;
     });
 }
 
-dashboard.controller('taskCtrl', ($scope, $http, $interval) => {
-  $scope.sort = (keyname) => {
+dashboard.controller('taskCtrl', function ($scope, $http, $interval) {
+  $scope.sort = function (keyname) {
     $scope.sortKey = keyname; // set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; // if true make it false and vice versa
   };
 
   getAllActiveTasks($scope, $http);
 
-  $interval(() => {
+  $interval(function () {
     getAllActiveTasks($scope, $http);
   }, 1500);
 });
@@ -74,16 +74,16 @@ dashboard.controller('taskCtrl', ($scope, $http, $interval) => {
 function getAllActiveTasks($scope, $http) {
   $http
     .get('/api/task/get_executing')
-    .then((response) => {
+    .then(function (response) {
       $scope.tasks = response.data;
     });
 }
 
-dashboard.run(($rootScope, $http, $window) => {
-  $rootScope.signOut = () => {
+dashboard.run(function ($rootScope, $http, $window) {
+  $rootScope.signOut = function () {
     $http
       .post('/api/user/sign_out')
-      .then(() => {
+      .then(function () {
         $rootScope.signedUser = null;
         $window.location.href = '/';
       });
@@ -91,7 +91,7 @@ dashboard.run(($rootScope, $http, $window) => {
 
   $http
     .get('/api/user/signed_in')
-    .then((response) => {
+    .then(function (response) {
       $rootScope.signedUser = response.data;
 
       if (!$rootScope.signedUser) {
@@ -99,7 +99,7 @@ dashboard.run(($rootScope, $http, $window) => {
       }
     });
 
-  $rootScope.$on('$routeChangeStart', (event, next) => {
+  $rootScope.$on('$routeChangeStart', function (event, next) {
     if (next.auth && !$rootScope.signedUser) {
       $location.path('/sign_in');
       return;

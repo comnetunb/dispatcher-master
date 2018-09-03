@@ -58,6 +58,25 @@ module.exports = (app) => {
     }
   });
 
+  app.post('/api/task/edit_task_set', (req, res) => {
+    try {
+      const taskSetFilter = { _id: req.body.id };
+
+      const taskSet = TaskSet.find(taskSetFilter);
+
+      if (req.body.name) taskSet.name = req.body.name;
+      if (req.body.priority) taskSet.priority = req.body.priority;
+      // if (req.body.argumentTemplate) taskSet.argumentTemplate = req.body.argumentTemplate;
+
+      TaskSet.save().then(() => {
+        res.sendStatus(200);
+      });
+    } catch (e) {
+      log.error(e);
+      res.status(412).send({ reason: e });
+    }
+  });
+
   app.get('/api/task/supported_runnables', (req, res) => {
     res.send([{
       type: 'java',

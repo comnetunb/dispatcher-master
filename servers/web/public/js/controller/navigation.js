@@ -1,8 +1,8 @@
-app.controller('navigationCtrl', ($scope, $rootScope, $http, $location) => {
-  $scope.signOut = () => {
+app.controller('navigationCtrl', function ($scope, $rootScope, $http, $location) {
+  $scope.signOut = function () {
     $http
       .post('/api/user/sign_out')
-      .then(() => {
+      .then(function () {
         $rootScope.signedUser = null;
         $location.path('/');
       });

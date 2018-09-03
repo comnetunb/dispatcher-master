@@ -23,30 +23,30 @@
 // ! DEALINGS IN THE SOFTWARE.
 // !
 
-app.controller('groupCtrl', ($scope, $http, $interval /* , $rootScope */) => {
+app.controller('groupCtrl', function ($scope, $http, $interval /* , $rootScope */) {
   $scope.activeCount = 0;
   $scope.finishedCount = 0;
   $scope.canceledCount = 0;
 
   let promise;
 
-  $scope.start = () => {
+  $scope.start = function () {
     $scope.stop();
 
     getCount($scope, $http);
 
-    promise = $interval(() => {
+    promise = $interval(function () {
       getCount($scope, $http);
     }, 1500);
   };
 
-  $scope.stop = () => {
+  $scope.stop = function () {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', () => {
+  $scope.$on('$destroy', function () {
     $scope.stop();
   });
 });
@@ -54,58 +54,58 @@ app.controller('groupCtrl', ($scope, $http, $interval /* , $rootScope */) => {
 function getCount(/* $scope, $http */) {
   // $http
   //   .get('/api/task/count_active')
-  //   .then((response) => {
+  //   .then(function (response) {
   //     $scope.activeCount = response.data.count;
   //     console.log(response);
   //   })
 
   // $http
   //   .get('/api/task/count_finished')
-  //   .then((response) => {
+  //   .then(function (response) {
   //     $scope.finishedCount = response.data.count;
   //     console.log(response);
   //   })
 
   // $http
   //   .get('/api/task/count_canceled')
-  //   .then((response) => {
+  //   .then(function (response) {
   //     $scope.canceledCount = response.data.count;
   //     console.log(response);
   //   });
 }
 
 // ExecutingTaskSet
-app.controller('executingTaskSetCtrl', ($scope, $rootScope, $http, $interval, $uibModal) => {
+app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true;
 
-  $scope.sort = (keyname) => {
+  $scope.sort = function (keyname) {
     $scope.sortKey = keyname; // set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; // if true make it false and vice versa
   };
 
-  $scope.openConfirmation = (taskSetId) => {
+  $scope.openConfirmation = function (taskSetId) {
     openConfirmation($uibModal, taskSetId, $http, $scope, getAllExecutingTaskSets);
   };
 
   let promise;
 
-  $scope.start = () => {
+  $scope.start = function () {
     $scope.stop();
 
     getAllExecutingTaskSets($scope, $http);
 
-    promise = $interval(() => {
+    promise = $interval(function () {
       getAllExecutingTaskSets($scope, $http);
     }, 1500);
   };
 
-  $scope.stop = () => {
+  $scope.stop = function () {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', () => {
+  $scope.$on('$destroy', function () {
     $scope.stop();
   });
 });
@@ -113,43 +113,43 @@ app.controller('executingTaskSetCtrl', ($scope, $rootScope, $http, $interval, $u
 function getAllExecutingTaskSets($scope, $http) {
   $http
     .get('/api/task/get_executing')
-    .then((response) => {
+    .then(function (response) {
       $scope.executingTaskSets = response.data;
     });
 }
 
 // FinishedTaskSet
-app.controller('finishedTaskSetCtrl', ($scope, $rootScope, $http, $interval, $uibModal) => {
+app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true;
 
-  $scope.sort = (keyname) => {
+  $scope.sort = function (keyname) {
     $scope.sortKey = keyname; // set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; // if true make it false and vice versa
   };
 
-  $scope.openConfirmation = (taskSetId) => {
+  $scope.openConfirmation = function (taskSetId) {
     openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets);
   };
 
   let promise;
 
-  $scope.start = () => {
+  $scope.start = function () {
     $scope.stop();
 
     getAllFinishedTaskSets($scope, $http);
 
-    promise = $interval(() => {
+    promise = $interval(function () {
       getAllFinishedTaskSets($scope, $http);
     }, 1500);
   };
 
-  $scope.stop = () => {
+  $scope.stop = function () {
     $interval.cancel(promise);
   };
 
   $scope.start();
 
-  $scope.$on('$destroy', () => {
+  $scope.$on('$destroy', function () {
     $scope.stop();
   });
 });
@@ -157,20 +157,20 @@ app.controller('finishedTaskSetCtrl', ($scope, $rootScope, $http, $interval, $ui
 function getAllFinishedTaskSets($scope, $http) {
   $http
     .get('/api/task/get_finished')
-    .then((response) => {
+    .then(function (response) {
       $scope.finishedTaskSets = response.data;
     });
 }
 
-app.controller('removalModalCtrl', ($uibModalInstance, taskSetId) => {
+app.controller('removalModalCtrl', function ($uibModalInstance, taskSetId) { // eslint-disable-line
   const $ctrl = this;
   $ctrl.taskSetId = taskSetId;
 
-  $ctrl.ok = () => {
+  $ctrl.ok = function () {
     $uibModalInstance.dismiss('ok');
   };
 
-  $ctrl.cancel = () => {
+  $ctrl.cancel = function () {
     $uibModalInstance.dismiss('cancel');
   };
 });
@@ -184,23 +184,23 @@ function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
     controller: 'removalModalCtrl',
     controllerAs: '$ctrl',
     resolve: {
-      taskSetId: () => {
+      taskSetId: function () { // eslint-disable-line
         return taskSetId;
       }
     }
   });
 
-  modalInstance.result.then(() => {
-  }, (option) => {
+  modalInstance.result.then(function () {
+  }, function (option) {
     console.log(option + taskSetId); // eslint-disable-line no-console
     if (option === 'ok') {
       $http
         .post('/api/task/remove_task_set', { id: taskSetId })
-        .then(() => {
+        .then(function () {
           $scope.errorMessage = false;
           callback($scope, $http);
         })
-        .catch((e) => {
+        .catch(function (e) {
           $scope.errorMessage = e.data.reason;
         });
     }
@@ -208,16 +208,16 @@ function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
 }
 
 // Add
-app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
+app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location) {
   $rootScope.sidebar = true;
 
   $http
     .get('/api/task/supported_runnables')
-    .then((response) => {
+    .then(function (response) {
       $scope.supportedRunnablesInfo = response.data;
     });
 
-  $scope.clear = () => {
+  $scope.clear = function () {
     const inputs = document.getElementById('inputContainer');
 
     while (inputs.firstChild) {
@@ -227,7 +227,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
     $scope.addTaskForm.inputs = [];
   };
 
-  $scope.submit = (addTaskForm) => {
+  $scope.submit = function (addTaskForm) {
     if (!addTaskForm.runnableInfo.runnable.length) {
       $scope.errorMessage = 'Runnable is undefined';
       return;
@@ -235,11 +235,11 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
 
     $http
       .post('/api/task/add_task_group_set', addTaskForm)
-      .then(() => {
+      .then(function () {
         $scope.errorMessage = false;
         $location.path('/executing');
       })
-      .catch((e) => {
+      .catch(function (e) {
         $scope.errorMessage = e.data.reason;
       });
   };
@@ -250,7 +250,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
     inputs: []
   };
 
-  $scope.parse = (argumentsTemplate) => {
+  $scope.parse = function (argumentsTemplate) {
     $scope.clear();
 
     const matches = argumentsTemplate.match(/(%n|%s|%f)/g);
@@ -328,7 +328,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
       .append($compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskSetForm.$invalid" value="Submit">')($scope));
   };
 
-  $scope.addInterpretiveDirective = (directive) => {
+  $scope.addInterpretiveDirective = function (directive) {
     $scope.clear();
 
     if (!$scope.addTaskForm.argumentsTemplate) {
@@ -340,13 +340,13 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
     $scope.addTaskForm.argumentsTemplate = [$scope.addTaskForm.argumentsTemplate.slice(0, position), directive, $scope.addTaskForm.argumentsTemplate.slice(position)].join('');
   };
 })
-  .directive('fileread', () => {
+  .directive('fileread', function () {
     return {
       scope: {
         fileread: '='
       },
-      link: (scope, element) => {
-        element.bind('change', (changeEvent) => {
+      link: function (scope, element) { // eslint-disable-line
+        element.bind('change', function (changeEvent) {
           const files = Array.from(changeEvent.target.files);
 
           if (!files.length) {
@@ -359,8 +359,8 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
           files.map((file) => {
             const reader = new FileReader();
 
-            reader.onload = (loadEvent) => {
-              scope.$apply(() => {
+            reader.onload = function (loadEvent) {
+              scope.$apply(function () {
                 const input = {
                   name: file.name,
                   data: loadEvent.target.result
@@ -377,7 +377,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
       }
     };
   })
-  .directive('precedence', () => {
+  .directive('precedence', function () {
     return {
       restrict: 'E',
       templateUrl: 'views/dashboard/directives/precedence.html',
@@ -387,7 +387,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
       replace: true
     };
   })
-  .directive('interpretiveNumber', () => {
+  .directive('interpretiveNumber', function () {
     return {
       restrict: 'E',
       templateUrl: 'views/dashboard/directives/interpretive_number.html',
@@ -397,7 +397,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
       replace: true
     };
   })
-  .directive('interpretiveString', () => {
+  .directive('interpretiveString', function () {
     return {
       restrict: 'E',
       templateUrl: 'views/dashboard/directives/interpretive_string.html',
@@ -407,7 +407,7 @@ app.controller('addCtrl', ($scope, $rootScope, $compile, $http, $location) => {
       replace: true
     };
   })
-  .directive('interpretiveFile', () => {
+  .directive('interpretiveFile', function () {
     return {
       restrict: 'E',
       templateUrl: 'views/dashboard/directives/interpretive_file.html',
