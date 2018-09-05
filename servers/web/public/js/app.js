@@ -30,7 +30,7 @@ app.config(function ($routeProvider /* , $locationProvider */) {
     })
     .when('/forgot_password', {
       templateUrl: 'views/authentication/forgot_password.html',
-      controller: 'SignInCtrl',
+      controller: 'signInCtrl',
       auth: false
     })
     .when('/workers', {

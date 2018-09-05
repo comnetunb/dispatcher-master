@@ -1,4 +1,4 @@
-main.controller('SignUpCtrl', function ($scope, $http, $window, $rootScope) {
+main.controller('signUpCtrl', function ($scope, $http, $window, $rootScope) {
   $scope.sign_in = function (signUp) {
     $http
       .post('/api/user/sign_up', signUp)

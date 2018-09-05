@@ -157,6 +157,113 @@ const buildTasks = (taskSetData, user) => {
     });
 };
 
+const editTaskSet = async (taskSetData) => {
+  const taskSetName = taskSetData.name;
+  const taskSetPriority = taskSetData.priority;
+  // const runnableType = taskSetData.runnableInfo.info.type;
+  // const runnable = taskSetData.runnableInfo.runnable[0];
+  // const { inputs } = taskSetData;
+  // const { argumentsTemplate } = taskSetData;
+  const oldTaskSet = await TaskSet.findOne({ _id: taskSetData._id });
+
+  // // Sort by precedence
+  // inputs.sort((first, second) => {
+  //   if (first.precedence > second.precedence) return 1;
+  //   if (second.precedence > first.precedence) return -1;
+  //   return 0;
+  // });
+
+  // const newFiles = [];
+  // const parsedInputs = [];
+
+  // for (let input in inputs) { // eslint-disable-line
+  //   switch (inputs[input].type) {
+  //     case 'N':
+  //       parsedInputs.push({
+  //         data: parseNumber(inputs[input].data),
+  //         directiveIndex: inputs[input].directiveIndex
+  //       });
+  //       break;
+
+  //     case 'F':
+  //       const data = [];
+  //       const files = inputs[input].data;
+
+  //       for (let file in files) { // eslint-disable-line
+  //         data.push(files[file].name);
+
+  //         const newFile = new File({
+  //           _user: user._id,
+  //           name: files[file].name,
+  //           dataURL: files[file].data
+  //         });
+
+  //         newFiles.push(newFile);
+  //       }
+
+  //       parsedInputs.push({
+  //         data,
+  //         directiveIndex: inputs[input].directiveIndex
+  //       });
+  //       break;
+
+  //     default:
+  //   }
+  // }
+
+  // // TODO: Get prefix command on database
+  // let prefix = '';
+  // switch (runnableType) {
+  //   case 'java':
+  //     prefix += `java -jar ${runnable.name} `;
+  //     break;
+
+  //   case 'python':
+  //     prefix += `python ${runnable.name} `;
+  //     break;
+
+  //   default:
+  // }
+
+  // // TODO: where does this preprocessing belong?
+  // let index = 0;
+  // let preProcessedArgumentsTemplate = argumentsTemplate;
+  // let match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+  // while (match != null) {
+  //   preProcessedArgumentsTemplate = preProcessedArgumentsTemplate.replace(match[0], `%${index}`);
+  //   match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+  //   index += 1;
+  // }
+
+  // commandLineTemplate = prefix + preProcessedArgumentsTemplate;
+
+  // const files = File.insertMany(newFiles);
+  // const fileIds = [];
+
+  // for (let file in files) { // eslint-disable-line
+  //   fileIds.push(files[file]._id);
+  // }
+
+  // const newRunnable = new File({
+  //   _user: user._id,
+  //   name: runnable.name,
+  //   dataURL: runnable.data
+  // });
+
+  // const savedRunnable = newRunnable.save();
+
+  if (taskSetName) oldTaskSet.name = taskSetName;
+  if (taskSetPriority) oldTaskSet.priority = taskSetPriority;
+
+  const savedTaskSet = await oldTaskSet.save();
+  // const promises = [];
+
+  // buildTaskSet(commandLineTemplate, parsedInputs, savedTaskSet._id, promises);
+
+  // await Promise.all(promises);
+  TaskSet.UpdateRemainingTasksCount(savedTaskSet._id);
+};
+
 //! Recursive method
 function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, promises, infos = []) {
   if (!parsedInputs.length) {
@@ -333,5 +440,6 @@ function writeFile(filePath, contents) {
 
 module.exports = {
   buildTasks,
-  exportTaskSet
+  exportTaskSet,
+  editTaskSet
 };
