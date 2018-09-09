@@ -55,7 +55,7 @@ module.exports.execute = () => {
       }
     });
 
-    connection.on('error', () => {});
+    connection.on('error', () => { });
   });
 
   // Open worker

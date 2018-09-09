@@ -24,6 +24,7 @@ global.databaseRequire = (name) => {
 const webServer = rootRequire('servers/web/service'); // eslint-disable-line
 const dbDriver = rootRequire('database/db_driver'); // eslint-disable-line
 const dispatcher = rootRequire('servers/dispatcher/dispatcher'); // eslint-disable-line
+const api = rootRequire('api/api');
 
 // Setup Database Driver
 dbDriver()
@@ -33,6 +34,8 @@ dbDriver()
 
     // Initialize WEB Server
     webServer();
+
+    api();
   })
   .catch((e) => {
     console.log(e); // eslint-disable-line
