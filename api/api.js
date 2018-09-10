@@ -22,7 +22,7 @@ module.exports = () => {
   running(app);
 };
 
-const PORT = 16181;
+const PORT = 80;
 
 app.listen(PORT, () => {
   log.info(`API listening on port ${PORT}`);
