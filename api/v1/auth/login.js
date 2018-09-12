@@ -14,15 +14,11 @@ module.exports = (app) => {
         }
 
         if (!user.validPassword(password)) {
-          res.status(401).json({ reason: 'Unauthorized.' });
+          res.status(401).json({ reason: 'Incorrect password.' });
           return;
         }
 
-        const token = jwt.sign({ id: user._id }, config.secret, {
-          expiresIn: 86400 // expires in 24 hours
-        });
-
-        res.status(200).json({ token });
+        res.status(200).send({ token: signJWTUser(user) });
       })
       .catch(() => {
         res.status(500).json({ reason: 'An internal error occurred.' });

@@ -29,11 +29,7 @@ module.exports = (app) => {
                 throw err;
               }
 
-              const token = jwt.sign({ id: user._id }, config.secret, {
-                expiresIn: 86400 // expires in 24 hours
-              });
-
-              res.status(200).send({ auth: true, token });
+              res.status(200).send({ token: signJWTUser(user) });
             });
         });
       })
