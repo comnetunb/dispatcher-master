@@ -1,5 +1,4 @@
 const User = databaseRequire('models/user');
-const config = rootRequire('api/config');
 
 module.exports = (app) => {
   app.post('/api/v1/auth/login', (req, res) => {
@@ -9,19 +8,19 @@ module.exports = (app) => {
       .findOne({ email })
       .then((user) => {
         if (!user) {
-          res.status(404).json({ reason: 'User not found.' });
+          res.status(404).send('User not found.');
           return;
         }
 
         if (!user.validPassword(password)) {
-          res.status(401).json({ reason: 'Incorrect password.' });
+          res.status(401).send('Incorrect password.');
           return;
         }
 
-        res.status(200).send({ token: signJWTUser(user) });
+        res.status(200).send({ token: signJWT(user) });
       })
       .catch(() => {
-        res.status(500).json({ reason: 'An internal error occurred.' });
+        res.status(500).send('An internal error occurred.');
       });
   });
 };

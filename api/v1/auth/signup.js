@@ -8,7 +8,7 @@ module.exports = (app) => {
       .count({ email })
       .then((count) => {
         if (count > 0) {
-          res.status(409).send({ reason: 'User already exists.' });
+          res.status(409).send('User already exists.');
           return;
         }
 
@@ -29,12 +29,12 @@ module.exports = (app) => {
                 throw err;
               }
 
-              res.status(200).send({ token: signJWTUser(user) });
+              res.status(200).send({ token: signJWT(user) });
             });
         });
       })
       .catch(() => {
-        res.status(500).send({ reason: 'An internal error occurred. Please try again later.' });
+        res.status(500).send('An internal error occurred. Please try again later.');
       });
   });
 };

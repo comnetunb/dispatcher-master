@@ -13,6 +13,7 @@ const running = require('./v1/admin/task-set/running');
 const finished = require('./v1/admin/task-set/finished');
 const del = require('./v1/admin/task-set/delete');
 const slave = require('./v1/admin/slave/slave');
+const command = require('./v1/admin/slave/command');
 
 const app = express();
 
@@ -28,19 +29,20 @@ module.exports = () => {
   finished(app);
   del(app);
   slave(app);
+  command(app);
 };
 
 global.verifyJWT = (req, res, next) => {
   const token = req.headers['x-access-token'];
 
   if (!token) {
-    res.status(401).json({ reason: 'No token provided.' });
+    res.status(401).send('No token provided.');
     return;
   }
 
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err) {
-      res.status(500).json({ reason: 'Failed to authenticate token.' });
+      res.status(401).send(`Token verification failed: ${err.message}`);
       return;
     }
 
@@ -50,7 +52,7 @@ global.verifyJWT = (req, res, next) => {
   });
 }
 
-global.signJWTUser = (user) => {
+global.signJWT = (user) => {
   return jwt.sign({ id: user._id }, config.secret, {
     expiresIn: config.expiresIn
   });
