@@ -1,9 +1,3 @@
-/*
- *
- * Copyright (c) 2017 Matheus Medeiros Sarmento
- *
- */
-
 /* eslint global-require: 0 */
 /* eslint import/no-dynamic-require: 0 */
 
@@ -12,7 +6,7 @@ global.rootRequire = (name) => {
 };
 
 global.protocolRequire = (name) => {
-  return require(`${__dirname}/../protocol/${name}`);
+  return require(`${__dirname}/DisysBot-Protocol/${name}`);
 };
 
 global.dispatcherRequire = (name) => {
