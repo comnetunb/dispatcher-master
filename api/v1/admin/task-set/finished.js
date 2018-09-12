@@ -2,7 +2,7 @@ const TaskSet = databaseRequire('models/task_set');
 const config = rootRequire('api/config');
 
 module.exports = (app) => {
-  app.get('/api/v1/taskset/running', (req, res) => {
+  app.get('/api/v1/taskset/finished', (req, res) => {
     const { token } = req.query;
 
     if (!token) {
@@ -18,7 +18,7 @@ module.exports = (app) => {
 
       const taskSetFilter = {
         _user: decoded.id,
-        state: TaskSet.State.EXECUTING
+        state: TaskSet.State.FINISHED
       };
 
       TaskSet

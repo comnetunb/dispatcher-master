@@ -1,8 +1,8 @@
-const TaskSet = databaseRequire('models/task_set');
+const Worker = databaseRequire('models/worker');
 const config = rootRequire('api/config');
 
 module.exports = (app) => {
-  app.get('/api/v1/taskset/running', (req, res) => {
+  app.get('/api/v1/slave', (req, res) => {
     const { token } = req.query;
 
     if (!token) {
@@ -16,17 +16,11 @@ module.exports = (app) => {
         return;
       }
 
-      const taskSetFilter = {
-        _user: decoded.id,
-        state: TaskSet.State.EXECUTING
-      };
-
-      TaskSet
-        .find(taskSetFilter)
-        .then((taskSets) => {
-          res.status(200).json({ data: taskSets });
-        })
-        .catch((e) => {
+      Worker
+        .find({})
+        .then((workers) => {
+          res.status(200).json({ data: workers });
+        }).catch((e) => {
           res.status(412).json({ reason: e });
         });
     });
