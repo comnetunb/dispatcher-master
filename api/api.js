@@ -7,13 +7,26 @@ const log = rootRequire('servers/shared/log');
 
 const config = rootRequire('api/config');
 
-const login = require('./v1/auth/login');
-const signUp = require('./v1/auth/signup');
-const running = require('./v1/admin/task-set/running');
-const finished = require('./v1/admin/task-set/finished');
-const del = require('./v1/admin/task-set/delete');
-const slave = require('./v1/admin/slave/slave');
-const command = require('./v1/admin/slave/command');
+const apis = {
+  auth: {
+    login: require('./v1/auth/login'),
+    signUp: require('./v1/auth/signup'),
+  },
+  admin: {
+    taskSet: {
+      running: require('./v1/admin/task-set/running'),
+      finished: require('./v1/admin/task-set/finished'),
+      delete: require('./v1/admin/task-set/delete'),
+    },
+    slave: {
+      slave: require('./v1/admin/slave/slave'),
+      command: require('./v1/admin/slave/command'),
+    },
+    log: {
+      log: require('./v1/admin/sys-log/sys-log')
+    }
+  }
+}
 
 const app = express();
 
@@ -23,14 +36,20 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(cors());
 
 module.exports = () => {
-  login(app);
-  signUp(app);
-  running(app);
-  finished(app);
-  del(app);
-  slave(app);
-  command(app);
+  walk(apis, (api) => {
+    api(app);
+  });
 };
+
+const walk = (obj, cb) => {
+  for (var key in obj) {
+    if (Object.keys(obj[key]).length > 0) {
+      walk(obj[key], cb);
+    } else {
+      cb(obj[key])
+    }
+  }
+}
 
 global.verifyJWT = (req, res, next) => {
   const token = req.headers['x-access-token'];
