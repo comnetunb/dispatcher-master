@@ -2,7 +2,12 @@ const User = databaseRequire('models/user');
 
 module.exports = (app) => {
   app.post('/api/v1/auth/signup', (req, res) => {
-    const { email, name, password } = req.body;
+    const { email, name, password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+      res.status(409).send('Passwords mismatched.');
+      return;
+    }
 
     User
       .count({ email })
