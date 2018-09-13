@@ -1,3 +1,4 @@
+/* eslint global-require: 0 */
 global.jwt = require('jsonwebtoken');
 
 const express = require('express');
@@ -26,7 +27,7 @@ const apis = {
       log: require('./v1/admin/sys-log/sys-log')
     }
   }
-}
+};
 
 const app = express();
 
@@ -35,21 +36,21 @@ app.use(require('body-parser').urlencoded({ extended: true }));
 
 app.use(cors());
 
+const walk = (obj, cb) => {
+  Object.keys(obj).forEach((key) => {
+    if (Object.keys(obj[key]).length > 0) {
+      walk(obj[key], cb);
+    } else {
+      cb(obj[key]);
+    }
+  });
+};
+
 module.exports = () => {
   walk(apis, (api) => {
     api(app);
   });
 };
-
-const walk = (obj, cb) => {
-  for (var key in obj) {
-    if (Object.keys(obj[key]).length > 0) {
-      walk(obj[key], cb);
-    } else {
-      cb(obj[key])
-    }
-  }
-}
 
 global.verifyJWT = (req, res, next) => {
   const token = req.headers['x-access-token'];
@@ -69,13 +70,13 @@ global.verifyJWT = (req, res, next) => {
 
     next();
   });
-}
+};
 
 global.signJWT = (user) => {
   return jwt.sign({ id: user._id }, config.secret, {
     expiresIn: config.expiresIn
   });
-}
+};
 
 const PORT = 80;
 

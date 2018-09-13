@@ -7,7 +7,6 @@ const getReport = protocolRequire('dwp/pdu/get_report');
 const performCommand = protocolRequire('dwp/pdu/perform_command');
 
 module.exports = (app) => {
-
   app.post('/api/v1/slave/pause', verifyJWT, (req, res) => {
     const { id } = req.body;
 
@@ -55,3 +54,4 @@ sendCommand = (req, res, id, command) => {
       res.status(500).send(e);
     });
 }
+;
