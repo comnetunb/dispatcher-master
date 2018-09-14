@@ -1,13 +1,25 @@
 module.exports = {
-  computeTablefication: (data, sort, page, perPage, filter) => {
+  getSortFilter: (query) => {
+    const field = query.split("|")[0] || '';
+    const criteria = query.split("|")[1] || '';
+
+    let filter = {};
+
+    if (field && criteria) {
+      filter[field] = criteria;
+    }
+
+    return filter;
+  },
+  computeTablefication: (data, page, perPage, filter) => {
     const filteredData = data;
 
     const lastPage = Math.ceil(filteredData.length / perPage);
     const currentPage = (page > lastPage) ? lastPage : page;
     const from = ((currentPage - 1) * perPage) + 1;
-    const to = ((from + perPage) - 1 > filteredData.length) ?
-      filteredData.length :
-      (from + perPage) - 1;
+    const to = ((from + perPage) - 1 > filteredData.length)
+      ? filteredData.length
+      : (from + perPage) - 1;
 
     return {
       total: filteredData.length,
