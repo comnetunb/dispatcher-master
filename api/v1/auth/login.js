@@ -17,7 +17,7 @@ module.exports = (app) => {
           return;
         }
 
-        res.status(200).send({ token: signJWT(user) });
+        res.status(200).send({ token: signJWT(user), isAdmin: user.admin });
       })
       .catch(() => {
         res.status(500).send('An internal error occurred.');

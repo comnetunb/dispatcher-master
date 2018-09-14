@@ -34,7 +34,7 @@ module.exports = (app) => {
                 throw err;
               }
 
-              res.status(200).send({ token: signJWT(user) });
+              res.status(200).send({ token: signJWT(user), isAdmin: user.admin });
             });
         });
       })
