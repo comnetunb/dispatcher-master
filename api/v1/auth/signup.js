@@ -1,4 +1,5 @@
 const User = databaseRequire('models/user');
+const config = rootRequire('api/config');
 
 module.exports = (app) => {
   app.post('/api/v1/auth/signup', (req, res) => {
@@ -34,7 +35,10 @@ module.exports = (app) => {
                 throw err;
               }
 
-              res.status(200).send({ token: signJWT(user), isAdmin: user.admin });
+              res
+                .cookie('DISYSBOT_SID', signJWT(user), { maxAge: config.expiresIn })
+                .status(200)
+                .send({});
             });
         });
       })

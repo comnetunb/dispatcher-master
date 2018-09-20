@@ -1,4 +1,5 @@
 const User = databaseRequire('models/user');
+const config = rootRequire('api/config');
 
 module.exports = (app) => {
   app.post('/api/v1/auth/login', (req, res) => {
@@ -17,7 +18,10 @@ module.exports = (app) => {
           return;
         }
 
-        res.status(200).send({ token: signJWT(user), isAdmin: user.admin });
+        res
+          .cookie('DISYSBOT_SID', signJWT(user), { maxAge: config.expiresIn })
+          .status(200)
+          .send({});
       })
       .catch(() => {
         res.status(500).send('An internal error occurred.');

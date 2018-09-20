@@ -1,16 +1,16 @@
-const Worker = databaseRequire('models/worker');
+const Slave = databaseRequire('models/slave');
 const util = rootRequire('api/util');
 
 module.exports = (app) => {
   app.get('/api/v1/slave', verifyJWT, (req, res) => {
     const sortFilter = util.getSortFilter(req.query.sort);
 
-    Worker
+    Slave
       .find({})
       .sort(sortFilter)
-      .then((workers) => {
+      .then((slaves) => {
         const response = util.computeTablefication(
-          workers,
+          slaves,
           parseInt(req.query.page, 10),
           parseInt(req.query.per_page, 10),
           req.query.filter

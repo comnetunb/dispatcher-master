@@ -1,7 +1,7 @@
 module.exports = {
   getSortFilter: (query) => {
-    const field = query.split("|")[0] || '';
-    const criteria = query.split("|")[1] || '';
+    const field = query.split("|")[0] || null;
+    const criteria = query.split("|")[1] || null;
 
     let filter = {};
 

@@ -1,6 +1,6 @@
-const Worker = databaseRequire('models/worker');
+const Slave = databaseRequire('models/slave');
 const { Command } = protocolRequire('dwp/pdu/perform_command');
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
+const connectionManager = rootRequire('servers/master/connection_manager');
 
 const { Flags } = protocolRequire('dwp/common');
 const getReport = protocolRequire('dwp/pdu/get_report');
@@ -27,26 +27,26 @@ module.exports = (app) => {
 };
 
 sendCommand = (req, res, id, command) => {
-  // TODO: Validate if user has permission to send a command to this worker
+  // TODO: Validate if user has permission to send a command to this slave
 
   if (!id) {
     res.status(412).send('No ID was given.');
     return;
   }
 
-  Worker
+  Slave
     .findById(id)
-    .then((worker) => {
-      if (!worker) {
+    .then((slave) => {
+      if (!slave) {
         res.status(412).send(e);
         return;
       }
 
-      connectionManager.send(worker.uuid, performCommand.format({ command }));
+      connectionManager.send(slave.uuid, performCommand.format({ command }));
 
       const flags = Flags.STATE | Flags.TASKS;
 
-      connectionManager.send(worker.uuid, getReport.format({ flags }));
+      connectionManager.send(slave.uuid, getReport.format({ flags }));
 
       res.status(200).send({});
     })
