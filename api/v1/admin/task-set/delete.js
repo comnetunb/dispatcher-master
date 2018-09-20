@@ -9,7 +9,7 @@ module.exports = (app) => {
       .findById(id)
       .remove()
       .then(() => {
-        res.status(200).send();
+        res.status(200).send({});
       })
       .catch((e) => {
         res.status(412).json({ reason: e });

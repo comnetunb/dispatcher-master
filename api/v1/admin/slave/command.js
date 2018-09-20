@@ -48,7 +48,7 @@ sendCommand = (req, res, id, command) => {
 
       connectionManager.send(worker.uuid, getReport.format({ flags }));
 
-      res.status(200).send();
+      res.status(200).send({});
     })
     .catch((e) => {
       res.status(500).send(e);

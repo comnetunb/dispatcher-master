@@ -25,6 +25,9 @@ const apis = {
     },
     log: {
       log: require('./v1/admin/sys-log/sys-log')
+    },
+    settings: {
+      settings: require('./v1/admin/settings/settings')
     }
   }
 };
