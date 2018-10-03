@@ -8,16 +8,16 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const { WorkerState } = protocolRequire('dwp/common'); // eslint-disable-line no-undef
+const { SlaveState } = protocolRequire('dwp/common'); // eslint-disable-line no-undef
 
 const Task = rootRequire('database/models/task'); // eslint-disable-line no-undef
 
 const State = {
-  EXECUTING: WorkerState.EXECUTING,
-  PAUSED: WorkerState.PAUSED
+  EXECUTING: SlaveState.EXECUTING,
+  PAUSED: SlaveState.PAUSED
 };
 
-const workerSchema = Schema({
+const slaveSchema = Schema({
   address: {
     type: String,
     required: true
@@ -58,7 +58,7 @@ const workerSchema = Schema({
   }
 });
 
-workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { // eslint-disable-line
+slaveSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { // eslint-disable-line
   const filter = {
     'resource.outdated': false,
     'resource.cpu': { $gt: cpuThreshold },
@@ -68,25 +68,25 @@ workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { 
 
   return this
     .find(filter)
-    .then((availableWorkers) => {
-      return availableWorkers;
+    .then((availableSlaves) => {
+      return availableSlaves;
     });
 };
 
-workerSchema.statics.State = State;
+slaveSchema.statics.State = State;
 
-workerSchema.methods.updateRunningInstances = function () { // eslint-disable-line func-names
-  const worker = this;
+slaveSchema.methods.updateRunningInstances = function () { // eslint-disable-line func-names
+  const slave = this;
   return Task
-    .count({ worker: worker.uuid })
+    .count({ slave: slave.uuid })
     .then((count) => {
-      worker.runningInstances = count;
-      return worker.save();
+      slave.runningInstances = count;
+      return slave.save();
     });
 };
 
-workerSchema.index({ address: 1, port: 1 }, { unique: true });
+slaveSchema.index({ address: 1, port: 1 }, { unique: true });
 
-const model = mongoose.model('worker', workerSchema);
+const model = mongoose.model('slave', slaveSchema);
 
 module.exports = model;

@@ -20,7 +20,7 @@ const log = rootRequire('servers/shared/log');
 // Protocol Related
 const factory = protocolRequire('dwp/factory');
 
-// TCP socket in which all the dispatcher-workers communication will be accomplished
+// TCP socket in which all the dispatcher-slaves communication will be accomplished
 const server = net.createServer();
 
 module.exports.execute = () => {
@@ -58,7 +58,7 @@ module.exports.execute = () => {
     connection.on('error', () => { });
   });
 
-  // Open worker
+  // Open slave
   server.listen(16180, '0.0.0.0', () => {
     log.info(`TCP server listening ${server.address().address}:${server.address().port}`);
   });
