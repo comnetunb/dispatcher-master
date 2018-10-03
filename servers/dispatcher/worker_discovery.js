@@ -43,7 +43,7 @@ module.exports.execute = () => {
   });
 
   socket.on('message', (message, rinfo) => {
-    if (message.indexOf('NewWorker') <= -1) {
+    if (message.indexOf('NewSlave') <= -1) {
       // Discard this message
       log.error(`Invalid message! ${message} from ${rinfo.address}`);
       return;
