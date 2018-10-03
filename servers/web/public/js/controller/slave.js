@@ -1,4 +1,4 @@
-app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
+app.controller('slaveCtrl', function ($scope, $rootScope, $http, $interval) {
   $rootScope.sidebar = true;
 
   $scope.threshold = {
@@ -12,10 +12,10 @@ app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
   $scope.start = function () {
     $scope.stop();
 
-    getAllWorkers($scope, $rootScope, $http, $interval);
+    getAllSlaves($scope, $rootScope, $http, $interval);
 
     promise = $interval(function () {
-      getAllWorkers($scope, $rootScope, $http, $interval);
+      getAllSlaves($scope, $rootScope, $http, $interval);
     }, 1500);
   };
 
@@ -30,10 +30,10 @@ app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
   });
 });
 
-function getAllWorkers($scope, $rootScope, $http) {
+function getAllSlaves($scope, $rootScope, $http) {
   $http
-    .get('/api/worker/get_all')
+    .get('/api/slave/get_all')
     .then((response) => {
-      $scope.workers = response.data;
+      $scope.slaves = response.data;
     });
 }

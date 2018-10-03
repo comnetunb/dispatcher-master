@@ -13,11 +13,11 @@ const log = rootRequire('servers/shared/log');
 const flags = protocolRequire('dwp/common').Flags;
 const terminateTask = protocolRequire('dwp/pdu/terminate_task');
 
-module.exports.execute = (pdu, worker) => {
+module.exports.execute = (pdu, slave) => {
   if (pdu.flags & flags.RESOURCE) {
-    worker.resource.outdated = false;
-    worker.resource.cpu = pdu.resource.cpu;
-    worker.resource.memory = pdu.resource.memory;
+    slave.resource.outdated = false;
+    slave.resource.cpu = pdu.resource.cpu;
+    slave.resource.memory = pdu.resource.memory;
   }
 
   if (pdu.flags & flags.TASKS) {
@@ -32,29 +32,29 @@ module.exports.execute = (pdu, worker) => {
 
           if (task.isFinished() || task.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id }));
+            connectionManager.send(slave.uuid, terminateTask.format({ taskId: taskReceived.id }));
             return;
           }
 
-          if (task.worker) {
-            // There is a worker executing this instance already
+          if (task.slave) {
+            // There is a slave executing this instance already
             if (task.startTime < taskReceived.startTime) {
-              // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id })); // eslint-disable-line
+              // Evaluating by the time they started, the 'older' slave will finish faster
+              connectionManager.send(slave.uuid, terminateTask.format({ taskId: taskReceived.id })); // eslint-disable-line
               return;
             }
 
-            // Evaluating by the time they started, the 'newer' worker will finish faster
-            connectionManager.send(task.worker, terminateTask.format({ taskId: taskReceived.id }));
+            // Evaluating by the time they started, the 'newer' slave will finish faster
+            connectionManager.send(task.slave, terminateTask.format({ taskId: taskReceived.id }));
           }
 
-          // Associate this instance to this worker
-          task.worker = worker.uuid;
+          // Associate this instance to this slave
+          task.slave = slave.uuid;
           task.save();
         });
     }))
       .then(() => {
-        const taskFilter = { worker: worker.uuid };
+        const taskFilter = { slave: slave.uuid };
 
         return Task
           .find(taskFilter)
@@ -76,7 +76,7 @@ module.exports.execute = (pdu, worker) => {
           });
       })
       .then(() => {
-        worker.updateRunningInstances();
+        slave.updateRunningInstances();
       })
       .catch((e) => {
         log.fatal(e);
@@ -84,14 +84,14 @@ module.exports.execute = (pdu, worker) => {
   }
 
   if (pdu.flags & flags.STATE) {
-    worker.state = pdu.state;
+    slave.state = pdu.state;
   }
 
   if (pdu.flags & flags.ALIAS) {
-    worker.alias = pdu.alias;
+    slave.alias = pdu.alias;
   }
 
-  worker
+  slave
     .save()
     .catch((e) => {
       log.fatal(e);

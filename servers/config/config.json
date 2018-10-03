@@ -5,7 +5,7 @@
    "memory": {
       "threshold": 0
    },
-   "workerPerformance": {
+   "slavePerformance": {
       "threshold": 0.25
    },
    "requestResourceInterval": 1,

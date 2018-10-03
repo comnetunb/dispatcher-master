@@ -5,16 +5,16 @@ dashboard.config(function ($routeProvider /* , $locationProvider */) {
   // $locationProvider.html5Mode(true)
 
   $routeProvider
-    .when('/workers', {
-      templateUrl: 'workers.html',
-      controller: 'workerCtrl'
+    .when('/slaves', {
+      templateUrl: 'slaves.html',
+      controller: 'slaveCtrl'
     })
     .when('/active', {
       templateUrl: 'active.html',
       controller: 'taskCtrl'
     })
     .otherwise({
-      redirectTo: '/workers'
+      redirectTo: '/slaves'
     });
 });
 
@@ -36,25 +36,25 @@ dashboard.controller('navigationCtrl', function ($scope, $http, $rootScope, $win
   };
 });
 
-dashboard.controller('workerCtrl', function ($scope, $http, $interval) {
+dashboard.controller('slaveCtrl', function ($scope, $http, $interval) {
   $scope.threshold = {
     0: { color: 'green' },
     50: { color: 'orange' },
     80: { color: 'red' }
   };
 
-  getAllWorkers($scope, $http);
+  getAllSlaves($scope, $http);
 
   $interval(function () {
-    getAllWorkers($scope, $http);
+    getAllSlaves($scope, $http);
   }, 1500);
 });
 
-function getAllWorkers($scope, $http) {
+function getAllSlaves($scope, $http) {
   $http
-    .get('/api/worker/getAll')
+    .get('/api/slave/getAll')
     .then(function (response) {
-      $scope.workers = response.data;
+      $scope.slaves = response.data;
     });
 }
 

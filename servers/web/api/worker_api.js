@@ -1,30 +1,30 @@
 
-const Worker = databaseRequire('models/worker');
+const Slave = databaseRequire('models/slave');
 const log = rootRequire('servers/shared/log');
 
 const interfaceManager = rootRequire('servers/shared/interface_manager');
 
 module.exports = (app) => {
-  app.post('/api/worker/pause', (req, res) => {
-    interfaceManager.pauseWorker(req.body.address);
+  app.post('/api/slave/pause', (req, res) => {
+    interfaceManager.pauseSlave(req.body.address);
     res.send();
   });
 
-  app.post('/api/worker/resume', (req, res) => {
-    interfaceManager.resumeWorker(req.body.address);
+  app.post('/api/slave/resume', (req, res) => {
+    interfaceManager.resumeSlave(req.body.address);
     res.send();
   });
 
-  app.post('/api/worker/stop', (req, res) => {
-    interfaceManager.stopWorker(req.body.address);
+  app.post('/api/slave/stop', (req, res) => {
+    interfaceManager.stopSlave(req.body.address);
     res.send();
   });
 
-  app.get('/api/worker/get_all', (req, res) => {
-    Worker
+  app.get('/api/slave/get_all', (req, res) => {
+    Slave
       .find({}, '-_id')
-      .then((workers) => {
-        res.send(workers);
+      .then((slaves) => {
+        res.send(slaves);
       }).catch((e) => {
         log.error(e);
       });

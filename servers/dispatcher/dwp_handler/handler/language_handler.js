@@ -6,7 +6,7 @@ const mapLanguageCommand = {
   java: 'java -version'
 };
 
-module.exports.getCommands = (pdu, worker) => {
+module.exports.getCommands = (pdu, slave) => {
   const languages = pdu.names;
   const languageCommands = [];
   const { length } = languages;
@@ -17,5 +17,5 @@ module.exports.getCommands = (pdu, worker) => {
     });
   }
 
-  connectionManager.send(worker.uuid, languageCommand.format({ languages: languageCommands }));
+  connectionManager.send(slave.uuid, languageCommand.format({ languages: languageCommands }));
 };
