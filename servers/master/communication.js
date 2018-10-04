@@ -11,8 +11,8 @@ const EventEmitter = require('events');
 const event = new EventEmitter();
 module.exports.event = event;
 
-// Dispatcher Related
-const dwpManager = rootRequire('servers/dispatcher/dwp_handler/manager');
+// Master Related
+const dwpManager = rootRequire('servers/master/dwp_handler/manager');
 
 // Shared Related
 const log = rootRequire('servers/shared/log');
@@ -20,7 +20,7 @@ const log = rootRequire('servers/shared/log');
 // Protocol Related
 const factory = protocolRequire('dwp/factory');
 
-// TCP socket in which all the dispatcher-workers communication will be accomplished
+// TCP socket in which all the master-slaves communication will be accomplished
 const server = net.createServer();
 
 module.exports.execute = () => {
@@ -55,10 +55,10 @@ module.exports.execute = () => {
       }
     });
 
-    connection.on('error', () => {});
+    connection.on('error', () => { });
   });
 
-  // Open worker
+  // Open slave
   server.listen(16180, '0.0.0.0', () => {
     log.info(`TCP server listening ${server.address().address}:${server.address().port}`);
   });

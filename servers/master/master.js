@@ -4,10 +4,10 @@
  *
  */
 
-// Dispatcher Related
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
-const communication = rootRequire('servers/dispatcher/communication');
-const workerDiscovery = rootRequire('servers/dispatcher/worker_discovery');
+// Master Related
+const connectionManager = rootRequire('servers/master/connection_manager');
+const communication = rootRequire('servers/master/communication');
+const slaveDiscovery = rootRequire('servers/master/slave_discovery');
 
 // Shared Related
 const log = rootRequire('servers/shared/log');
@@ -16,7 +16,7 @@ const interfaceManagerEvent = rootRequire('servers/shared/interface_manager').ev
 
 // Database Related
 const Task = databaseRequire('models/task');
-const Worker = rootRequire('database/models/worker');
+const Slave = rootRequire('database/models/slave');
 
 // Protocol Related
 const { Flags } = protocolRequire('dwp/common');
@@ -30,7 +30,7 @@ module.exports = () => {
       .then(() => {
         // After cleanUp, start all services
         communication.execute();
-        workerDiscovery.execute();
+        slaveDiscovery.execute();
 
         // Routines
         requestResourceRoutine();
@@ -62,16 +62,16 @@ function batchDispatchRoutine() {
 }
 
 /**
- * Retrieve number of workers that fit in cpu and memory threshold. With this
+ * Retrieve number of slaves that fit in cpu and memory threshold. With this
  * number (n) in hands, make a top 'n' select of pending tasks and dispatch it
- * to all those workers
+ * to all those slaves
  */
 
 function batchDispatch() {
-  Worker
+  Slave
     .getAvailables(config.cpu.threshold, config.memory.threshold)
-    .then((availableWorkers) => {
-      if (!availableWorkers || !availableWorkers.length) {
+    .then((availableSlaves) => {
+      if (!availableSlaves || !availableSlaves.length) {
         return;
       }
 
@@ -90,7 +90,7 @@ function batchDispatch() {
         .find(taskFilter)
         .populate(taskPopulate)
         .sort({ precedence: 1 })
-        .limit(availableWorkers.length)
+        .limit(availableSlaves.length)
         .then((tasks) => {
           if (!tasks) {
             // No tasks are pending
@@ -100,7 +100,7 @@ function batchDispatch() {
           tasks
             .forEach((task, index) => {
               task.state = Task.State.SENT;
-              task.worker = availableWorkers[index].uuid;
+              task.slave = availableSlaves[index].uuid;
 
               return task
                 .save()
@@ -114,12 +114,12 @@ function batchDispatch() {
                     files
                   });
 
-                  connectionManager.send(availableWorkers[index].uuid, pdu);
+                  connectionManager.send(availableSlaves[index].uuid, pdu);
 
                   const taskSetName = task._taskSet.name;
 
                   log.info(`Dispatched task with precedence ${task.precedence} from set`
-                    + `${taskSetName} to ${availableWorkers[index].address}`);
+                    + `${taskSetName} to ${availableSlaves[index].address}`);
 
                   // If after X seconds it is still 'Sent', return it to its default state
                   setTimeout(() => {
@@ -131,7 +131,7 @@ function batchDispatch() {
                         }
 
                         if (taskRefreshed.isSent()) {
-                          log.warn(`Timeout from worker ${availableWorkers[index].address}:${availableWorkers[index].port}`);
+                          log.warn(`Timeout from slave ${availableSlaves[index].address}:${availableSlaves[index].port}`);
                           return Task.updateToDefaultState(taskRefreshed._id);
                         }
                         return undefined;
@@ -157,7 +157,7 @@ function cleanUp() {
 
   const taskUpdate = {
     state: Task.State.PENDING,
-    $unset: { worker: 1, startTime: 1 }
+    $unset: { slave: 1, startTime: 1 }
   };
 
   const promises = [];
@@ -166,28 +166,28 @@ function cleanUp() {
     .push(Task
       .update(taskFilter, taskUpdate, { multi: true }));
 
-  // Remove all workers since it is the dispatcher startup
-  promises.push(Worker.remove({}));
+  // Remove all slaves since it is the master startup
+  promises.push(Slave.remove({}));
 
   return Promise.all(promises);
 }
 
 // TODO: use uuid instead of address
-interfaceManagerEvent.on('worker_command', (address, command) => {
-  const workerFilter = { address };
+interfaceManagerEvent.on('slave_command', (address, command) => {
+  const slaveFilter = { address };
 
-  Worker
-    .findOne(workerFilter)
-    .then((worker) => {
-      if (!worker) {
-        throw String('Worker not found');
+  Slave
+    .findOne(slaveFilter)
+    .then((slave) => {
+      if (!slave) {
+        throw String('Slave not found');
       }
 
-      connectionManager.send(worker.uuid, performCommand.format({ command }));
+      connectionManager.send(slave.uuid, performCommand.format({ command }));
 
       const flags = Flags.STATE | Flags.TASKS;
 
-      connectionManager.send(worker.uuid, getReport.format({ flags }));
+      connectionManager.send(slave.uuid, getReport.format({ flags }));
     })
     .catch((e) => {
       log.fatal(e);

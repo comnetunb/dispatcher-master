@@ -33,9 +33,9 @@ app.config(function ($routeProvider /* , $locationProvider */) {
       controller: 'signInCtrl',
       auth: false
     })
-    .when('/workers', {
-      templateUrl: 'views/dashboard/workers.html',
-      controller: 'workerCtrl',
+    .when('/slaves', {
+      templateUrl: 'views/dashboard/slaves.html',
+      controller: 'slaveCtrl',
       auth: true
     })
     .when('/executing', {

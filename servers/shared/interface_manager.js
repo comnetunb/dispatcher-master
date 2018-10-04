@@ -1,7 +1,7 @@
 /*
  * This module is responsible for every
  * direct communication between the interface
- * and the dispatcher.
+ * and the master.
  * This communication is done through Events
  */
 
@@ -13,14 +13,14 @@ const event = new EventEmitter();
 
 module.exports.event = event;
 
-module.exports.pauseWorker = (address) => {
-  event.emit('worker_command', address, Command.PAUSE);
+module.exports.pauseSlave = (address) => {
+  event.emit('slave_command', address, Command.PAUSE);
 };
 
-module.exports.resumeWorker = (address) => {
-  event.emit('worker_command', address, Command.RESUME);
+module.exports.resumeSlave = (address) => {
+  event.emit('slave_command', address, Command.RESUME);
 };
 
-module.exports.stopWorker = (address) => {
-  event.emit('worker_command', address, Command.STOP);
+module.exports.stopSlave = (address) => {
+  event.emit('slave_command', address, Command.STOP);
 };

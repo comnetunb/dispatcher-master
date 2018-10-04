@@ -1,0 +1,43 @@
+﻿<div class="content-wrapper">
+  <div class="container-fluid">
+    <h3 class="text-center">Running</h3>
+    <hr />
+
+    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(slaves | filter: { state: 0 }).length">
+      <i class="fa fa-fw fa-info-circle"></i> You currently have no running slaves.
+    </div>
+
+    <div gridster>
+      <ul>
+        <li class="outer" gridster-item="item" ng-repeat="slave in slaves track by slave.uuid" ng-show="slave.state === 0">
+          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{slave.runningInstances}} Tasks</span> <strong>{{slave.alias}} {{slave.address}}</strong></div>
+          <hr />
+          <div class="inner">
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - slave.resource.cpu ) * 100" cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - slave.resource.memory ) * 100" cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <h3 class="text-center">Paused</h3>
+    <hr />
+
+    <div class="alert alert-primary text-center" role="alert" ng-cloak ng-if="!(slaves | filter: { state: 1 }).length">
+      <i class="fa fa-fw fa-info-circle"></i> You currently have no paused slaves.
+    </div>
+
+    <div gridster>
+      <ul>
+        <li class="outer" gridster-item="item" ng-repeat="slave in slaves track by slave.uuid" ng-show="slave.state === 1">
+          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{slave.runningInstances}} Tasks</span> <strong>{{slave.alias}} {{slave.address}}</strong></div>
+          <hr />
+          <div class="inner">
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - slave.resource.cpu ) * 100" cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - slave.resource.memory ) * 100" cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

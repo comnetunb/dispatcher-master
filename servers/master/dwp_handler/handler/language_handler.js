@@ -1,4 +1,4 @@
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
+const connectionManager = rootRequire('servers/master/connection_manager');
 const languageCommand = protocolRequire('dwp/pdu/language_command');
 
 const mapLanguageCommand = {
@@ -6,7 +6,7 @@ const mapLanguageCommand = {
   java: 'java -version'
 };
 
-module.exports.getCommands = (pdu, worker) => {
+module.exports.getCommands = (pdu, slave) => {
   const languages = pdu.names;
   const languageCommands = [];
   const { length } = languages;
@@ -17,5 +17,5 @@ module.exports.getCommands = (pdu, worker) => {
     });
   }
 
-  connectionManager.send(worker.uuid, languageCommand.format({ languages: languageCommands }));
+  connectionManager.send(slave.uuid, languageCommand.format({ languages: languageCommands }));
 };

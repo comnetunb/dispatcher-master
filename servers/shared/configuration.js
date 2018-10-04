@@ -37,8 +37,8 @@ function treatDefaultValues() {
     configuration.memory = {};
   }
 
-  if (configuration.workerPerformance === undefined) {
-    configuration.workerPerformance = {};
+  if (configuration.slavePerformance === undefined) {
+    configuration.slavePerformance = {};
   }
 
   if (configuration.transporter === undefined) {
@@ -63,12 +63,12 @@ function treatDefaultValues() {
     configuration.memory.threshold = 0;
   }
 
-  if (configuration.workerPerformance.threshold === undefined || typeof configuration.workerPerformance.threshold === 'string') {
-    configuration.workerPerformance.threshold = 0.25;
-  } else if (configuration.workerPerformance.threshold > 1) {
-    configuration.workerPerformance.threshold = 1;
-  } else if (configuration.workerPerformance.threshold < 0) {
-    configuration.workerPerformance.threshold = 0;
+  if (configuration.slavePerformance.threshold === undefined || typeof configuration.slavePerformance.threshold === 'string') {
+    configuration.slavePerformance.threshold = 0.25;
+  } else if (configuration.slavePerformance.threshold > 1) {
+    configuration.slavePerformance.threshold = 1;
+  } else if (configuration.slavePerformance.threshold < 0) {
+    configuration.slavePerformance.threshold = 0;
   }
 
   if (configuration.requestResourceInterval === undefined || typeof configuration.requestResourceInterval === 'string') {

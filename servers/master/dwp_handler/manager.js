@@ -10,18 +10,18 @@ const uuidv1 = require('uuid/v1');
 // Shared Related
 const log = rootRequire('servers/shared/log');
 
-// Dispatcher Related
-const communicationEvent = rootRequire('servers/dispatcher/communication').event;
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
-const performTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/perform_task_response_handler');
-const reportHandler = rootRequire('servers/dispatcher/dwp_handler/handler/report_handler');
-const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/task_result_handler');
-const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler');
-const languageHandler = rootRequire('servers/dispatcher/dwp_handler/handler/language_handler');
+// Master Related
+const communicationEvent = rootRequire('servers/master/communication').event;
+const connectionManager = rootRequire('servers/master/connection_manager');
+const performTaskResponseHandler = rootRequire('servers/master/dwp_handler/handler/perform_task_response_handler');
+const reportHandler = rootRequire('servers/master/dwp_handler/handler/report_handler');
+const taskResultHandler = rootRequire('servers/master/dwp_handler/handler/task_result_handler');
+const terminateTaskResponseHandler = rootRequire('servers/master/dwp_handler/handler/terminate_task_response_handler');
+const languageHandler = rootRequire('servers/master/dwp_handler/handler/language_handler');
 
 // Database Related
 const Task = rootRequire('database/models/task');
-const Worker = rootRequire('database/models/worker');
+const Slave = rootRequire('database/models/slave');
 
 // Protocol Related
 const factory = protocolRequire('dwp/factory');
@@ -30,21 +30,21 @@ const { Flags } = protocolRequire('dwp/common');
 const getReport = protocolRequire('dwp/pdu/get_report');
 
 communicationEvent.on('new_connection', (connection) => {
-  const worker = new Worker({
+  const slave = new Slave({
     address: connection.remoteAddress,
     port: connection.remotePort,
     uuid: uuidv1()
   });
 
-  worker
+  slave
     .save()
-    .then((newWorker) => {
-      connectionManager.add(newWorker.uuid, connection);
+    .then((newSlave) => {
+      connectionManager.add(newSlave.uuid, connection);
 
       // Ask everything
       const flags = (Flags.RESOURCE | Flags.TASKS | Flags.STATE | Flags.ALIAS);
 
-      connectionManager.send(newWorker.uuid, getReport.format({ flags }));
+      connectionManager.send(newSlave.uuid, getReport.format({ flags }));
     })
     .catch((e) => {
       log.fatal(e);
@@ -54,7 +54,7 @@ communicationEvent.on('new_connection', (connection) => {
 communicationEvent.on('closed_connection', (connection) => {
   connectionManager.remove(connection.id);
 
-  const taskFilter = { worker: connection.id };
+  const taskFilter = { slave: connection.id };
 
   Task
     .find(taskFilter, '_id')
@@ -67,7 +67,7 @@ communicationEvent.on('closed_connection', (connection) => {
       log.fatal(e);
     });
 
-  Worker
+  Slave
     .find({ uuid: connection.id })
     .remove()
     .catch((e) => {
@@ -87,40 +87,40 @@ module.exports.treat = (packet, socket) => {
 
   const filter = { address: socket.remoteAddress, port: socket.remotePort };
 
-  return Worker
+  return Slave
     .findOne(filter)
-    .then((worker) => {
-      if (!worker) {
-        throw String('Worker not found');
+    .then((slave) => {
+      if (!slave) {
+        throw String('Slave not found');
       }
 
-      chooseHandler(pdu, worker);
+      chooseHandler(pdu, slave);
     })
     .catch((e) => {
       log.fatal(e);
     });
 };
 
-function chooseHandler(pdu, worker) {
+function chooseHandler(pdu, slave) {
   switch (pdu.header.id) {
     case Id.REPORT:
-      reportHandler.execute(pdu, worker);
+      reportHandler.execute(pdu, slave);
       break;
 
     case Id.PERFORM_TASK_RESPONSE:
-      performTaskResponseHandler.execute(pdu, worker);
+      performTaskResponseHandler.execute(pdu, slave);
       break;
 
     case Id.TASK_RESULT:
-      taskResultHandler.execute(pdu, worker);
+      taskResultHandler.execute(pdu, slave);
       break;
 
     case Id.TERMINATE_TASK_RESPONSE:
-      terminateTaskResponseHandler.execute(pdu, worker);
+      terminateTaskResponseHandler.execute(pdu, slave);
       break;
 
     case Id.GET_LANGUAGE_COMMAND:
-      languageHandler.getCommands(pdu, worker);
+      languageHandler.getCommands(pdu, slave);
       break;
 
     default:
