@@ -1,7 +1,7 @@
 /*
  * This module is responsible for every
  * direct communication between the interface
- * and the dispatcher.
+ * and the master.
  * This communication is done through Events
  */
 

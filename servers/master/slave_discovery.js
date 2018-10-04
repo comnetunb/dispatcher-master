@@ -7,7 +7,7 @@
 const dgram = require('dgram');
 const EventEmitter = require('events');
 
-const communication = rootRequire('servers/dispatcher/communication');
+const communication = rootRequire('servers/master/communication');
 const log = rootRequire('servers/shared/log');
 
 // UDP socket which will receive slaves requests

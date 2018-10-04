@@ -7,7 +7,7 @@
 const terminateTask = protocolRequire('dwp/pdu/terminate_task');
 const { ReturnCode } = protocolRequire('dwp/pdu/perform_task_response');
 const log = rootRequire('servers/shared/log');
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
+const connectionManager = rootRequire('servers/master/connection_manager');
 
 const Task = rootRequire('database/models/task');
 

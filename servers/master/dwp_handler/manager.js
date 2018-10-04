@@ -10,14 +10,14 @@ const uuidv1 = require('uuid/v1');
 // Shared Related
 const log = rootRequire('servers/shared/log');
 
-// Dispatcher Related
-const communicationEvent = rootRequire('servers/dispatcher/communication').event;
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
-const performTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/perform_task_response_handler');
-const reportHandler = rootRequire('servers/dispatcher/dwp_handler/handler/report_handler');
-const taskResultHandler = rootRequire('servers/dispatcher/dwp_handler/handler/task_result_handler');
-const terminateTaskResponseHandler = rootRequire('servers/dispatcher/dwp_handler/handler/terminate_task_response_handler');
-const languageHandler = rootRequire('servers/dispatcher/dwp_handler/handler/language_handler');
+// Master Related
+const communicationEvent = rootRequire('servers/master/communication').event;
+const connectionManager = rootRequire('servers/master/connection_manager');
+const performTaskResponseHandler = rootRequire('servers/master/dwp_handler/handler/perform_task_response_handler');
+const reportHandler = rootRequire('servers/master/dwp_handler/handler/report_handler');
+const taskResultHandler = rootRequire('servers/master/dwp_handler/handler/task_result_handler');
+const terminateTaskResponseHandler = rootRequire('servers/master/dwp_handler/handler/terminate_task_response_handler');
+const languageHandler = rootRequire('servers/master/dwp_handler/handler/language_handler');
 
 // Database Related
 const Task = rootRequire('database/models/task');

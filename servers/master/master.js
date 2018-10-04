@@ -4,10 +4,10 @@
  *
  */
 
-// Dispatcher Related
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
-const communication = rootRequire('servers/dispatcher/communication');
-const slaveDiscovery = rootRequire('servers/dispatcher/slave_discovery');
+// Master Related
+const connectionManager = rootRequire('servers/master/connection_manager');
+const communication = rootRequire('servers/master/communication');
+const slaveDiscovery = rootRequire('servers/master/slave_discovery');
 
 // Shared Related
 const log = rootRequire('servers/shared/log');
@@ -166,7 +166,7 @@ function cleanUp() {
     .push(Task
       .update(taskFilter, taskUpdate, { multi: true }));
 
-  // Remove all slaves since it is the dispatcher startup
+  // Remove all slaves since it is the master startup
   promises.push(Slave.remove({}));
 
   return Promise.all(promises);
