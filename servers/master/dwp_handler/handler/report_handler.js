@@ -4,7 +4,7 @@
  *
  */
 
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
+const connectionManager = rootRequire('servers/master/connection_manager');
 
 const Task = rootRequire('database/models/task');
 

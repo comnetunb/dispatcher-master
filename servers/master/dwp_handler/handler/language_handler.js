@@ -1,4 +1,4 @@
-const connectionManager = rootRequire('servers/dispatcher/connection_manager');
+const connectionManager = rootRequire('servers/master/connection_manager');
 const languageCommand = protocolRequire('dwp/pdu/language_command');
 
 const mapLanguageCommand = {

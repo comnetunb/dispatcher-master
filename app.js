@@ -9,8 +9,8 @@ global.protocolRequire = (name) => {
   return require(`${__dirname}/DisysBot-Protocol/${name}`);
 };
 
-global.dispatcherRequire = (name) => {
-  return require(`${__dirname}/servers/dispatcher/${name}`);
+global.masterRequire = (name) => {
+  return require(`${__dirname}/servers/master/${name}`);
 };
 
 global.webServerRequire = (name) => {
@@ -23,14 +23,14 @@ global.databaseRequire = (name) => {
 
 const webServer = rootRequire('servers/web/service'); // eslint-disable-line
 const dbDriver = rootRequire('database/db_driver'); // eslint-disable-line
-const dispatcher = rootRequire('servers/dispatcher/dispatcher'); // eslint-disable-line
+const master = rootRequire('servers/master/master'); // eslint-disable-line
 const api = rootRequire('api/api');
 
 // Setup Database Driver
 dbDriver()
   .then(() => {
-    // Initialize dispatcher
-    dispatcher();
+    // Initialize master
+    master();
 
     // Initialize WEB Server
     webServer();
