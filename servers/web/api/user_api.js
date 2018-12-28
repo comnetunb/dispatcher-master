@@ -28,8 +28,6 @@ module.exports = (app, passport) => {
 
         const { email, name, password } = req.body;
 
-        console.log(req.body);
-
         User.encryptPassword(password, (e, hash) => {
           if (e) {
             throw e;
@@ -41,12 +39,9 @@ module.exports = (app, passport) => {
             password: hash
           });
 
-          console.log(newUser);
-
           newUser
             .save()
-            .catch((e) => {
-              console.log(e);
+            .catch(() => {
               res.status(500).send({ reason: 'An internal error occurred. Please try again later.' });
             });
         });
