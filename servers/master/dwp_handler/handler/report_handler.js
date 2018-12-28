@@ -4,14 +4,17 @@
  *
  */
 
+
+const dispatcherProtocol = require('dispatcher-protocol');
+
 const connectionManager = rootRequire('servers/master/connection_manager');
 
 const Task = rootRequire('database/models/task');
 
 const log = rootRequire('servers/shared/log');
 
-const flags = protocolRequire('dwp/common').Flags;
-const terminateTask = protocolRequire('dwp/pdu/terminate_task');
+const flags = dispatcherProtocol.common.Flags;
+const { terminateTask } = dispatcherProtocol.pdu;
 
 module.exports.execute = (pdu, slave) => {
   if (pdu.flags & flags.RESOURCE) {

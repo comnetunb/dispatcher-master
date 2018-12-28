@@ -7,6 +7,7 @@
 // General
 const net = require('net');
 const EventEmitter = require('events');
+const dispatcherProtocol = require('dispatcher-protocol');
 
 const event = new EventEmitter();
 module.exports.event = event;
@@ -18,7 +19,7 @@ const dwpManager = rootRequire('servers/master/dwp_handler/manager');
 const log = rootRequire('servers/shared/log');
 
 // Protocol Related
-const factory = protocolRequire('dwp/factory');
+const { factory } = dispatcherProtocol;
 
 // TCP socket in which all the master-slaves communication will be accomplished
 const server = net.createServer();

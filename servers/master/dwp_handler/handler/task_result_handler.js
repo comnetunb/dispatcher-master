@@ -1,6 +1,7 @@
 
-// Protocol Related
-const { ReturnCode } = protocolRequire('dwp/pdu/task_result');
+const dispatcherProtocol = require('dispatcher-protocol');
+
+const { taskResult } = dispatcherProtocol.pdu;
 
 // Database Related
 const Task = rootRequire('database/models/task');
@@ -11,7 +12,7 @@ const mailer = rootRequire('servers/shared/mailer');
 const log = rootRequire('servers/shared/log');
 
 module.exports.execute = (pdu, slave) => {
-  if (pdu.code === ReturnCode.SUCCESS) {
+  if (pdu.code === taskResult.ReturnCode.SUCCESS) {
     // Succeded
     try {
       JSON.parse(pdu.output);

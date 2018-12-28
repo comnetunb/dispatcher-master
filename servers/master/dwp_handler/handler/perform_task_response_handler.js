@@ -4,15 +4,17 @@
  *
  */
 
-const terminateTask = protocolRequire('dwp/pdu/terminate_task');
-const { ReturnCode } = protocolRequire('dwp/pdu/perform_task_response');
+const dispatcherProtocol = require('dispatcher-protocol');
+
 const log = rootRequire('servers/shared/log');
 const connectionManager = rootRequire('servers/master/connection_manager');
 
 const Task = rootRequire('database/models/task');
 
+const { terminateTask, performTaskResponse } = dispatcherProtocol.pdu;
+
 module.exports.execute = (pdu, slave) => {
-  if (pdu.code === ReturnCode.EXECUTING) {
+  if (pdu.code === performTaskResponse.ReturnCode.EXECUTING) {
     Task
       .findById(pdu.task.id)
       .then((task) => {
@@ -42,7 +44,7 @@ module.exports.execute = (pdu, slave) => {
       .catch((e) => {
         log.fatal(e);
       });
-  } else if (pdu.code === ReturnCode.DENIED) {
+  } else if (pdu.code === performTaskResponse.ReturnCode.DENIED) {
     log.warn(`Task was denied by slave ${slave.address}:${slave.port}`);
   } else {
     log.fatal(`Unknown return code ${pdu.code}`);

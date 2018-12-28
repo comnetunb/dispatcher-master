@@ -3,6 +3,7 @@
  * Copyright (c) 2017 Matheus Medeiros Sarmento
  *
  */
+const dispatcherProtocol = require('dispatcher-protocol');
 
 // Master Related
 const connectionManager = rootRequire('servers/master/connection_manager');
@@ -19,10 +20,8 @@ const Task = databaseRequire('models/task');
 const Slave = rootRequire('database/models/slave');
 
 // Protocol Related
-const { Flags } = protocolRequire('dwp/common');
-const getReport = protocolRequire('dwp/pdu/get_report');
-const performTask = protocolRequire('dwp/pdu/perform_task');
-const performCommand = protocolRequire('dwp/pdu/perform_command');
+const { Flags } = dispatcherProtocol.common;
+const { getReport, performTask, performCommand } = dispatcherProtocol.pdu;
 
 module.exports = () => {
   try {

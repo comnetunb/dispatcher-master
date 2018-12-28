@@ -5,10 +5,6 @@ global.rootRequire = (name) => {
   return require(`${__dirname}/${name}`);
 };
 
-global.protocolRequire = (name) => {
-  return require(`${__dirname}/DisysBot-Protocol/${name}`);
-};
-
 global.masterRequire = (name) => {
   return require(`${__dirname}/servers/master/${name}`);
 };

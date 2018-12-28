@@ -5,10 +5,11 @@
  */
 
 const mongoose = require('mongoose');
+const dispatcherProtocol = require('dispatcher-protocol');
 
 const { Schema } = mongoose;
 
-const { SlaveState } = protocolRequire('dwp/common'); // eslint-disable-line no-undef
+const { SlaveState } = dispatcherProtocol.common; // eslint-disable-line no-undef
 
 const Task = rootRequire('database/models/task'); // eslint-disable-line no-undef
 

@@ -4,8 +4,8 @@
  *
  */
 
-// General Requirements
 const uuidv1 = require('uuid/v1');
+const dispatcherProtocol = require('dispatcher-protocol');
 
 // Shared Related
 const log = rootRequire('servers/shared/log');
@@ -24,10 +24,9 @@ const Task = rootRequire('database/models/task');
 const Slave = rootRequire('database/models/slave');
 
 // Protocol Related
-const factory = protocolRequire('dwp/factory');
-const { Id } = protocolRequire('dwp/factory');
-const { Flags } = protocolRequire('dwp/common');
-const getReport = protocolRequire('dwp/pdu/get_report');
+const { factory } = dispatcherProtocol;
+const { Flags } = dispatcherProtocol.common;
+const { getReport } = dispatcherProtocol.pdu;
 
 communicationEvent.on('new_connection', (connection) => {
   const slave = new Slave({
@@ -103,23 +102,23 @@ module.exports.treat = (packet, socket) => {
 
 function chooseHandler(pdu, slave) {
   switch (pdu.header.id) {
-    case Id.REPORT:
+    case factory.Id.REPORT:
       reportHandler.execute(pdu, slave);
       break;
 
-    case Id.PERFORM_TASK_RESPONSE:
+    case factory.Id.PERFORM_TASK_RESPONSE:
       performTaskResponseHandler.execute(pdu, slave);
       break;
 
-    case Id.TASK_RESULT:
+    case factory.Id.TASK_RESULT:
       taskResultHandler.execute(pdu, slave);
       break;
 
-    case Id.TERMINATE_TASK_RESPONSE:
+    case factory.Id.TERMINATE_TASK_RESPONSE:
       terminateTaskResponseHandler.execute(pdu, slave);
       break;
 
-    case Id.GET_LANGUAGE_COMMAND:
+    case factory.Id.GET_LANGUAGE_COMMAND:
       languageHandler.getCommands(pdu, slave);
       break;
 

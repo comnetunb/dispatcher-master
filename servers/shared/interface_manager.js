@@ -5,7 +5,9 @@
  * This communication is done through Events
  */
 
-const { Command } = protocolRequire('dwp/pdu/perform_command');
+const dispatcherProtocol = require('dispatcher-protocol');
+
+const { Command } = dispatcherProtocol.pdu.performCommand;
 
 const EventEmitter = require('events');
 

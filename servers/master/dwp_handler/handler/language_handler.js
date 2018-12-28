@@ -1,5 +1,7 @@
+const dispatcherProtocol = require('dispatcher-protocol');
+
 const connectionManager = rootRequire('servers/master/connection_manager');
-const languageCommand = protocolRequire('dwp/pdu/language_command');
+const { languageCommand } = dispatcherProtocol.pdu;
 
 const mapLanguageCommand = {
   python: 'python --version',
