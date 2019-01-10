@@ -1,0 +1,58 @@
+version: '2.3'
+
+services:
+
+  node:
+    image: dispatcher-master
+    build:
+      context: .
+      args:
+        - NODE_ENV=production
+    ports:
+      - "80:8080"
+      - "16180:16180"
+    volumes:
+      - .:/opt/app:delegated
+      # bind-mounting these two files in will let you add packages during development without rebuilding
+      # for example, to add bower to your app while developing, just install it inside the container
+      # and then nodemon will restart. Your changes will last until you "docker-compose down" and will
+      # be saved on host for next build
+      # docker-compose exec node npm install --save bower
+      - ./package.json:/opt/package.json
+      - ./package-lock.json:/opt/package-lock.json
+      # this is a workaround to prevent host node_modules from accidently getting mounted in container
+      # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+      # this will overwrite the default node_modules dir in container so it won't conflict with our
+      # /opt/node_modules location. Thanks to PR from @brnluiz
+      - notused:/opt/app/node_modules
+    environment:
+      - NODE_ENV=production
+      - MONGO_USERNAME=root
+      - MONGO_PASSWORD=example
+      - MONGO_HOSTNAME=localhost
+      - MONGO_PORT=27017
+      - MONGO_DATABASE_NAME=ons
+    network_mode: "host"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_DATABASE=ons
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/ons --quiet
+      interval: 5s
+      start_period: 10s
+      timeout: 4s
+      retries: 3
+
+volumes:
+  notused:

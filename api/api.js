@@ -94,7 +94,7 @@ module.exports = () => {
   });
 };
 
-const PORT = 80;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   log.info(`API listening on port ${PORT}`);

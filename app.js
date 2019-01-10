@@ -17,7 +17,7 @@ global.databaseRequire = (name) => {
   return require(`${__dirname}/database/${name}`);
 };
 
-const webServer = rootRequire('servers/web/service'); // eslint-disable-line
+// const webServer = rootRequire('servers/web/service'); // eslint-disable-line
 const dbDriver = rootRequire('database/db_driver'); // eslint-disable-line
 const master = rootRequire('servers/master/master'); // eslint-disable-line
 const api = rootRequire('api/api');
@@ -29,7 +29,7 @@ dbDriver()
     master();
 
     // Initialize WEB Server
-    webServer();
+    // webServer();
 
     api();
   })
