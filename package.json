@@ -1,11 +1,12 @@
 {
-  "name": "web_dispatcher",
-  "version": "1.0.0",
-  "description": "Web Dispatcher",
-  "main": "app.js",
+  "name": "dispatcher-master",
+  "version": "0.0.1",
+  "description": "Simulations Dispatcher - Master",
+  "main": "index.js",
   "scripts": {
-    "lint": "esw *.js database servers --color",
-    "test": "npm run lint"
+    "lint": "esw *.js src --color",
+    "test": "npm run lint",
+    "dev-start": "MONGO_HOSTNAME=localhost MONGO_PORT=27017 MONGO_DATABASE_NAME=ons node index.js"
   },
   "keywords": [
     "dispatcher"
