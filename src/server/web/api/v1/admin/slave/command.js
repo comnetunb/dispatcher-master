@@ -7,19 +7,19 @@ const { Flags } = dispatcherProtocol.common;
 const { getReport, performCommand } = dispatcherProtocol.pdu;
 
 module.exports = (app) => {
-  app.post('/api/v1/slave/pause', verifyJWT, (req, res) => {
+  app.post('/v1/slave/pause', verifyJWT, (req, res) => {
     const { id } = req.body;
 
     sendCommand(req, res, id, performCommand.Command.PAUSE);
   });
 
-  app.post('/api/v1/slave/resume', verifyJWT, (req, res) => {
+  app.post('/v1/slave/resume', verifyJWT, (req, res) => {
     const { id } = req.body;
 
     sendCommand(req, res, id, performCommand.Command.RESUME);
   });
 
-  app.post('/api/v1/slave/stop', verifyJWT, (req, res) => {
+  app.post('/v1/slave/stop', verifyJWT, (req, res) => {
     const { id } = req.body;
 
     sendCommand(req, res, id, performCommand.Command.STOP);

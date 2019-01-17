@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "esw *.js src --color",
     "test": "npm run lint",
-    "dev-start": "MONGO_HOSTNAME=localhost MONGO_PORT=27017 MONGO_DATABASE_NAME=ons node index.js"
+    "dev-start": "STATIC_PATH=/home/mmello/Documents/comnet/vue-ui/dist/ MONGO_HOSTNAME=localhost MONGO_PORT=27017 MONGO_DATABASE_NAME=ons nodemon index.js"
   },
   "keywords": [
     "dispatcher"
@@ -17,11 +17,13 @@
     "bcryptjs": "^2.4.3",
     "bluebird": "~3.5.0",
     "body-parser": "^1.17.1",
+    "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "dispatcher-protocol": "^1.0.1",
     "dotenv": "^6.2.0",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "jsonwebtoken": "^8.3.0",
     "log4js": "^3.0.6",
     "mongoose": "^4.11.1",
@@ -33,6 +35,7 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.11.0",
-    "eslint-watch": "^3.1.4"
+    "eslint-watch": "^3.1.4",
+    "nodemon": "^1.18.9"
   }
 }

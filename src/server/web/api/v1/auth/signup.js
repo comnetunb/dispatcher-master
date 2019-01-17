@@ -1,8 +1,8 @@
 const User = databaseRequire('models/user');
-const config = apiRequire('config');
+const config = webRequire('config');
 
 module.exports = (app) => {
-  app.post('/api/v1/auth/signup', (req, res) => {
+  app.post('/v1/auth/signup', (req, res) => {
     const {
       email,
       name,

@@ -6,7 +6,11 @@ global.dispatcherRequire = (name) => {
 };
 
 global.apiRequire = (name) => {
-  return require(`${__dirname}/src/server/api/${name}`);
+  return require(`${__dirname}/src/server/web/api/${name}`);
+};
+
+global.webRequire = (name) => {
+  return require(`${__dirname}/src/server/web/${name}`);
 };
 
 global.sharedRequire = (name) => {
@@ -19,7 +23,7 @@ global.databaseRequire = (name) => {
 
 const dbDriver = databaseRequire('driver');
 const dispatcher = dispatcherRequire('index');
-const api = apiRequire('index');
+const web = webRequire('index');
 
 // Setup Database Driver
 dbDriver()
@@ -27,8 +31,7 @@ dbDriver()
     // Initialize dispatcher
     dispatcher();
 
-    // Initialize api
-    api();
+    web.start();
   })
   .catch((e) => {
     console.log(e); // eslint-disable-line

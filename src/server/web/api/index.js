@@ -2,8 +2,7 @@
 const jwt = require('jsonwebtoken');
 const express = require('express');
 
-const log = sharedRequire('log');
-const config = apiRequire('config');
+const config = webRequire('config');
 
 const User = databaseRequire('models/user');
 
@@ -71,12 +70,12 @@ const apis = {
   }
 };
 
-const app = express();
+const router = express.Router();
 
-app.use(require('cookie-parser')());
-app.use(require('body-parser').json());
-app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('cors')({ credentials: true, origin: true }));
+router.use(require('cookie-parser')());
+router.use(require('body-parser').json());
+router.use(require('body-parser').urlencoded({ extended: true }));
+router.use(require('cors')({ credentials: true, origin: true }));
 
 const walk = (obj, cb) => {
   Object.keys(obj).forEach((key) => {
@@ -88,14 +87,8 @@ const walk = (obj, cb) => {
   });
 };
 
-module.exports = () => {
-  walk(apis, (api) => {
-    api(app);
-  });
-};
-
-const PORT = process.env.PORT || 8080;
-
-app.listen(PORT, () => {
-  log.info(`API listening on port ${PORT}`);
+walk(apis, (api) => {
+  api(router);
 });
+
+module.exports = router;

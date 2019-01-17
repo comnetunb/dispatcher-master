@@ -14,7 +14,7 @@ const assign = (src, dest) => {
 module.exports = (app) => {
   const event = new EventEmitter();
 
-  app.get('/api/v1/settings/master', verifyJWT, (req, res) => {
+  app.get('/v1/settings/master', verifyJWT, (req, res) => {
     Settings
       .findOne({})
       .then((settings) => {
@@ -29,7 +29,7 @@ module.exports = (app) => {
       });
   });
 
-  app.get('/api/v1/settings/slave', verifyJWT, (req, res) => {
+  app.get('/v1/settings/slave', verifyJWT, (req, res) => {
     Settings
       .findOne({})
       .then((settings) => {
@@ -44,7 +44,7 @@ module.exports = (app) => {
       });
   });
 
-  app.post('/api/v1/settings/update', verifyJWT, (req, res) => {
+  app.post('/v1/settings/update', verifyJWT, (req, res) => {
     const property = req.body;
 
     Settings
