@@ -21,7 +21,7 @@ const languageHandler = rootRequire('servers/master/dwp_handler/handler/language
 
 // Database Related
 const Task = rootRequire('database/models/task');
-const Slave = rootRequire('database/models/slave');
+const Worker = rootRequire('database/models/worker');
 
 // Protocol Related
 const { factory } = dispatcherProtocol;
@@ -29,21 +29,21 @@ const { Flags } = dispatcherProtocol.common;
 const { getReport } = dispatcherProtocol.pdu;
 
 communicationEvent.on('new_connection', (connection) => {
-  const slave = new Slave({
+  const worker = new Worker({
     address: connection.remoteAddress,
     port: connection.remotePort,
     uuid: uuidv1()
   });
 
-  slave
+  worker
     .save()
-    .then((newSlave) => {
-      connectionManager.add(newSlave.uuid, connection);
+    .then((newWorker) => {
+      connectionManager.add(newWorker.uuid, connection);
 
       // Ask everything
       const flags = (Flags.RESOURCE | Flags.TASKS | Flags.STATE | Flags.ALIAS);
 
-      connectionManager.send(newSlave.uuid, getReport.format({ flags }));
+      connectionManager.send(newWorker.uuid, getReport.format({ flags }));
     })
     .catch((e) => {
       log.fatal(e);
@@ -53,7 +53,7 @@ communicationEvent.on('new_connection', (connection) => {
 communicationEvent.on('closed_connection', (connection) => {
   connectionManager.remove(connection.id);
 
-  const taskFilter = { slave: connection.id };
+  const taskFilter = { worker: connection.id };
 
   Task
     .find(taskFilter, '_id')
@@ -66,7 +66,7 @@ communicationEvent.on('closed_connection', (connection) => {
       log.fatal(e);
     });
 
-  Slave
+  Worker
     .find({ uuid: connection.id })
     .remove()
     .catch((e) => {
@@ -86,40 +86,40 @@ module.exports.treat = (packet, socket) => {
 
   const filter = { address: socket.remoteAddress, port: socket.remotePort };
 
-  return Slave
+  return Worker
     .findOne(filter)
-    .then((slave) => {
-      if (!slave) {
-        throw String('Slave not found');
+    .then((worker) => {
+      if (!worker) {
+        throw String('Worker not found');
       }
 
-      chooseHandler(pdu, slave);
+      chooseHandler(pdu, worker);
     })
     .catch((e) => {
       log.fatal(e);
     });
 };
 
-function chooseHandler(pdu, slave) {
+function chooseHandler(pdu, worker) {
   switch (pdu.header.id) {
     case factory.Id.REPORT:
-      reportHandler.execute(pdu, slave);
+      reportHandler.execute(pdu, worker);
       break;
 
     case factory.Id.PERFORM_TASK_RESPONSE:
-      performTaskResponseHandler.execute(pdu, slave);
+      performTaskResponseHandler.execute(pdu, worker);
       break;
 
     case factory.Id.TASK_RESULT:
-      taskResultHandler.execute(pdu, slave);
+      taskResultHandler.execute(pdu, worker);
       break;
 
     case factory.Id.TERMINATE_TASK_RESPONSE:
-      terminateTaskResponseHandler.execute(pdu, slave);
+      terminateTaskResponseHandler.execute(pdu, worker);
       break;
 
     case factory.Id.GET_LANGUAGE_COMMAND:
-      languageHandler.getCommands(pdu, slave);
+      languageHandler.getCommands(pdu, worker);
       break;
 
     default:

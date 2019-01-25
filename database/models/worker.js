@@ -9,16 +9,16 @@ const dispatcherProtocol = require('dispatcher-protocol');
 
 const { Schema } = mongoose;
 
-const { SlaveState } = dispatcherProtocol.common; // eslint-disable-line no-undef
+const { WorkerState } = dispatcherProtocol.common; // eslint-disable-line no-undef
 
 const Task = rootRequire('database/models/task'); // eslint-disable-line no-undef
 
 const State = {
-  EXECUTING: SlaveState.EXECUTING,
-  PAUSED: SlaveState.PAUSED
+  EXECUTING: WorkerState.EXECUTING,
+  PAUSED: WorkerState.PAUSED
 };
 
-const slaveSchema = Schema({
+const workerSchema = Schema({
   address: {
     type: String,
     required: true
@@ -59,7 +59,7 @@ const slaveSchema = Schema({
   }
 });
 
-slaveSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { // eslint-disable-line
+workerSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { // eslint-disable-line
   const filter = {
     'resource.outdated': false,
     'resource.cpu': { $gt: cpuThreshold },
@@ -69,25 +69,25 @@ slaveSchema.statics.getAvailables = function (cpuThreshold, memoryThreshold) { /
 
   return this
     .find(filter)
-    .then((availableSlaves) => {
-      return availableSlaves;
+    .then((availableWorkers) => {
+      return availableWorkers;
     });
 };
 
-slaveSchema.statics.State = State;
+workerSchema.statics.State = State;
 
-slaveSchema.methods.updateRunningInstances = function () { // eslint-disable-line func-names
-  const slave = this;
+workerSchema.methods.updateRunningInstances = function () { // eslint-disable-line func-names
+  const worker = this;
   return Task
-    .count({ slave: slave.uuid })
+    .count({ worker: worker.uuid })
     .then((count) => {
-      slave.runningInstances = count;
-      return slave.save();
+      worker.runningInstances = count;
+      return worker.save();
     });
 };
 
-slaveSchema.index({ address: 1, port: 1 }, { unique: true });
+workerSchema.index({ address: 1, port: 1 }, { unique: true });
 
-const model = mongoose.model('slave', slaveSchema);
+const model = mongoose.model('worker', workerSchema);
 
 module.exports = model;

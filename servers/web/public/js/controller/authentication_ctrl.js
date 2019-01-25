@@ -5,7 +5,7 @@ app.controller('signInCtrl', function ($scope, $http, $window, $rootScope, $loca
       .then(function (response) {
         $scope.errorMessage = false;
         $rootScope.signedUser = response.data;
-        $location.path('/slaves');
+        $location.path('/workers');
       })
       .catch(function (e) {
         console.log(e); // eslint-disable-line no-console

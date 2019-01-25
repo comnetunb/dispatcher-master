@@ -57,7 +57,7 @@ const taskSchema = Schema({
     type: Number,
     required: true
   },
-  slave: {
+  worker: {
     type: String
   },
   state: {
@@ -86,7 +86,7 @@ taskSchema.statics.updateToDefaultState = (taskId) => {
     .then((task) => {
       const taskSetState = task._taskSet.state;
 
-      task.slave = undefined;
+      task.worker = undefined;
       task.startTime = undefined;
 
       const TaskSet = databaseRequire('models/task_set'); // eslint-disable-line no-undef

@@ -21,7 +21,7 @@ const log = rootRequire('servers/shared/log');
 // Protocol Related
 const { factory } = dispatcherProtocol;
 
-// TCP socket in which all the master-slaves communication will be accomplished
+// TCP socket in which all the master-workers communication will be accomplished
 const server = net.createServer();
 
 module.exports.execute = () => {
@@ -59,7 +59,7 @@ module.exports.execute = () => {
     connection.on('error', () => { });
   });
 
-  // Open slave
+  // Open worker
   server.listen(16180, '0.0.0.0', () => {
     log.info(`TCP server listening ${server.address().address}:${server.address().port}`);
   });

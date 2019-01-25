@@ -11,7 +11,7 @@ const TaskSet = rootRequire('database/models/task_set');
 const mailer = rootRequire('servers/shared/mailer');
 const log = rootRequire('servers/shared/log');
 
-module.exports.execute = (pdu, slave) => {
+module.exports.execute = (pdu, worker) => {
   if (pdu.code === taskResult.ReturnCode.SUCCESS) {
     // Succeded
     try {
@@ -24,20 +24,20 @@ module.exports.execute = (pdu, slave) => {
       result: pdu.output,
       state: Task.State.FINISHED,
       endTime: Date.now(),
-      $unset: { slave: 1 }
+      $unset: { worker: 1 }
     };
 
     Task
       .findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true })
       .then((task) => {
-        log.info(`Slave ${slave.address}:${slave.port} has finished task ${task._id}`);
+        log.info(`Worker ${worker.address}:${worker.port} has finished task ${task._id}`);
 
         TaskSet.UpdateRemainingTasksCount(task._taskSet);
 
         return cascadeConclusion(task._taskSet);
       })
       .then(() => {
-        return slave.updateRunningInstances();
+        return worker.updateRunningInstances();
       })
       .catch((e) => {
         log.fatal(e);
@@ -49,7 +49,7 @@ module.exports.execute = (pdu, slave) => {
     Task
       .updateToDefaultState(pdu.task.id)
       .then(() => {
-        return slave.updateRunningInstances();
+        return worker.updateRunningInstances();
       })
       .catch((e) => {
         log.fatal(e);

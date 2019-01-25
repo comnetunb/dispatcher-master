@@ -13,7 +13,7 @@ const Task = rootRequire('database/models/task');
 
 const { terminateTask, performTaskResponse } = dispatcherProtocol.pdu;
 
-module.exports.execute = (pdu, slave) => {
+module.exports.execute = (pdu, worker) => {
   if (pdu.code === performTaskResponse.ReturnCode.EXECUTING) {
     Task
       .findById(pdu.task.id)
@@ -22,15 +22,15 @@ module.exports.execute = (pdu, slave) => {
           throw String('Task not found');
         }
 
-        if (task.slave !== slave.uuid) {
-          // There is already a slave executing it
-          connectionManager.send(slave.uuid, terminateTask.format({
+        if (task.worker !== worker.uuid) {
+          // There is already a worker executing it
+          connectionManager.send(worker.uuid, terminateTask.format({
             taskId: pdu.task.id
           }));
           return false;
         }
 
-        task.slave = slave.uuid;
+        task.worker = worker.uuid;
         task.state = Task.State.EXECUTING;
         task.save();
 
@@ -38,14 +38,14 @@ module.exports.execute = (pdu, slave) => {
       })
       .then((needsToUpdate) => {
         if (needsToUpdate) {
-          slave.updateRunningInstances();
+          worker.updateRunningInstances();
         }
       })
       .catch((e) => {
         log.fatal(e);
       });
   } else if (pdu.code === performTaskResponse.ReturnCode.DENIED) {
-    log.warn(`Task was denied by slave ${slave.address}:${slave.port}`);
+    log.warn(`Task was denied by worker ${worker.address}:${worker.port}`);
   } else {
     log.fatal(`Unknown return code ${pdu.code}`);
   }

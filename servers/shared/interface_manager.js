@@ -15,14 +15,14 @@ const event = new EventEmitter();
 
 module.exports.event = event;
 
-module.exports.pauseSlave = (address) => {
-  event.emit('slave_command', address, Command.PAUSE);
+module.exports.pauseWorker = (address) => {
+  event.emit('worker_command', address, Command.PAUSE);
 };
 
-module.exports.resumeSlave = (address) => {
-  event.emit('slave_command', address, Command.RESUME);
+module.exports.resumeWorker = (address) => {
+  event.emit('worker_command', address, Command.RESUME);
 };
 
-module.exports.stopSlave = (address) => {
-  event.emit('slave_command', address, Command.STOP);
+module.exports.stopWorker = (address) => {
+  event.emit('worker_command', address, Command.STOP);
 };
