@@ -1,3 +1,5 @@
+const utils = require('../utils');
+
 const User = databaseRequire('models/user');
 const config = webRequire('config');
 
@@ -19,7 +21,7 @@ module.exports = (app) => {
         }
 
         res
-          .cookie('DISYSBOT_SID', signJWT(user), { maxAge: config.expiresIn })
+          .cookie('DISYSBOT_SID', utils.signJWT(user), { maxAge: config.expiresIn })
           .status(200)
           .send({});
       })

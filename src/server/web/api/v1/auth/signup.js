@@ -1,5 +1,6 @@
 const User = databaseRequire('models/user');
 const config = webRequire('config');
+const utils = require('../utils');
 
 module.exports = (app) => {
   app.post('/v1/auth/signup', (req, res) => {
@@ -41,7 +42,7 @@ module.exports = (app) => {
               }
 
               res
-                .cookie('DISYSBOT_SID', signJWT(user), { maxAge: config.expiresIn })
+                .cookie('DISYSBOT_SID', utils.signJWT(user), { maxAge: config.expiresIn })
                 .status(200)
                 .send({});
             });
