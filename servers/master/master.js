@@ -117,7 +117,7 @@ function batchDispatch() {
 
                   const taskSetName = task._taskSet.name;
 
-                  log.info(`Dispatched task with precedence ${task.precedence} from set`
+                  log.info(`Dispatched task with precedence ${task.precedence} from set `
                     + `${taskSetName} to ${availableWorkers[index].address}`);
 
                   // If after X seconds it is still 'Sent', return it to its default state
