@@ -1,4 +1,4 @@
-app.controller('graphCtrl', function ($scope, $http, $window, $rootScope /* , $location */) {
+app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $routeParams /* , $location */) {
   $rootScope.sidebar = true;
 
   $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
