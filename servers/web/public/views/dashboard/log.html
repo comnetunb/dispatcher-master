@@ -1,4 +1,6 @@
 ﻿<div class="content-wrapper">
+  <h3 ng-show="taskSet" style="margin-left: 5px">Logs from Task Set: {{taskSet.name}}</h3>
+  <h3 ng-hide="taskSet" style="margin-left: 5px">General Logs</h3>
   <table class="table">
     <thead>
       <tr ng-click="toggle=!toggle" ng-init="toggle=false">

@@ -3,7 +3,7 @@ const log = rootRequire('servers/shared/log');
 module.exports = (app) => {
   app.get('/api/log/get_all', (req, res) => {
     log
-      .getAll()
+      .getAll(req.query.taskSetId)
       .then((logs) => {
         if (!logs) {
           throw String('Failed to get logs');
@@ -19,7 +19,7 @@ module.exports = (app) => {
 
   app.get('/api/log/get_all_from_date', (req, res) => {
     log
-      .getAllFromDate(req.query.lastDate)
+      .getAllFromDate(req.query.lastDate, req.query.taskSetId)
       .then((logs) => {
         if (!logs) {
           throw String('Failed to get logs');

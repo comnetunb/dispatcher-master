@@ -88,4 +88,17 @@ module.exports = (app) => {
       }
     });
   });
+
+  app.get('/api/task/:id', (req, res) => {
+    const taskSetFilter = { _id: req.params.id };
+
+    TaskSet
+      .findOne(taskSetFilter)
+      .then((taskSet) => {
+        res.send(taskSet);
+      })
+      .catch((e) => {
+        res.status(412).send({ reason: e });
+      });
+  });
 };

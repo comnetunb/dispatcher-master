@@ -7,6 +7,7 @@
 const log4js = require('log4js');
 
 const Log = rootRequire('database/models/log');
+const Task = rootRequire('database/models/task');
 
 log4js.configure({
   appenders: {
@@ -20,65 +21,106 @@ log4js.configure({
 
 const logger = log4js.getLogger();
 
-module.exports.getAll = () => {
-  const logFilter = { session: Log.SessionId };
+module.exports.getAll = async (taskSetId) => {
+  let logFilter;
+
+  if (taskSetId) {
+    // get all tasks pertaining to taskSet
+    const taskList = await Task.find({ _taskSet: taskSetId }, '_id');
+    const taskIds = taskList.map(task => task._id);
+    logFilter = { taskId: { $in: taskIds } };
+  } else {
+    logFilter = { session: Log.SessionId };
+  }
 
   return Log.find(logFilter).sort({ date: -1 });
 };
 
-module.exports.getAllFromDate = (date) => {
-  const logFilter = {
-    session: Log.SessionId,
-    date: {
-      $gt: date
-    }
-  };
+module.exports.getAllFromDate = async (date, taskSetId) => {
+  let logFilter;
+  if (taskSetId) {
+    const taskList = await Task.find({ _taskSet: taskSetId }, '_id');
+    const taskIds = taskList.map(task => task._id);
+    logFilter = { date: { $gt: date }, taskId: { $in: taskIds } };
+  } else {
+    logFilter = { date: { $gt: date }, session: Log.SessionId };
+  }
 
   return Log.find(logFilter).sort({ date: -1 });
 };
 
-module.exports.trace = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Trace });
+module.exports.trace = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Trace,
+    taskId
+  });
 
   log.save();
 
   logger.trace(message);
 };
 
-module.exports.debug = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Debug });
+module.exports.debug = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Debug,
+    taskId
+  });
 
   log.save();
 
   logger.debug(message);
 };
 
-module.exports.info = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Info });
+module.exports.info = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Info,
+    taskId
+  });
 
   log.save();
 
   logger.info(message);
 };
 
-module.exports.warn = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Warn });
+module.exports.warn = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Warn,
+    taskId
+  });
 
   log.save();
 
   logger.warn(message);
 };
 
-module.exports.error = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Error });
+module.exports.error = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Error,
+    taskId
+  });
 
   log.save();
 
   logger.error(message);
 };
 
-module.exports.fatal = (message) => {
-  const log = new Log({ log: message, date: Date.now(), level: Log.Level.Fatal });
+module.exports.fatal = (message, taskId) => {
+  const log = new Log({
+    log: message,
+    date: Date.now(),
+    level: Log.Level.Fatal,
+    taskId
+  });
 
   log.save();
 

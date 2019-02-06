@@ -8,34 +8,54 @@ const updateLog = function ($scope, response) {
 };
 
 const getAllLogs = function ($scope, $http) {
+  const params = {};
+  if ($scope.taskSetId) {
+    params.taskSetId = $scope.taskSetId;
+  }
+
   $http
-    .get('/api/log/get_all')
+    .get('/api/log/get_all', { params })
     .then(function (response) {
       updateLog($scope, response);
     });
 };
 
 const getAllLogsFromDate = function ($scope, $http) {
+  const params = {
+    lastDate: $scope.lastDate,
+  };
+  if ($scope.taskSetId) {
+    params.taskSetId = $scope.taskSetId;
+  }
+
   $http
-    .get('/api/log/get_all_from_date', {
-      params: { lastDate: $scope.lastDate }
-    })
+    .get('/api/log/get_all_from_date', { params })
     .then(function (response) {
       updateLog($scope, response);
     });
 };
 
-app.controller('logCtrl', function ($scope, $rootScope, $http, $interval) {
+function getTaskSet($scope, $http) {
+  $http
+    .get(`/api/task/${$scope.taskSetId}`)
+    .then(function (response) {
+      $scope.taskSet = response.data;
+    });
+}
+
+app.controller('logCtrl', function ($scope, $rootScope, $http, $interval, $routeParams) {
+  $scope.taskSetId = $routeParams.task_set_id;
   $rootScope.sidebar = true;
 
   $scope.logs = [];
   $scope.lastDate = Date.now();
-
   let promise;
-
   $scope.start = function () {
     $scope.stop();
 
+    if ($scope.taskSetId) {
+      getTaskSet($scope, $http);
+    }
     getAllLogs($scope, $http);
 
     promise = $interval(function () {

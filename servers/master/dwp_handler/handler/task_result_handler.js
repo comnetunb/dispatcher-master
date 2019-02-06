@@ -17,7 +17,7 @@ module.exports.execute = (pdu, worker) => {
     try {
       JSON.parse(pdu.output);
     } catch (e) {
-      log.fatal(`${e}\nJSON: ${pdu.output}`);
+      log.fatal(`${e}\nJSON: ${pdu.output}`, pdu.task.id);
     }
 
     const taskUpdate = {
@@ -30,7 +30,7 @@ module.exports.execute = (pdu, worker) => {
     Task
       .findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true })
       .then((task) => {
-        log.info(`Worker ${worker.address}:${worker.port} has finished task ${task._id}`);
+        log.info(`Worker ${worker.address}:${worker.port} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
 
         TaskSet.UpdateRemainingTasksCount(task._taskSet);
 
@@ -40,11 +40,11 @@ module.exports.execute = (pdu, worker) => {
         return worker.updateRunningInstances();
       })
       .catch((e) => {
-        log.fatal(e);
+        log.fatal(e, pdu.task.id);
       });
   } else {
     // Failed
-    log.warn(`${pdu.task.id} failed to execute: ${pdu.output}`);
+    log.warn(`${pdu.task.id} failed to execute: ${pdu.output}`, pdu.task.id);
 
     Task
       .updateToDefaultState(pdu.task.id)
@@ -52,7 +52,7 @@ module.exports.execute = (pdu, worker) => {
         return worker.updateRunningInstances();
       })
       .catch((e) => {
-        log.fatal(e);
+        log.fatal(e, pdu.task.id);
       });
   }
 };

@@ -42,11 +42,11 @@ module.exports.execute = (pdu, worker) => {
         }
       })
       .catch((e) => {
-        log.fatal(e);
+        log.fatal(e, pdu.task.id);
       });
   } else if (pdu.code === performTaskResponse.ReturnCode.DENIED) {
-    log.warn(`Task was denied by worker ${worker.address}:${worker.port}`);
+    log.warn(`Task was denied by worker ${worker.address}:${worker.port}`, pdu.task.id);
   } else {
-    log.fatal(`Unknown return code ${pdu.code}`);
+    log.fatal(`Unknown return code ${pdu.code}`, pdu.task.id);
   }
 };

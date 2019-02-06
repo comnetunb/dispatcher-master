@@ -32,6 +32,9 @@ const logSchema = Schema({
     type: Number,
     required: true
   },
+  taskId: {
+    type: Schema.Types.ObjectId,
+  },
   session: {
     type: Schema.Types.ObjectId,
     default: SessionId

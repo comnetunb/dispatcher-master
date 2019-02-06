@@ -117,8 +117,8 @@ function batchDispatch() {
 
                   const taskSetName = task._taskSet.name;
 
-                  log.info(`Dispatched task with precedence ${task.precedence} from set `
-                    + `${taskSetName} to ${availableWorkers[index].address}`);
+                  log.info(`Dispatched task with precedence ${task.precedence} (${task._id}) from set `
+                    + `${taskSetName} to ${availableWorkers[index].address}`, task._id);
 
                   // If after X seconds it is still 'Sent', return it to its default state
                   setTimeout(() => {
@@ -130,7 +130,7 @@ function batchDispatch() {
                         }
 
                         if (taskRefreshed.isSent()) {
-                          log.warn(`Timeout from worker ${availableWorkers[index].address}:${availableWorkers[index].port}`);
+                          log.warn(`Timeout from worker ${availableWorkers[index].address}:${availableWorkers[index].port}`, task._id);
                           return Task.updateToDefaultState(taskRefreshed._id);
                         }
                         return undefined;

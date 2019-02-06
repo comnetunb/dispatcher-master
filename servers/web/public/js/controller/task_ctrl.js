@@ -75,7 +75,7 @@ function getCount(/* $scope, $http */) {
 }
 
 // ExecutingTaskSet
-app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
+app.controller('executingTaskSetCtrl', function ($scope, $location, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true;
 
   $scope.sort = function (keyname) {
@@ -86,6 +86,11 @@ app.controller('executingTaskSetCtrl', function ($scope, $rootScope, $http, $int
   $scope.openConfirmation = function (taskSetId) {
     openConfirmation($uibModal, taskSetId, $http, $scope, getAllExecutingTaskSets);
   };
+
+  $scope.openLogs = function (taskSetId) {
+    $location.path(`log/${taskSetId}`);
+  };
+
 
   let promise;
 
@@ -119,7 +124,7 @@ function getAllExecutingTaskSets($scope, $http) {
 }
 
 // FinishedTaskSet
-app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $interval, $uibModal) {
+app.controller('finishedTaskSetCtrl', function ($scope, $location, $rootScope, $http, $interval, $uibModal) {
   $rootScope.sidebar = true;
 
   $scope.sort = function (keyname) {
@@ -129,6 +134,10 @@ app.controller('finishedTaskSetCtrl', function ($scope, $rootScope, $http, $inte
 
   $scope.openConfirmation = function (taskSetId) {
     openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets);
+  };
+
+  $scope.openLogs = function (taskSetId) {
+    $location.path(`log/${taskSetId}`);
   };
 
   let promise;
