@@ -47,4 +47,14 @@ const notificationSchema = Schema({
 
 notificationSchema.statics.Type = Type;
 
+notificationSchema.statics.getUnread = function (userId) {
+  return this.find({ userId, read: false })
+    .exec();
+};
+
+notificationSchema.statics.getAll = function (userId) {
+  return this.find({ userId })
+    .exec();
+};
+
 module.exports = mongoose.model('Notification', notificationSchema);
