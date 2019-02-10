@@ -33,7 +33,8 @@ const logSchema = Schema({
     required: true
   },
   taskId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.ObjectId,
+    ref: 'Task',
   },
   session: {
     type: Schema.Types.ObjectId,
