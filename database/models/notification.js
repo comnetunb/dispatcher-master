@@ -60,4 +60,17 @@ notificationSchema.statics.getAll = function (userId) {
     .exec();
 };
 
+notificationSchema.statics.create = function (result, title, message, user, taskSetId, taskId) {
+  const notification = new this({
+    result,
+    title,
+    message,
+    userId: user,
+    taskSetId,
+    taskId,
+  });
+
+  return notification.save();
+};
+
 module.exports = mongoose.model('Notification', notificationSchema);
