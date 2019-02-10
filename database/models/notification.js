@@ -2,23 +2,26 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const Type = {
-  SUCCESS: 0,
-  NEUTRAL: 1,
-  WARNING: 2,
-  ERROR: 3,
+const Result = {
+  SUCCESS: 'success',
+  NEUTRAL: 'neutral',
+  WARNING: 'warning',
+  ERROR: 'error',
 };
 
 const notificationSchema = Schema({
   userId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.ObjectId,
+    ref: 'User',
     required: true,
   },
   taskSetId: {
-    type: Schema.Types.ObjectId
+    type: Schema.ObjectId,
+    ref: 'TaskSet',
   },
   taskId: {
-    type: Schema.Types.ObjectId
+    type: Schema.ObjectId,
+    ref: 'Task',
   },
   title: {
     type: String,
@@ -33,10 +36,10 @@ const notificationSchema = Schema({
     required: true,
     default: Date.now,
   },
-  type: {
-    type: Number,
+  result: {
+    type: String,
     required: true,
-    default: Type.NEUTRAL,
+    default: Result.NEUTRAL,
   },
   read: {
     type: Boolean,
@@ -45,7 +48,7 @@ const notificationSchema = Schema({
   }
 });
 
-notificationSchema.statics.Type = Type;
+notificationSchema.statics.Result = Result;
 
 notificationSchema.statics.getUnread = function (userId) {
   return this.find({ userId, read: false })
