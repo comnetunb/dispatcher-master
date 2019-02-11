@@ -47,7 +47,7 @@ module.exports.execute = (pdu, worker) => {
     log.warn(`${pdu.task.id} failed to execute: ${pdu.output}`, pdu.task.id);
 
     Task
-      .updateToDefaultState(pdu.task.id)
+      .flagError(pdu.task.id)
       .then(() => {
         return worker.updateRunningInstances();
       })

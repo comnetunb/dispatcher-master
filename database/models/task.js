@@ -57,6 +57,11 @@ const taskSchema = Schema({
     type: Number,
     required: true
   },
+  errorCount: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   worker: {
     type: String
   },
@@ -88,6 +93,31 @@ taskSchema.statics.updateToDefaultState = (taskId) => {
 
       task.worker = undefined;
       task.startTime = undefined;
+
+      const TaskSet = databaseRequire('models/task_set'); // eslint-disable-line no-undef
+
+      if (taskSetState === TaskSet.State.EXECUTING) {
+        task.state = State.PENDING;
+      } else {
+        task.state = State.CANCELED;
+      }
+
+      return task.save();
+    });
+};
+
+taskSchema.statics.flagError = (taskId) => {
+  const taskPopulate = { path: '_taskSet' };
+
+  return model // eslint-disable-line no-use-before-define
+    .findById(taskId)
+    .populate(taskPopulate)
+    .then((task) => {
+      const taskSetState = task._taskSet.state;
+
+      task.worker = undefined;
+      task.startTime = undefined;
+      task.errorCount += 1;
 
       const TaskSet = databaseRequire('models/task_set'); // eslint-disable-line no-undef
 
