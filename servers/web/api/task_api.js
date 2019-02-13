@@ -95,7 +95,17 @@ module.exports = (app) => {
     TaskSet
       .findOne(taskSetFilter)
       .then((taskSet) => {
-        res.send(taskSet);
+        if (req.query.includeTasks === 'true') {
+          Task
+            .find({ _taskSet: req.params.id })
+            .then((tasks) => {
+              const completeTaskSet = taskSet.toObject();
+              completeTaskSet.tasks = tasks;
+              res.send(completeTaskSet);
+            });
+        } else {
+          res.send(taskSet);
+        }
       })
       .catch((e) => {
         res.status(412).send({ reason: e });

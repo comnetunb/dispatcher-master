@@ -216,6 +216,18 @@ function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
   });
 }
 
+app.controller('detailsCtrl', function ($scope, $http, $routeParams) {
+  $scope.taskSetId = $routeParams.task_set_id;
+  getTaskSet($scope, $http);
+  $http
+    .get(`/api/task/${$scope.taskSetId}?includeTasks=true`)
+    .then(function (response) {
+      $scope.taskSet = response.data;
+      console.log($scope.taskSet);
+    });
+  
+});
+
 // Add
 app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location) {
   $rootScope.sidebar = true;

@@ -53,6 +53,11 @@ app.config(function ($routeProvider /* , $locationProvider */) {
       controller: 'addCtrl',
       auth: true
     })
+    .when('/details/:task_set_id', {
+      templateUrl: 'views/dashboard/details.html',
+      controller: 'detailsCtrl',
+      auth: true
+    })
     .when('/log/:task_set_id', {
       templateUrl: 'views/dashboard/log.html',
       controller: 'logCtrl',
