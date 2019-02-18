@@ -100,6 +100,7 @@ function batchDispatch() {
             .forEach((task, index) => {
               task.state = Task.State.SENT;
               task.worker = availableWorkers[index].uuid;
+              task.startTime = new Date();
 
               return task
                 .save()

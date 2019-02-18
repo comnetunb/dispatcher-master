@@ -23,7 +23,7 @@ module.exports.execute = (pdu, worker) => {
     const taskUpdate = {
       result: pdu.output,
       state: Task.State.FINISHED,
-      endTime: Date.now(),
+      endTime: new Date(),
       $unset: { worker: 1 }
     };
 

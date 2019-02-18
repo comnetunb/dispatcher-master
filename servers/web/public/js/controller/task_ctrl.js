@@ -216,16 +216,115 @@ function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
   });
 }
 
-app.controller('detailsCtrl', function ($scope, $http, $routeParams) {
-  $scope.taskSetId = $routeParams.task_set_id;
-  getTaskSet($scope, $http);
+function getTaskSetAndTasks($scope, $http) {
   $http
     .get(`/api/task/${$scope.taskSetId}?includeTasks=true`)
     .then(function (response) {
       $scope.taskSet = response.data;
-      console.log($scope.taskSet);
+      $scope.taskSet.tasks.sort((a, b) => {
+        // orders by state and then by precedence
+        if (a.errorCount !== b.errorCount) {
+          return a.errorCount - b.errorCount;
+        }
+        if (a.state !== b.state) {
+          return b.state - a.state;
+        }
+        return b.precedence - a.precedence;
+      });
     });
-  
+}
+
+app.controller('detailsCtrl', function ($scope, $interval, $rootScope, $http, $routeParams) {
+  let promise;
+
+  $rootScope.sidebar = true;
+  $scope.taskSetId = $routeParams.task_set_id;
+  $scope.logs = [];
+  $scope.lastDate = Date.now();
+
+  $scope.start = () => {
+    getTaskSetAndTasks($scope, $http);
+    getAllLogs($scope, $http);
+  };
+
+  $scope.stop = () => {
+    $interval.cancel(promise);
+  };
+
+  $scope.start();
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
+
+  promise = $interval(function () {
+    getTaskSetAndTasks($scope, $http);
+    getAllLogsFromDate($scope, $http);
+  }, 1500);
+
+  $scope.formatTaskSetState = (state) => {
+    if (state === 0) {
+      return 'Executing';
+    } else if (state === 1) {
+      return 'Finished';
+    }
+    return 'Canceled';
+  };
+
+  $scope.formatTaskState = (state) => {
+    if (state === 0) {
+      return 'Pending';
+    } else if (state === 1) {
+      return 'Executing';
+    } else if (state === 2) {
+      return 'Finished';
+    } else if (state === 3) {
+      return 'Canceled';
+    }
+    return 'Sent';
+  };
+
+  $scope.formatPriority = (priority) => {
+    if (priority === 0) {
+      return 'Minimum';
+    } else if (priority === 1) {
+      return 'Low';
+    } else if (priority === 2) {
+      return 'Normal';
+    } else if (priority === 3) {
+      return 'High';
+    }
+    return 'Urgent';
+  };
+
+  $scope.getDurationString = (task) => {
+    const start = new Date(task.startTime);
+    const end = new Date(task.endTime);
+
+    if (task.state !== 2) {
+      return 'Unfinished';
+    }
+    if (!task.startTime || !task.endTime) {
+      return 'Unavailable';
+    }
+
+    let diff = end - start;
+    let hourS = '';
+    let minuteS = '';
+    let secondS = '';
+
+    if (diff >= (1000 * 60 * 60)) {
+      hourS = `${Math.floor(diff / (1000 * 60 * 60))}h `;
+      diff %= (1000 * 60 * 60);
+    }
+    if (diff >= (1000 * 60)) {
+      minuteS = `${Math.floor(diff / (1000 * 60))}h `;
+      diff %= (1000 * 60);
+    }
+    secondS = `${Math.floor(diff / 1000)}s`;
+
+    return `${hourS}${minuteS}${secondS}`;
+  };
 });
 
 // Add

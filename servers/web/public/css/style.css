@@ -245,3 +245,43 @@ footer.sticky-footer {
 [ng\:cloak], [ng-cloak], .ng-cloak {
   display: none !important;
 }
+
+div .horizontal-rule {
+    width: 100%;
+    border-bottom: 1px solid #aaa;
+    margin: 5px 0 5px 0;
+}
+
+.container-details {
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+  grid-template-rows: minmax(50px, auto);
+  margin: 0 auto;
+}
+
+.container-details .box {
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.container-details .one {
+    border-right: 1px solid #aaa;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.container-details .two {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.container-details .wide {
+    grid-column: span 2;
+    border-top: 1px solid #aaa;
+    padding-top: 10px;
+}
+   
+.container-details .three {
+    grid-row: 2;
+    margin-bottom: 10px;
+}
