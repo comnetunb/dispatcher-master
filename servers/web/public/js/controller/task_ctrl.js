@@ -83,15 +83,6 @@ app.controller('executingTaskSetCtrl', function ($scope, $location, $rootScope, 
     $scope.reverse = !$scope.reverse; // if true make it false and vice versa
   };
 
-  $scope.openConfirmation = function (taskSetId) {
-    openConfirmation($uibModal, taskSetId, $http, $scope, getAllExecutingTaskSets);
-  };
-
-  $scope.openLogs = function (taskSetId) {
-    $location.path(`log/${taskSetId}`);
-  };
-
-
   let promise;
 
   $scope.start = function () {
@@ -130,14 +121,6 @@ app.controller('finishedTaskSetCtrl', function ($scope, $location, $rootScope, $
   $scope.sort = function (keyname) {
     $scope.sortKey = keyname; // set the sortKey to the param passed
     $scope.reverse = !$scope.reverse; // if true make it false and vice versa
-  };
-
-  $scope.openConfirmation = function (taskSetId) {
-    openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets);
-  };
-
-  $scope.openLogs = function (taskSetId) {
-    $location.path(`log/${taskSetId}`);
   };
 
   let promise;
@@ -234,7 +217,7 @@ function getTaskSetAndTasks($scope, $http) {
     });
 }
 
-app.controller('detailsCtrl', function ($scope, $interval, $rootScope, $http, $routeParams) {
+app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval, $rootScope, $http, $routeParams) {
   let promise;
 
   $rootScope.sidebar = true;
@@ -245,6 +228,14 @@ app.controller('detailsCtrl', function ($scope, $interval, $rootScope, $http, $r
   $scope.start = () => {
     getTaskSetAndTasks($scope, $http);
     getAllLogs($scope, $http);
+  };
+
+  $scope.openConfirmation = function (taskSetId) {
+    openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets);
+  };
+
+  $scope.openGraphs = function (taskSetId) {
+    $location.path(`graph/${taskSetId}`);
   };
 
   $scope.stop = () => {

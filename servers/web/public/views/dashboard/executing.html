@@ -25,8 +25,6 @@
               Start Time
               <i class="fa fa-fw fa-sort" ng-show="sortKey=='start_time'" ng-class="{'fa fa-fw fa-sort-up':reverse,'fa fa-fw fa-sort-down':!reverse}"></i>
             </th>
-            <th></th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -34,20 +32,6 @@
             <td><a ng-href="#!details/{{executingTaskSet._id}}">{{executingTaskSet.name}}</a></td>
             <td>{{executingTaskSet.remainingTasksCount}}</td>
             <td>{{executingTaskSet.startTime | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
-            <td>
-              <div class="dropdown">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                  Export
-                </button>
-                <div class="dropdown-menu">
-                  <!--<span class="dropdown-item" ng-click="export(finishedTaskSet._id, 'json')">JSON</span>-->
-                  <a class="dropdown-item" ng-href="/api/task/export/?format=json&taskSetId={{executingTaskSet._id}}" download="{{executingTaskSet.name}}.zip">JSON</a>
-                  <a class="dropdown-item" ng-href="/api/task/export/?format=csv&taskSetId={{executingTaskSet._id}}" download="{{executingTaskSet.name}}.zip">CSV</a>
-                </div>
-              </div>
-            </td>
-            <td><button class="btn btn-large btn-primary" ng-click="openLogs(executingTaskSet._id)"><span class="fa fa-fw fa-file"></span> Logs</button></td>
-            <td><button class="btn btn-large btn-danger" ng-click="openConfirmation(executingTaskSet._id)"><span class="fa fa-fw fa-trash"></span> Remove</button></td>
           </tr>
         </tbody>
       </table>
