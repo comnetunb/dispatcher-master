@@ -23,59 +23,14 @@
 // ! DEALINGS IN THE SOFTWARE.
 // !
 
-app.controller('groupCtrl', function ($scope, $http, $interval /* , $rootScope */) {
-  $scope.activeCount = 0;
-  $scope.finishedCount = 0;
-  $scope.canceledCount = 0;
-
-  let promise;
-
-  $scope.start = function () {
-    $scope.stop();
-
-    getCount($scope, $http);
-
-    promise = $interval(function () {
-      getCount($scope, $http);
-    }, 1500);
-  };
-
-  $scope.stop = function () {
-    $interval.cancel(promise);
-  };
-
-  $scope.start();
-
-  $scope.$on('$destroy', function () {
-    $scope.stop();
-  });
-});
-
-function getCount(/* $scope, $http */) {
-  // $http
-  //   .get('/api/task/count_active')
-  //   .then(function (response) {
-  //     $scope.activeCount = response.data.count;
-  //     console.log(response);
-  //   })
-
-  // $http
-  //   .get('/api/task/count_finished')
-  //   .then(function (response) {
-  //     $scope.finishedCount = response.data.count;
-  //     console.log(response);
-  //   })
-
-  // $http
-  //   .get('/api/task/count_canceled')
-  //   .then(function (response) {
-  //     $scope.canceledCount = response.data.count;
-  //     console.log(response);
-  //   });
-}
+const taskSetState = {
+  EXECUTING: 0,
+  FINISHED: 1,
+  CANCELED: 2
+};
 
 // ExecutingTaskSet
-app.controller('executingTaskSetCtrl', function ($scope, $location, $rootScope, $http, $interval, $uibModal) {
+app.controller('tasksCtrl', function ($scope, $location, $rootScope, $http, $interval) {
   $rootScope.sidebar = true;
 
   $scope.sort = function (keyname) {
@@ -88,10 +43,10 @@ app.controller('executingTaskSetCtrl', function ($scope, $location, $rootScope, 
   $scope.start = function () {
     $scope.stop();
 
-    getAllExecutingTaskSets($scope, $http);
+    getAllTaskSets($scope, $http);
 
     promise = $interval(function () {
-      getAllExecutingTaskSets($scope, $http);
+      getAllTaskSets($scope, $http);
     }, 1500);
   };
 
@@ -106,55 +61,18 @@ app.controller('executingTaskSetCtrl', function ($scope, $location, $rootScope, 
   });
 });
 
-function getAllExecutingTaskSets($scope, $http) {
+function getAllTaskSets($scope, $http) {
   $http
-    .get('/api/task/get_executing')
+    .get('/api/tasks')
     .then(function (response) {
-      $scope.executingTaskSets = response.data;
+      $scope.executingTaskSets = response.data.filter(taskSet => taskSet.state === taskSetState.EXECUTING); // eslint-disable-line
+      $scope.finishedTaskSets = response.data.filter(taskSet => taskSet.state === taskSetState.FINISHED); // eslint-disable-line
+      $scope.canceledTaskSets = response.data.filter(taskSet => taskSet.state === taskSetState.CANCELED); // eslint-disable-line
+      $scope.totalCount = response.data.length;
     });
 }
 
-// FinishedTaskSet
-app.controller('finishedTaskSetCtrl', function ($scope, $location, $rootScope, $http, $interval, $uibModal) {
-  $rootScope.sidebar = true;
-
-  $scope.sort = function (keyname) {
-    $scope.sortKey = keyname; // set the sortKey to the param passed
-    $scope.reverse = !$scope.reverse; // if true make it false and vice versa
-  };
-
-  let promise;
-
-  $scope.start = function () {
-    $scope.stop();
-
-    getAllFinishedTaskSets($scope, $http);
-
-    promise = $interval(function () {
-      getAllFinishedTaskSets($scope, $http);
-    }, 1500);
-  };
-
-  $scope.stop = function () {
-    $interval.cancel(promise);
-  };
-
-  $scope.start();
-
-  $scope.$on('$destroy', function () {
-    $scope.stop();
-  });
-});
-
-function getAllFinishedTaskSets($scope, $http) {
-  $http
-    .get('/api/task/get_finished')
-    .then(function (response) {
-      $scope.finishedTaskSets = response.data;
-    });
-}
-
-app.controller('removalModalCtrl', function ($uibModalInstance, taskSetId) { // eslint-disable-line
+app.controller('modalCtrl', function ($uibModalInstance, taskSetId) { // eslint-disable-line
   const $ctrl = this;
   $ctrl.taskSetId = taskSetId;
 
@@ -167,13 +85,13 @@ app.controller('removalModalCtrl', function ($uibModalInstance, taskSetId) { // 
   };
 });
 
-function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
+function openConfirmation(taskSetId, templateUrl, apiUri, $uibModal, $http, $scope, callback) { // eslint-disable-line
   const modalInstance = $uibModal.open({
     animation: false,
     ariaLabelledBy: 'modal-title',
     ariaDescribedBy: 'modal-body',
-    templateUrl: 'views/dashboard/modals/task_set_removal.html',
-    controller: 'removalModalCtrl',
+    templateUrl,
+    controller: 'modalCtrl',
     controllerAs: '$ctrl',
     resolve: {
       taskSetId: function () { // eslint-disable-line
@@ -187,7 +105,7 @@ function openConfirmation($uibModal, taskSetId, $http, $scope, callback) {
     console.log(option + taskSetId); // eslint-disable-line no-console
     if (option === 'ok') {
       $http
-        .post('/api/task/remove_task_set', { id: taskSetId })
+        .post(apiUri, { id: taskSetId })
         .then(function () {
           $scope.errorMessage = false;
           callback($scope, $http);
@@ -230,8 +148,28 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
     getAllLogs($scope, $http);
   };
 
-  $scope.openConfirmation = function (taskSetId) {
-    openConfirmation($uibModal, taskSetId, $http, $scope, getAllFinishedTaskSets);
+  $scope.openCancel = function (taskSetId) {
+    openConfirmation(
+      taskSetId,
+      'views/dashboard/modals/task_set_cancel.html',
+      '/api/task/cancel_task_set',
+      $uibModal,
+      $http,
+      $scope,
+      () => $location.path('tasks')
+    );
+  };
+
+  $scope.openRemove = function (taskSetId) {
+    openConfirmation(
+      taskSetId,
+      'views/dashboard/modals/task_set_removal.html',
+      '/api/task/remove_task_set',
+      $uibModal,
+      $http,
+      $scope,
+      () => $location.path('tasks')
+    );
   };
 
   $scope.openGraphs = function (taskSetId) {
@@ -254,12 +192,14 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
   }, 1500);
 
   $scope.formatTaskSetState = (state) => {
-    if (state === 0) {
+    if (state === taskSetState.EXECUTING) {
       return 'Executing';
-    } else if (state === 1) {
+    } else if (state === taskSetState.FINISHED) {
       return 'Finished';
+    } else if (state === taskSetState.CANCELED) {
+      return 'Canceled';
     }
-    return 'Canceled';
+    return 'Undefined';
   };
 
   $scope.formatTaskState = (state) => {
@@ -271,8 +211,10 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
       return 'Finished';
     } else if (state === 3) {
       return 'Canceled';
+    } else if (state === 4) {
+      return 'Sent';
     }
-    return 'Sent';
+    return 'Undefined';
   };
 
   $scope.formatPriority = (priority) => {
@@ -348,7 +290,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       .post('/api/task/add_task_group_set', addTaskForm)
       .then(function () {
         $scope.errorMessage = false;
-        $location.path('/executing');
+        $location.path('/tasks');
       })
       .catch(function (e) {
         $scope.errorMessage = e.data.reason;

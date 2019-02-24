@@ -5,21 +5,8 @@ const TaskSet = databaseRequire('models/task_set');
 const Task = databaseRequire('models/task');
 
 module.exports = (app) => {
-  app.get('/api/task/get_executing', (req, res) => {
-    const taskSetFilter = { state: TaskSet.State.EXECUTING };
-
-    TaskSet
-      .find(taskSetFilter)
-      .then((taskSet) => {
-        res.send(taskSet);
-      })
-      .catch((e) => {
-        res.status(412).send({ reason: e });
-      });
-  });
-
-  app.get('/api/task/get_finished', (req, res) => {
-    const taskSetFilter = { state: TaskSet.State.FINISHED };
+  app.get('/api/tasks', (req, res) => {
+    const taskSetFilter = { _user: req.user._id };
 
     TaskSet
       .find(taskSetFilter)
@@ -50,6 +37,23 @@ module.exports = (app) => {
       const taskSetFilter = { _id: req.body.id };
 
       TaskSet.remove(taskSetFilter, () => { });
+
+      res.sendStatus(200);
+    } catch (e) {
+      log.error(e);
+      res.status(412).send({ reason: e });
+    }
+  });
+
+  app.post('/api/task/cancel_task_set', (req, res) => {
+    try {
+      const taskFilter = { _taskSet: req.body.id, state: Task.State.PENDING };
+
+      Task.update(taskFilter, { $set: { state: Task.State.CANCELED } }, { multi: true }, () => {});
+
+      const taskSetFilter = { _id: req.body.id, state: TaskSet.State.EXECUTING };
+
+      TaskSet.update(taskSetFilter, { $set: { state: TaskSet.State.CANCELED, endTime: new Date() } }, () => {}); // eslint-disable-line
 
       res.sendStatus(200);
     } catch (e) {

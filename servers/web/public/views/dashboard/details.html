@@ -24,7 +24,8 @@
             </div>
           </div><br>
           <button class="btn btn-large btn-primary" ng-click="openGraphs(taskSet._id)"><span class="fa fa-fw fa-line-chart"></span> Graphs</button><br><br>
-          <button class="btn btn-large btn-danger" ng-click="openConfirmation(taskSet._id)"><span class="fa fa-fw fa-trash"></span> Remove</button>
+          <button class="btn btn-large btn-danger" ng-if="taskSet.state === 0" ng-click="openCancel(taskSet._id)"><span class="fa fa-fw fa-times"></span> Cancel</button>
+          <button class="btn btn-large btn-danger" ng-click="openRemove(taskSet._id)"><span class="fa fa-fw fa-trash"></span> Remove</button>
         </div>
         <div class="box one">
             <h4>Tasks</h4>

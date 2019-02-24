@@ -38,14 +38,9 @@ app.config(function ($routeProvider /* , $locationProvider */) {
       controller: 'workerCtrl',
       auth: true
     })
-    .when('/executing', {
-      templateUrl: 'views/dashboard/executing.html',
-      controller: 'executingTaskSetCtrl',
-      auth: true
-    })
-    .when('/finished', {
-      templateUrl: 'views/dashboard/finished.html',
-      controller: 'finishedTaskSetCtrl',
+    .when('/tasks', {
+      templateUrl: 'views/dashboard/tasks.html',
+      controller: 'tasksCtrl',
       auth: true
     })
     .when('/add', {
@@ -53,7 +48,7 @@ app.config(function ($routeProvider /* , $locationProvider */) {
       controller: 'addCtrl',
       auth: true
     })
-    .when('/details/:task_set_id', {
+    .when('/tasks/:task_set_id', {
       templateUrl: 'views/dashboard/details.html',
       controller: 'detailsCtrl',
       auth: true

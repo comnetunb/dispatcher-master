@@ -32,25 +32,17 @@
               <span class="nav-link-text">Workers</span>
             </a>
           </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Task Sets" ng-controller="groupCtrl">
-            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" ng-href="#collapseComponents" data-parent="#exampleAccordion">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Task Sets">
+            <a class="nav-link" ng-href="#!tasks">
               <i class="fa fa-fw fa-folder"></i>
               <span class="nav-link-text">Task Sets</span>
             </a>
-            <ul class="sidenav-second-level collapse" id="collapseComponents">
-              <li>
-                <a ng-href="#!executing"><!--<span class="badge badge-secondary">{{activeCount}}</span>--> Executing</a>
-              </li>
-              <li>
-                <a ng-href="#!finished"><!--<span class="badge badge-secondary">{{finishedCount}}</span>--> Finished</a>
-              </li>
-              <!--<li>
-                <a ng-href="#!paused"><span class="badge badge-secondary">{{canceledCount}}</span> Paused</a>
-              </li>-->
-              <li>
-                <a ng-href="#!add"><i class="fa fa-fw fa-plus"></i> Add</a>
-              </li>
-            </ul>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Add Task Set">
+            <a class="nav-link" ng-href="#!add">
+              <i class="fa fa-fw fa-plus"></i>
+              <span class="nav-link-text">Add Task Set</span>
+            </a>
           </li>
           <li class="nav-item" data-toggle="tooltip" data-placement="right" title="" data-original-title="Logs">
             <a class="nav-link" ng-href="#!log">
