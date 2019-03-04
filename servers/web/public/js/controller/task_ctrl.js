@@ -102,7 +102,6 @@ function openConfirmation(taskSetId, templateUrl, apiUri, $uibModal, $http, $sco
 
   modalInstance.result.then(function () {
   }, function (option) {
-    console.log(option + taskSetId); // eslint-disable-line no-console
     if (option === 'ok') {
       $http
         .post(apiUri, { id: taskSetId })
