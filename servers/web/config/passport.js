@@ -23,18 +23,22 @@ module.exports = (passport) => {
     User
       .findOne({ email: email.toLowerCase() })
       .then((user) => {
+        console.log('??');
         if (!user) {
           return done(null, false, { reason: 'User not found.' });
         }
 
+        console.log('??2');
         if (!user.validPassword(password)) {
-          return done(null, false, { reason: 'Password do not match.' });
+          return done(null, false, { reason: 'Wrong password.' });
         }
 
-        // if (!user.permitted) {
-        //   return done(null, false, { reason: 'A system administrator must permit you first.' })
-        // }
+        console.log('??3');
+        if (!user.permitted) {
+          return done(null, false, { reason: 'A system administrator must allow your access.' });
+        }
 
+        console.log('??4');
         user.password = undefined;
 
         // Success

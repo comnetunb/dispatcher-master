@@ -8,13 +8,16 @@ app.controller('signInCtrl', function ($scope, $http, $window, $rootScope, $loca
         $location.path('/workers');
       })
       .catch(function (e) {
-        console.log(e); // eslint-disable-line no-console
-        $scope.errorMessage = e.data;
+        if (e.data && e.data.reason) {
+          $scope.errorMessage = e.data.reason;
+        } else {
+          $scope.errorMessage = e;
+        }
       });
   };
 });
 
-app.controller('signUpCtrl', function ($scope, $http, $window, $rootScope, $location) {
+app.controller('signUpCtrl', function ($scope, $http) {
   $scope.sign_up = function (signUp) {
     if (signUp.password !== signUp.confirmPassword) {
       $scope.errorMessage = 'Passwords must match!';
@@ -23,13 +26,16 @@ app.controller('signUpCtrl', function ($scope, $http, $window, $rootScope, $loca
 
     $http
       .post('/api/user/sign_up', signUp)
-      .then(function (response) {
+      .then(function () {
         $scope.errorMessage = false;
-        $rootScope.signedUser = response.data;
-        $location.path('/');
+        $scope.successMessage = 'Successful sign up, you can now log in';
       })
       .catch(function (e) {
-        $scope.errorMessage = e.data.reason;
+        if (e.data && e.data.reason) {
+          $scope.errorMessage = e.data.reason;
+        } else {
+          $scope.errorMessage = e;
+        }
       });
   };
 });

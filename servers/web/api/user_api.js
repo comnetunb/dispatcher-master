@@ -2,8 +2,12 @@
 const User = rootRequire('database/models/user');
 
 module.exports = (app, passport) => {
-  app.post('/api/user/sign_in', passport.authenticate('local'), (req, res) => {
-    res.json(req.user);
+  app.post('/api/user/sign_in', function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+      if (err) { return res.status(401).send(err); }
+      if (!user) { return res.status(401).json(info); }
+      return res.json(user);
+    })(req, res, next);
   });
 
   app.get('/api/user/signed_in', (req, res) => {
@@ -41,6 +45,9 @@ module.exports = (app, passport) => {
 
           newUser
             .save()
+            .then(() => {
+              res.send();
+            })
             .catch(() => {
               res.status(500).send({ reason: 'An internal error occurred. Please try again later.' });
             });

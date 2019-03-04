@@ -2,7 +2,10 @@ const Notification = databaseRequire('models/notification');
 
 module.exports = (app) => {
   app.get('/api/notifications', (req, res) => {
-    Notification
+    if (!req.user || !req.user._id) {
+      return res.sendStatus(401);
+    }
+    return Notification
       .getUnread(req.user._id)
       .then((notifications) => {
         res.send(notifications.reverse());
@@ -14,7 +17,10 @@ module.exports = (app) => {
   });
 
   app.get('/api/notifications/all', (req, res) => {
-    Notification
+    if (!req.user || !req.user._id) {
+      return res.sendStatus(401);
+    }
+    return Notification
       .getAll(req.user._id)
       .then((notifications) => {
         res.send(notifications.reverse());

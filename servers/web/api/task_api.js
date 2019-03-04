@@ -6,6 +6,9 @@ const Task = databaseRequire('models/task');
 
 module.exports = (app) => {
   app.get('/api/tasks', (req, res) => {
+    if (!req.user || !req.user._id) {
+      res.sendStatus(401);
+    }
     const taskSetFilter = { _user: req.user._id };
 
     TaskSet
@@ -20,6 +23,9 @@ module.exports = (app) => {
 
   app.post('/api/task/add_task_group_set', (req, res) => {
     try {
+      if (!req.user || !req.user._id) {
+        res.sendStatus(401);
+      }
       taskUtils.buildTasks(req.body, req.user);
       res.sendStatus(200);
     } catch (e) {
@@ -30,6 +36,9 @@ module.exports = (app) => {
 
   app.post('/api/task/remove_task_set', (req, res) => {
     try {
+      if (!req.user || !req.user._id) {
+        res.sendStatus(401);
+      }
       const taskFilter = { _taskSet: req.body.id };
 
       Task.remove(taskFilter, () => { });
@@ -47,6 +56,10 @@ module.exports = (app) => {
 
   app.post('/api/task/cancel_task_set', (req, res) => {
     try {
+      if (!req.user || !req.user._id) {
+        res.sendStatus(401);
+      }
+
       const taskFilter = { _taskSet: req.body.id, state: Task.State.PENDING };
 
       Task.update(taskFilter, { $set: { state: Task.State.CANCELED } }, { multi: true }, () => {});
@@ -64,6 +77,10 @@ module.exports = (app) => {
 
   app.post('/api/task/edit_task_set', async (req, res) => {
     try {
+      if (!req.user || !req.user._id) {
+        res.sendStatus(401);
+      }
+
       await taskUtils.editTaskSet(req.body);
       res.sendStatus(200);
     } catch (e) {
@@ -73,6 +90,9 @@ module.exports = (app) => {
   });
 
   app.get('/api/task/supported_runnables', (req, res) => {
+    if (!req.user || !req.user._id) {
+      res.sendStatus(401);
+    }
     res.send([{
       type: 'java',
       extension: '.jar'
