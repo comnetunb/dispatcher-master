@@ -6,7 +6,11 @@ module.exports = (app, passport) => {
     passport.authenticate('local', function (err, user, info) {
       if (err) { return res.status(401).send(err); }
       if (!user) { return res.status(401).json(info); }
-      return res.json(user);
+
+      return req.logIn(user, function (err2) {
+        if (err) { return next(err2); }
+        return res.json(user);
+      });
     })(req, res, next);
   });
 

@@ -29,10 +29,25 @@ $ npm install --only=prod
 
 And that's it!
 
+#### For Docker
+
+If you want to run it as a dockerized container, everything you need is to install Docker CE (Community Edition):
+
+- [CentOS](https://docs.docker.com/install/linux/docker-ce/centos/)
+- [Debian](https://docs.docker.com/install/linux/docker-ce/debian/)
+- [Fedora](https://docs.docker.com/install/linux/docker-ce/fedora/)
+- [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- [Others](https://docs.docker.com/install/linux/docker-ce/binaries)
+
+And also install [Docker Compose](https://docs.docker.com/compose/install/).
+
 ## Running
-After installing the web dispatcher, you can run it by executing the following command on terminal(pwd on root of the project):
+
+Clone the web dispatcher and run it
 
 ```bash
+$ git clone https://github.com/comnetunb/dispatcher-master
+$ cd dispatcher-master
 $ node app.js
 ```
 
@@ -48,6 +63,17 @@ If you'd like to let the server run without being attached to a terminal, in a f
 2. `forever start app.js`
 
 If you want to limit the number of restarts in case of failure, 5 for example, you can use `forever -m5 start app.js`
+
+### For Docker
+
+After installing Docker, just `cd` into the directory and execute `docker-compose up`:
+
+```bash
+$ git clone https://github.com/comnetunb/dispatcher-master
+$ cd dispatcher-master
+$ docker-compose up
+```
+
 
 ### Properties
 - cpu.threshold: defines the cpu threashold that should be available on worker machines
