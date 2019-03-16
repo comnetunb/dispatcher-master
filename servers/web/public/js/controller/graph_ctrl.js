@@ -13,7 +13,8 @@ app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $rou
     },
     elements: {
       line: {
-        fill: false
+        tension: 0,
+        fill: false,
       }
     }
   };
