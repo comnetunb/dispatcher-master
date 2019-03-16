@@ -1,10 +1,10 @@
 const Task = databaseRequire('models/task');
+const TaskSet = databaseRequire('models/task_set');
 
 module.exports = (app) => {
   app.get('/api/graph/plot_info', (req, res) => {
     const taskFilter = {
       _taskSet: req.query.taskSetId,
-      state: Task.State.FINISHED
     };
 
     Task
@@ -13,7 +13,8 @@ module.exports = (app) => {
       .then((task) => {
         const info = {
           axes: [],
-          curves: []
+          curves: [],
+          graphs: [],
         };
 
         if (!task) {
@@ -33,6 +34,10 @@ module.exports = (app) => {
           info.curves.push(option);
         }
 
+        console.log(task._taskSet);
+
+        info.graphs = task._taskSet.graphs;
+
         res.send(info);
       })
       .catch((e) => {
@@ -40,40 +45,50 @@ module.exports = (app) => {
       });
   });
 
-  app.get('/api/graph/plot_data', (req, res) => {
-    const { index, xAxis, yAxis } = req.query;
-
+  app.post('/api/graph/plot_data', (req, res) => {
+    const graphs = req.body.body;
     const taskFilter = {
-      _taskSet: req.query.taskSetId,
+      _taskSet: req.body.params.taskSetId,
       state: Task.State.FINISHED
     };
 
     Task
       .find(taskFilter)
       .then((tasks) => {
-        const curves = {};
+        const graphsCurves = [];
 
-        for (let task in tasks) { // eslint-disable-line
-          const curveIdx = tasks[task].indexes[index].toString();
+        for (let i = 0; i < graphs.length; i += 1) {
+          if (graphs[i].curve !== undefined && graphs[i].xAxis && graphs[i].xAxis) {
+            const curves = {};
 
-          if (!curves.hasOwnProperty(curveIdx)) {
-            curves[curveIdx] = {};
+            for (let task in tasks) { // eslint-disable-line
+              const curveIdx = tasks[task].indexes[graphs[i].curve].toString();
+
+              if (!curves.hasOwnProperty(curveIdx)) {
+                curves[curveIdx] = {};
+              }
+
+              const result = JSON.parse(tasks[task].result);
+
+              const xAxisIdx = result[graphs[i].xAxis].toString();
+
+              if (!curves[curveIdx].hasOwnProperty(xAxisIdx)) {
+                curves[curveIdx][xAxisIdx] = [];
+              }
+
+              curves[curveIdx][xAxisIdx].push(result[graphs[i].yAxis]);
+            }
+
+            graphsCurves.push(curves);
+          } else {
+            graphsCurves.push(undefined);
           }
-
-          const result = JSON.parse(tasks[task].result);
-
-          const xAxisIdx = result[xAxis].toString();
-
-          if (!curves[curveIdx].hasOwnProperty(xAxisIdx)) {
-            curves[curveIdx][xAxisIdx] = [];
-          }
-
-          curves[curveIdx][xAxisIdx].push(result[yAxis]);
         }
-
-        res.send(curves);
+        res.send(graphsCurves);
+        TaskSet.update({ _id: req.body.params.taskSetId }, { $set: { graphs } });
       })
       .catch((e) => {
+        console.log(e);
         res.status(500).send({ reason: e });
       });
   });

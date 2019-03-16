@@ -66,6 +66,9 @@ const taskSetSchema = Schema({
   argumentTemplate: {
     type: String
   },
+  graphs: {
+    type: {},
+  },
   priority: {
     type: Number,
     default: Priority.MINIMUM

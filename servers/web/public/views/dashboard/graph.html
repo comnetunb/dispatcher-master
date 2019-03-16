@@ -7,12 +7,12 @@
     </div>
   </div>
 
-  <div class="col-lg-6 col-sm-12 container h-100">
-    <canvas id="line" class="chart chart-line" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
-  </div>
-
-  <form name="graphForm" novalidate>
-    <div class="btn-group">
+  <div ng-repeat="graph in graphs" class="col-lg-6 col-sm-12 container h-100">
+    <div>
+      <canvas id="line" ng-show="graph.data" class="chart chart-line" chart-data="graph.data" chart-labels="graph.labels" chart-series="graph.series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
+    </div>
+    
+    <div class="btn-group align-self-center">
       <div class="p-2">
         <label>Curve</label>
         <select class="custom-select" ng-model="graph.curve" ng-options="curve.value as curve.key for curve in curves" ng-required="true"></select>
@@ -25,9 +25,14 @@
         <label>Y Axis</label>
         <select class="custom-select" ng-model="graph.yAxis" ng-options="axis for axis in axes" ng-required="true"></select>
       </div>
+      <div class="p-2">
+          <label></label>
+          <button class="btn btn-danger" ng-click="graphs.splice($index, 1)">Remove</button>
+      </div>
     </div>
-    <div class="p-2">
-      <input class="btn btn-primary" ng-click="getPlotData(graph)" ng-disabled="graphForm.$invalid" value="Plot">
-    </div>
-  </form>
+    <div class="horizontal-rule" style="margin-top: 20px; margin-bottom: 20px;"></div>
+  </div>
+  <div class="col-lg-1 col-sm-1 container h-100">
+    <button class="btn btn-primary" ng-click="graphs.push({})">+</button>
+  </div>
 </div>

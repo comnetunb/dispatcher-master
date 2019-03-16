@@ -1,6 +1,6 @@
 app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $routeParams /* , $location */) {
   $rootScope.sidebar = true;
-
+  $scope.graphs = [];
   $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
   $scope.options = {
     scales: {
@@ -28,74 +28,68 @@ app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $rou
     .then(function (response) {
       $scope.axes = response.data.axes;
       $scope.curves = response.data.curves;
+      $scope.graphs = response.data.graphs;
       $scope.argumentTemplate = response.data.argumentTemplate;
+      $scope.start();
     });
 
-  $scope.getPlotData = function (graph) {
-    let promise;
+  let promise;
 
-    $scope.start = function () {
-      $scope.stop();
+  $scope.start = function () {
+    $scope.stop();
 
-      plotData(graph, taskSetId, $http, $scope);
+    plotData(taskSetId, $http, $scope);
 
-      promise = $interval(function () {
-        plotData(graph, taskSetId, $http, $scope);
-      }, 1500);
-    };
+    promise = $interval(function () {
+      plotData(taskSetId, $http, $scope);
+    }, 1500);
+  };
 
-    $scope.stop = function () {
-      $interval.cancel(promise);
-    };
-
-    $scope.start();
-
-    $scope.$on('$destroy', function () {
-      $scope.stop();
-    });
+  $scope.stop = function () {
+    $interval.cancel(promise);
   };
 });
 
-function plotData(graph, taskSetId, $http, $scope) {
+function plotData(taskSetId, $http, $scope) {
   $http
-    .get('/api/graph/plot_data', {
+    .post('/api/graph/plot_data', {
       params: {
-        index: graph.curve,
-        xAxis: graph.xAxis,
-        yAxis: graph.yAxis,
         taskSetId
-      }
+      },
+      body: $scope.graphs.map(g => ({ curve: g.curve, xAxis: g.xAxis, yAxis: g.yAxis })),
     })
     .then(function (response) {
-      const curves = response.data;
+      const graphsCurves = response.data;
 
-      const labels = [];
-      const data = [];
+      for (let i = 0; i < graphsCurves.length; i += 1) {
+        if (graphsCurves[i]) {
+          $scope.graphs[i].curves = graphsCurves[i];
+          $scope.graphs[i].labels = [];
+          $scope.graphs[i].data = [];
 
-      for (let curve in curves) { // eslint-disable-line
-        const curveData = [];
-        for (let xAxis in curves[curve]) { // eslint-disable-line
-          if (labels.indexOf(xAxis) === -1) {
-            // Push if doesn't exist already
-            labels.push(xAxis);
+          for (let curve in $scope.graphs[i].curves) { // eslint-disable-line
+            const curveData = [];
+            for (let xAxis in $scope.graphs[i].curves[curve]) { // eslint-disable-line
+              if ($scope.graphs[i].labels.indexOf(xAxis) === -1) {
+                // Push if doesn't exist already
+                $scope.graphs[i].labels.push(xAxis);
+              }
+
+              // TODO: here, get here the
+              let yAxisValue = 0;
+
+              for (let j = 0; j < $scope.graphs[i].curves[curve][xAxis].length; j += 1) {
+                yAxisValue += $scope.graphs[i].curves[curve][xAxis][j];
+              }
+
+              yAxisValue /= $scope.graphs[i].curves[curve][xAxis].length;
+
+              curveData.push(yAxisValue);
+            }
+
+            $scope.graphs[i].data.push(curveData);
           }
-
-          // TODO: here, get here the
-          let yAxisValue = 0;
-
-          for (let i = 0; i < curves[curve][xAxis].length; i += 1) {
-            yAxisValue += curves[curve][xAxis][i];
-          }
-
-          yAxisValue /= curves[curve][xAxis].length;
-
-          curveData.push(yAxisValue);
         }
-
-        data.push(curveData);
       }
-
-      $scope.data = data;
-      $scope.labels = labels;
     });
 }
