@@ -68,6 +68,7 @@ const taskSetSchema = Schema({
   },
   graphs: {
     type: {},
+    default: [],
   },
   priority: {
     type: Number,
