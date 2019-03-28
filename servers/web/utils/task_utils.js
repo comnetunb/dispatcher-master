@@ -60,6 +60,13 @@ const buildTasks = (taskSetData, user) => {
         });
         break;
 
+      case 'S':
+        parsedInputs.push({
+          data: parseString(inputs[input].data),
+          directiveIndex: inputs[input].directiveIndex
+        });
+        break;
+
       case 'F':
         const data = [];
         const files = inputs[input].data;
@@ -311,6 +318,38 @@ function buildTaskSet(commandLineTemplate, parsedInputs, taskSetId, promises, in
 
     infos.splice(-1, 1);
   }
+}
+
+function parseString(stringNotation) {
+  const strings = [];
+  let cancel = false;
+  let currentString = '';
+  for (let i = 0; i < stringNotation.length; i += 1) {
+    const char = stringNotation[i];
+    switch (char) {
+      case ',':
+        if (cancel) {
+          currentString += char;
+          cancel = false;
+        } else {
+          strings.push(currentString);
+          currentString = '';
+        }
+        break;
+      case '\\':
+        if (cancel) {
+          currentString += char;
+          cancel = false;
+        } else {
+          cancel = true;
+        }
+        break;
+      default:
+        currentString += char;
+    }
+  }
+  strings.push(currentString);
+  return strings;
 }
 
 function parseNumber(numberNotation) {
