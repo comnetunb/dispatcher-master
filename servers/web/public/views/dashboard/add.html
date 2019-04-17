@@ -15,9 +15,9 @@
             </div>-->
             <div class="input-group mb-3">
               <div class="input-group-prepend">
-                <span class="input-group-text">Runnable type</span>
+                <span class="input-group-text">Type</span>
               </div>
-              <select class="custom-select col-md-1" ng-model="addTaskForm.runnableInfo.info" ng-options="supportedRunnableInfo.type for supportedRunnableInfo in supportedRunnablesInfo"></select>
+              <select class="custom-select col-md-2" ng-model="addTaskForm.runnableInfo.info" ng-options="supportedRunnableInfo.type for supportedRunnableInfo in supportedRunnablesInfo"></select>
               <div class="input-group-prepend">
                 <span class="input-group-text">Runnable</span>
               </div>
@@ -26,6 +26,14 @@
                 <label class="custom-file-label" ng-disabled="true">{{addTaskForm.runnableInfo.runnable[0].name}}</label>
               </div>
             </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Limit of errors in a single task</span>
+              </div>
+              <input class="col-md-2" ng-model="addTaskForm.errorLimit" type="number" value="{{addTaskForm.errorLimit || 5}}"></input>
+            </div>
+
             <div class="mb-3">
               <label>Task arguments template</label>
               <div>

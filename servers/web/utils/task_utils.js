@@ -38,8 +38,7 @@ const buildTasks = (taskSetData, user) => {
   const taskSetName = taskSetData.name;
   const runnableType = taskSetData.runnableInfo.info.type;
   const runnable = taskSetData.runnableInfo.runnable[0];
-  const { inputs } = taskSetData;
-  const { argumentTemplate } = taskSetData;
+  const { inputs, argumentTemplate, errorLimit } = taskSetData;
 
   // Sort by precedence
   inputs.sort((first, second) => {
@@ -142,7 +141,8 @@ const buildTasks = (taskSetData, user) => {
             _runnable: savedRunnable._id,
             _files: fileIds,
             name: taskSetName,
-            argumentTemplate: argumentTemplate
+            argumentTemplate,
+            errorLimitCount: errorLimit,
           });
 
           return newTaskSet.save();
