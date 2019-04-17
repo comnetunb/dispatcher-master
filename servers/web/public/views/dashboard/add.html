@@ -30,12 +30,12 @@
               <label>Task arguments template</label>
               <div>
                 <div class="input-group">
-                  <input class="form-control form-control-success" id="argumentsTemplate" name="argumentsTemplate" ng-model="addTaskForm.argumentsTemplate" type="text" ng-change="clear()">
+                  <input class="form-control form-control-success" id="argumentTemplate" name="argumentTemplate" ng-model="addTaskForm.argumentTemplate" type="text" ng-change="clear()">
                   <span class="input-group-btn">
-                    <button class="btn btn-dark" type="button" ng-click="parse(addTaskForm.argumentsTemplate)"><i class="fa fa-fw fa-check"></i> Parse</button>
+                    <button class="btn btn-dark" type="button" ng-click="parse(addTaskForm.argumentTemplate)"><i class="fa fa-fw fa-check"></i> Parse</button>
                   </span>
                 </div>
-                <div ng-show="addTaskSetForm.argumentsTemplate.$touched && addTaskSetForm.commandLine.$invalid">
+                <div ng-show="addTaskSetForm.argumentTemplate.$touched && addTaskSetForm.commandLine.$invalid">
                   <small class="warning">Enter a command line</small>
                 </div>
                 <div class="container-fluid">

@@ -175,6 +175,12 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
     $location.path(`graph/${taskSetId}`);
   };
 
+  $scope.clone = () => {
+    $location.path('add').search({
+      argumentTemplate: $scope.taskSet.argumentTemplate,
+    });
+  };
+
   $scope.stop = () => {
     $interval.cancel(promise);
   };
@@ -260,7 +266,7 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
 });
 
 // Add
-app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location) {
+app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $location, $routeParams) {
   $rootScope.sidebar = true;
 
   $http
@@ -296,16 +302,10 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       });
   };
 
-  $scope.addTaskForm = {
-    runnableInfo: {},
-    argumentsTemplate: '',
-    inputs: []
-  };
-
-  $scope.parse = function (argumentsTemplate) {
+  $scope.parse = function (argumentTemplate) {
     $scope.clear();
 
-    const matches = argumentsTemplate.match(/(%n|%s|%f)/g);
+    const matches = argumentTemplate.match(/(%n|%s|%f)/g);
 
     const table = document.createElement('table');
     table.className = 'table table-bordered';
@@ -380,16 +380,27 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
       .append($compile('<input class="btn btn-primary btn-block" ng-click="submit(addTaskForm)" ng-disabled="addTaskSetForm.$invalid" value="Submit">')($scope));
   };
 
+  $scope.addTaskForm = {
+    runnableInfo: {},
+    name: '',
+    argumentTemplate: $routeParams.argumentTemplate || '',
+    inputs: []
+  };
+
+  if ($scope.addTaskForm.argumentTemplate) {
+    $scope.parse($scope.addTaskForm.argumentTemplate)
+  }
+
   $scope.addInterpretiveDirective = function (directive) {
     $scope.clear();
 
-    if (!$scope.addTaskForm.argumentsTemplate) {
-      $scope.addTaskForm.argumentsTemplate = '';
+    if (!$scope.addTaskForm.argumentTemplate) {
+      $scope.addTaskForm.argumentTemplate = '';
     }
 
-    const position = argumentsTemplate.selectionStart;
+    const position = argumentTemplate.selectionStart;
 
-    $scope.addTaskForm.argumentsTemplate = [$scope.addTaskForm.argumentsTemplate.slice(0, position), directive, $scope.addTaskForm.argumentsTemplate.slice(position)].join('');
+    $scope.addTaskForm.argumentTemplate = [$scope.addTaskForm.argumentTemplate.slice(0, position), directive, $scope.addTaskForm.argumentTemplate.slice(position)].join('');
   };
 })
   .directive('fileread', function () {
