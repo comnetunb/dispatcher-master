@@ -39,7 +39,7 @@ const buildTasks = (taskSetData, user) => {
   const runnableType = taskSetData.runnableInfo.info.type;
   const runnable = taskSetData.runnableInfo.runnable[0];
   const { inputs } = taskSetData;
-  const { argumentsTemplate } = taskSetData;
+  const { argumentTemplate } = taskSetData;
 
   // Sort by precedence
   inputs.sort((first, second) => {
@@ -109,15 +109,15 @@ const buildTasks = (taskSetData, user) => {
 
   // TODO: where does this preprocessing belong?
   let index = 0;
-  let preProcessedArgumentsTemplate = argumentsTemplate;
-  let match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+  let preProcessedArgumentTemplate = argumentTemplate;
+  let match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
   while (match != null) {
-    preProcessedArgumentsTemplate = preProcessedArgumentsTemplate.replace(match[0], `%${index}`);
-    match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+    preProcessedArgumentTemplate = preProcessedArgumentTemplate.replace(match[0], `%${index}`);
+    match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
     index += 1;
   }
 
-  commandLineTemplate = prefix + preProcessedArgumentsTemplate;
+  commandLineTemplate = prefix + preProcessedArgumentTemplate;
 
   File
     .insertMany(newFiles)
@@ -142,7 +142,7 @@ const buildTasks = (taskSetData, user) => {
             _runnable: savedRunnable._id,
             _files: fileIds,
             name: taskSetName,
-            argumentTemplate: argumentsTemplate
+            argumentTemplate: argumentTemplate
           });
 
           return newTaskSet.save();
@@ -170,7 +170,7 @@ const editTaskSet = async (taskSetData) => {
   // const runnableType = taskSetData.runnableInfo.info.type;
   // const runnable = taskSetData.runnableInfo.runnable[0];
   // const { inputs } = taskSetData;
-  // const { argumentsTemplate } = taskSetData;
+  // const { argumentTemplate } = taskSetData;
   const oldTaskSet = await TaskSet.findOne({ _id: taskSetData._id });
 
   // // Sort by precedence
@@ -234,15 +234,15 @@ const editTaskSet = async (taskSetData) => {
 
   // // TODO: where does this preprocessing belong?
   // let index = 0;
-  // let preProcessedArgumentsTemplate = argumentsTemplate;
-  // let match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+  // let preProcessedArgumentTemplate = argumentTemplate;
+  // let match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
   // while (match != null) {
-  //   preProcessedArgumentsTemplate = preProcessedArgumentsTemplate.replace(match[0], `%${index}`);
-  //   match = /(%n|%s|%f)/g.exec(preProcessedArgumentsTemplate);
+  //   preProcessedArgumentTemplate = preProcessedArgumentTemplate.replace(match[0], `%${index}`);
+  //   match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
   //   index += 1;
   // }
 
-  // commandLineTemplate = prefix + preProcessedArgumentsTemplate;
+  // commandLineTemplate = prefix + preProcessedArgumentTemplate;
 
   // const files = File.insertMany(newFiles);
   // const fileIds = [];
