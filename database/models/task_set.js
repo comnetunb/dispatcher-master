@@ -87,6 +87,9 @@ const taskSetSchema = Schema({
   },
   remainingTasksCount: {
     type: Number
+  },
+  errorLimitCount: {
+    type: Number
   }
 });
 

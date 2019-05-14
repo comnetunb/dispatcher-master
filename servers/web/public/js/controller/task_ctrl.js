@@ -218,6 +218,8 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
       return 'Canceled';
     } else if (state === 4) {
       return 'Sent';
+    } else if (state === 5) {
+      return 'Failed';
     }
     return 'Undefined';
   };
@@ -384,11 +386,12 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     runnableInfo: {},
     name: '',
     argumentTemplate: $routeParams.argumentTemplate || '',
-    inputs: []
+    inputs: [],
+    errorLimit: 5,
   };
 
   if ($scope.addTaskForm.argumentTemplate) {
-    $scope.parse($scope.addTaskForm.argumentTemplate)
+    $scope.parse($scope.addTaskForm.argumentTemplate);
   }
 
   $scope.addInterpretiveDirective = function (directive) {

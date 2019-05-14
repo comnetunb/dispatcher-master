@@ -48,8 +48,10 @@ module.exports.execute = (pdu, worker) => {
 
     Task
       .flagError(pdu.task.id)
-      .then(() => {
-        return worker.updateRunningInstances();
+      .then((task) => {
+        TaskSet.UpdateRemainingTasksCount(task._taskSet);
+        worker.updateRunningInstances();
+        return cascadeConclusion(task._taskSet);
       })
       .catch((e) => {
         log.fatal(e, pdu.task.id);
@@ -60,9 +62,11 @@ module.exports.execute = (pdu, worker) => {
 function cascadeConclusion(taskSetId) {
   const taskFilter = {
     _taskSet: taskSetId,
-    state: {
-      $ne: Task.State.FINISHED
-    }
+    $or: [
+      { state: Task.State.PENDING },
+      { state: Task.State.SENT },
+      { state: Task.State.EXECUTING }
+    ],
   };
 
   return Task

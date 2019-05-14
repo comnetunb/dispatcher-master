@@ -32,7 +32,8 @@ const State = {
   EXECUTING: 1,
   FINISHED: 2,
   CANCELED: 3,
-  SENT: 4
+  SENT: 4,
+  FAILED: 5,
 };
 
 const taskSchema = Schema({
@@ -119,12 +120,16 @@ taskSchema.statics.flagError = (taskId) => {
       task.startTime = undefined;
       task.errorCount += 1;
 
-      const TaskSet = databaseRequire('models/task_set'); // eslint-disable-line no-undef
-
-      if (taskSetState === TaskSet.State.EXECUTING) {
-        task.state = State.PENDING;
+      if (task.errorCount > task._taskSet.errorLimitCount) {
+        task.state = State.FAILED;
       } else {
-        task.state = State.CANCELED;
+        const TaskSet = databaseRequire('models/task_set'); // eslint-disable-line no-undef
+
+        if (taskSetState === TaskSet.State.EXECUTING) {
+          task.state = State.PENDING;
+        } else {
+          task.state = State.CANCELED;
+        }
       }
 
       return task.save();
@@ -149,6 +154,10 @@ taskSchema.methods.isFinished = function () { // eslint-disable-line func-names
 
 taskSchema.methods.isCanceled = function () { // eslint-disable-line func-names
   return this.state === State.CANCELED;
+};
+
+taskSchema.methods.isFailed = function () { // eslint-disable-line func-names
+  return this.state === State.FAILED;
 };
 
 const model = mongoose.model('Task', taskSchema);
