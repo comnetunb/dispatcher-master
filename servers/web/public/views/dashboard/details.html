@@ -8,6 +8,7 @@
           <div class="horizontal-rule"></div>
           <p><b>Status: </b>{{formatTaskSetState(taskSet.state)}}</p>
           <p><b>Priority: </b>{{formatPriority(taskSet.priority)}}</p>
+          <p><b>Error Limit by Task: </b>{{taskSet.errorLimitCount}}</p>
           <p><b>Start: </b>{{taskSet.startTime | date : "MMM d, y HH:mm:ss Z" }}</p>
           <p><b>End: </b>{{taskSet.endTime | date : "MMM d, y HH:mm:ss Z" }}</p>
           <p><b>Command Template: </b>{{taskSet.argumentTemplate}}</p>
