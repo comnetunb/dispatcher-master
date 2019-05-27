@@ -43,6 +43,16 @@ app.config(function ($routeProvider /* , $locationProvider */) {
       controller: 'tasksCtrl',
       auth: true
     })
+    .when('/admin', {
+      templateUrl: 'views/dashboard/admin.html',
+      controller: 'adminCtrl',
+      auth: true
+    })
+    .when('/admin/users', {
+      templateUrl: 'views/dashboard/admin-users.html',
+      controller: 'adminUsersCtrl',
+      auth: true
+    })
     .when('/add', {
       templateUrl: 'views/dashboard/add.html',
       controller: 'addCtrl',
