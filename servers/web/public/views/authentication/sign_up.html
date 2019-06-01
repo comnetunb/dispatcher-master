@@ -2,7 +2,7 @@
   <div class="alert alert-danger mx-auto mt-5 text-center" ng-if="errorMessage">{{ errorMessage }}</div>
   <div class="alert alert-success mx-auto mt-5 text-center" ng-if="successMessage">{{ successMessage }}</div>
 
-  <div class="card card-register mx-auto mt-5">
+  <div class="card card-register mx-auto mt-5" ng-if="!successMessage">
     <div class="card-header text-center">Sign Up to WebSimAdmin</div>
     <div class="card-body">
       <form name="signUpForm" novalidate>

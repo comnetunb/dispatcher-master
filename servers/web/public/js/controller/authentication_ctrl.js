@@ -28,7 +28,7 @@ app.controller('signUpCtrl', function ($scope, $http) {
       .post('/api/user/sign_up', signUp)
       .then(function () {
         $scope.errorMessage = false;
-        $scope.successMessage = 'Successful sign up, you can now log in';
+        $scope.successMessage = 'Successful sign up, you may now wait for the approval of your account.';
       })
       .catch(function (e) {
         if (e.data && e.data.reason) {
