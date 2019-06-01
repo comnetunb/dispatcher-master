@@ -1,4 +1,5 @@
 app.controller('adminUsersCtrl', function ($scope, $rootScope, $http, $interval, $routeParams) {
+  $rootScope.sidebar = true;
   $scope.start = function () {
   };
 

@@ -23,6 +23,45 @@ module.exports = (app, passport) => {
     res.sendStatus(200);
   });
 
+  app.post('/api/user/allow/:id', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send();
+    }
+
+    if (!req.user.admin) {
+      return res.status(403).send();
+    }
+
+    const userFilter = { _id: req.params.id };
+
+    User
+      .findOne(userFilter)
+      .then((user) => {
+        user.permitted = true;
+        user.save().then(() => res.send());
+      })
+      .catch((e) => {
+        res.status(412).send({ reason: e });
+      });
+  });
+
+  app.get('/api/user/pending', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send();
+    }
+
+    if (!req.user.admin) {
+      return res.status(403).send();
+    }
+
+    const userFilter = { permitted: false };
+
+    User.find(userFilter)
+      .then((users) => {
+        res.send(users);
+      });
+  });
+
   app.post('/api/user/sign_up', (req, res) => {
     const userFilter = { email: req.body.email };
 
