@@ -72,50 +72,6 @@ function getAllTaskSets($scope, $http) {
     });
 }
 
-app.controller('modalCtrl', function ($uibModalInstance, taskSetId) { // eslint-disable-line
-  const $ctrl = this;
-  $ctrl.taskSetId = taskSetId;
-
-  $ctrl.ok = function () {
-    $uibModalInstance.dismiss('ok');
-  };
-
-  $ctrl.cancel = function () {
-    $uibModalInstance.dismiss('cancel');
-  };
-});
-
-function openConfirmation(taskSetId, templateUrl, apiUri, $uibModal, $http, $scope, callback) { // eslint-disable-line
-  const modalInstance = $uibModal.open({
-    animation: false,
-    ariaLabelledBy: 'modal-title',
-    ariaDescribedBy: 'modal-body',
-    templateUrl,
-    controller: 'modalCtrl',
-    controllerAs: '$ctrl',
-    resolve: {
-      taskSetId: function () { // eslint-disable-line
-        return taskSetId;
-      }
-    }
-  });
-
-  modalInstance.result.then(function () {
-  }, function (option) {
-    if (option === 'ok') {
-      $http
-        .post(apiUri, { id: taskSetId })
-        .then(function () {
-          $scope.errorMessage = false;
-          callback($scope, $http);
-        })
-        .catch(function (e) {
-          $scope.errorMessage = e.data.reason;
-        });
-    }
-  });
-}
-
 function getTaskSetAndTasks($scope, $http) {
   $http
     .get(`/api/task/${$scope.taskSetId}?includeTasks=true`)
@@ -149,25 +105,37 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
 
   $scope.openCancel = function (taskSetId) {
     openConfirmation(
-      taskSetId,
-      'views/dashboard/modals/task_set_cancel.html',
-      '/api/task/cancel_task_set',
       $uibModal,
-      $http,
-      $scope,
-      () => $location.path('tasks')
+      'views/dashboard/modals/task_set_cancel.html',
+      () => {
+        $http
+          .post('/api/task/cancel_task_set', { id: taskSetId })
+          .then(function () {
+            $scope.errorMessage = false;
+            $location.path('tasks')
+          })
+          .catch(function (e) {
+            $scope.errorMessage = e.data.reason;
+          })
+      },
     );
   };
 
   $scope.openRemove = function (taskSetId) {
     openConfirmation(
-      taskSetId,
-      'views/dashboard/modals/task_set_removal.html',
-      '/api/task/remove_task_set',
       $uibModal,
-      $http,
-      $scope,
-      () => $location.path('tasks')
+      'views/dashboard/modals/task_set_removal.html',
+      () => {
+        $http
+          .post('/api/task/remove_task_set', { id: taskSetId })
+          .then(function () {
+            $scope.errorMessage = false;
+            $location.path('tasks')
+          })
+          .catch(function (e) {
+            $scope.errorMessage = e.data.reason;
+          })
+      },
     );
   };
 
