@@ -1,0 +1,12 @@
+﻿<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">
+    Do you wish to approve {{user.name}}?
+  </h3>
+</div>
+<div class="modal-body" id="modal-body">
+  If approved, {{user.name}} ({{user.email}}) will be able to execute tasks in any connected workers.
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" type="button" ng-click="$ctrl.cancel()">No</button>
+  <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">Yes</button>
+</div>
