@@ -106,36 +106,40 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
   $scope.openCancel = function (taskSetId) {
     openConfirmation(
       $uibModal,
-      'views/dashboard/modals/task_set_cancel.html',
-      () => {
-        $http
-          .post('/api/task/cancel_task_set', { id: taskSetId })
-          .then(function () {
-            $scope.errorMessage = false;
-            $location.path('tasks')
-          })
-          .catch(function (e) {
-            $scope.errorMessage = e.data.reason;
-          })
-      },
+      {
+        templateUrl: 'views/dashboard/modals/task_set_cancel.html',
+        callbackOk: () => {
+          $http
+            .post('/api/task/cancel_task_set', { id: taskSetId })
+            .then(function () {
+              $scope.errorMessage = false;
+              $location.path('tasks')
+            })
+            .catch(function (e) {
+              $scope.errorMessage = e.data.reason;
+            })
+        },
+      }
     );
   };
 
   $scope.openRemove = function (taskSetId) {
     openConfirmation(
       $uibModal,
-      'views/dashboard/modals/task_set_removal.html',
-      () => {
-        $http
-          .post('/api/task/remove_task_set', { id: taskSetId })
-          .then(function () {
-            $scope.errorMessage = false;
-            $location.path('tasks')
-          })
-          .catch(function (e) {
-            $scope.errorMessage = e.data.reason;
-          })
-      },
+      {
+        templateUrl: 'views/dashboard/modals/task_set_removal.html',
+        callbackOk: () => {
+          $http
+            .post('/api/task/remove_task_set', { id: taskSetId })
+            .then(function () {
+              $scope.errorMessage = false;
+              $location.path('tasks')
+            })
+            .catch(function (e) {
+              $scope.errorMessage = e.data.reason;
+            })
+        },
+      }
     );
   };
 

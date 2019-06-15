@@ -11,22 +11,29 @@ app.controller('modalCtrl', function ($uibModalInstance) { // eslint-disable-lin
   };
 });
 
-function openConfirmation($uibModal, templateUrl, callbackOk, callbackCancel) { // eslint-disable-line
+function openConfirmation($uibModal, options = {}) { // eslint-disable-line
   const modalInstance = $uibModal.open({
     animation: false,
     ariaLabelledBy: 'modal-title',
     ariaDescribedBy: 'modal-body',
-    templateUrl,
-    controller: 'modalCtrl',
+    templateUrl: options.templateUrl,
+    controller: options.controller ? options.controller : 'modalCtrl',
+    resolve: options.resolve,
     controllerAs: '$ctrl',
   });
 
   modalInstance.result.then(function () {
-  }, function (option) {
-    if (option === 'ok' && typeof callbackOk === 'function') {
-      callbackOk();
-    } else if (option === 'cancel' && typeof callbackCancel === 'function') {
-      callbackCancel();
+  }, function (button) {
+    if (button === 'ok'
+      && options
+      && options.callbackOk
+      && typeof options.callbackOk === 'function') {
+      options.callbackOk();
+    } else if (button === 'cancel'
+      && options
+      && options.callbackOk
+      && typeof options.callbackCancel === 'function') {
+      options.callbackCancel();
     }
   });
 }
