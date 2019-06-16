@@ -91,11 +91,7 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa fa-fw fa-bell"></i>
-            <span class="d-lg-none">
-              Alerts
-              <span class="badge badge-pill badge-warning">6 New</span>
-            </span>
-            <span class="indicator text-warning d-none d-lg-block">
+            <span class="indicator text-warning d-none d-lg-block" ng-if="notifications && notifications.length > 0">
               <i class="fa fa-fw fa-circle"></i>
             </span>
           </a>
