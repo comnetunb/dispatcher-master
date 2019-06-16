@@ -55,6 +55,18 @@ notificationSchema.statics.getUnread = function (userId) {
     .exec();
 };
 
+notificationSchema.statics.read = function (userId, notificationId) {
+  return this.findOne({ userId, _id: notificationId, read: false })
+    .then((notification) => {
+      if (!notification) {
+        throw `Unread notification from user ${userId} and of id ${notificationId} not found`;
+      }
+
+      notification.read = true;
+      return notification.save();
+    });
+};
+
 notificationSchema.statics.getAll = function (userId) {
   return this.find({ userId })
     .exec();
