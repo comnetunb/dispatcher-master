@@ -34,8 +34,6 @@ module.exports = (app) => {
           info.curves.push(option);
         }
 
-        console.log(task._taskSet);
-
         info.graphs = task._taskSet.graphs;
 
         res.send(info);

@@ -6,6 +6,7 @@ const { taskResult } = dispatcherProtocol.pdu;
 // Database Related
 const Task = rootRequire('database/models/task');
 const TaskSet = rootRequire('database/models/task_set');
+const Notification = rootRequire('database/models/notification');
 
 // Shared Related
 const mailer = rootRequire('servers/shared/mailer');
@@ -83,12 +84,42 @@ function cascadeConclusion(taskSetId) {
       };
 
       TaskSet
-        .findByIdAndUpdate(taskSetId, taskSetUpdate, { new: true })
+        .findOneAndUpdate({ _id: taskSetId, state: TaskSet.State.EXECUTING }, taskSetUpdate, { new: true })
         .populate('_user')
         .then((taskSet) => {
-          sendConclusionEmail(taskSet);
+          if (taskSet) {
+            sendConclusionEmail(taskSet);
+            sendConclusionNotification(taskSet);
+          }
         });
     });
+}
+
+function sendConclusionNotification(taskSet) {
+  if (taskSet.state !== TaskSet.State.FINISHED) {
+    return;
+  }
+
+  const taskFilter = {
+    _taskSet: taskSet._id,
+    $or: [
+      { state: Task.State.CANCELED },
+      { state: Task.State.FAILED }
+    ],
+  };
+
+  return Task
+    .count(taskFilter)
+    .then((activeCount) => {
+      let result = Notification.Result.SUCCESS;
+      if (activeCount > 0) {
+        result = Notification.Result.WARNING;
+      }
+
+      Notification.create(result, `Task set "${taskSet.name}" has finished`,
+        `Result: ${result}`, taskSet._user, taskSet._id);
+    });
+
 }
 
 function sendConclusionEmail(taskSet) {

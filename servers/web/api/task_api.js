@@ -62,11 +62,11 @@ module.exports = (app) => {
 
       const taskFilter = { _taskSet: req.body.id, state: Task.State.PENDING };
 
-      Task.update(taskFilter, { $set: { state: Task.State.CANCELED } }, { multi: true }, () => {});
+      Task.update(taskFilter, { $set: { state: Task.State.CANCELED, endTime: new Date() } }, { multi: true }, () => { });
 
       const taskSetFilter = { _id: req.body.id, state: TaskSet.State.EXECUTING };
 
-      TaskSet.update(taskSetFilter, { $set: { state: TaskSet.State.CANCELED, endTime: new Date() } }, () => {}); // eslint-disable-line
+      TaskSet.update(taskSetFilter, { $set: { state: TaskSet.State.CANCELED, endTime: new Date() } }, () => { }); // eslint-disable-line
 
       res.sendStatus(200);
     } catch (e) {
