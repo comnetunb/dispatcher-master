@@ -23,7 +23,7 @@ module.exports = (app, passport) => {
     res.sendStatus(200);
   });
 
-  app.post('/api/user/allow/:id', (req, res) => {
+  app.post('/api/user/manage/:id', (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send();
     }
@@ -33,11 +33,13 @@ module.exports = (app, passport) => {
     }
 
     const userFilter = { _id: req.params.id };
+    const allow = req.param.disallow ? false : true;
 
     User
       .findOne(userFilter)
       .then((user) => {
-        user.permitted = true;
+        user.permitted = allow;
+        user.pending = false;
         user.save().then(() => res.send());
       })
       .catch((e) => {
@@ -54,7 +56,7 @@ module.exports = (app, passport) => {
       return res.status(403).send();
     }
 
-    const userFilter = { permitted: false };
+    const userFilter = { pending: true };
 
     User.find(userFilter)
       .then((users) => {

@@ -5,7 +5,12 @@ const getPendingUsers = function ($scope, $http) {
 
 const allowUser = function (userId, $scope, $http) {
   return $http
-    .post(`/api/user/allow/${userId}`);
+    .post(`/api/user/manage/${userId}`);
+};
+
+const disallowUser = function (userId, $scope, $http) {
+  return $http
+    .post(`/api/user/manage/${userId}?disallow=true`);
 };
 
 app.controller('approveUserModalCtrl', function ($uibModalInstance, $scope, user) {
@@ -42,6 +47,31 @@ app.controller('adminCtrl', function ($scope, $rootScope, $http, $uibModal) {
         resolve: { user },
         callbackOk: () => {
           allowUser(user._id, $scope, $http)
+            .then(() => {
+              let userIdx = -1;
+              for (let i = 0; i < $scope.users.length; i += 1) {
+                if ($scope.users[i]._id == user._id) {
+                  userIdx = i;
+                }
+              }
+              if (userIdx != -1) {
+                $scope.users.splice(userIdx, 1);
+              }
+            });
+        },
+      },
+    );
+  };
+
+  $scope.disallow = function (user) {
+    openConfirmation(
+      $uibModal,
+      {
+        templateUrl: 'views/dashboard/modals/user_rejection_confirm.html',
+        controller: 'approveUserModalCtrl',
+        resolve: { user },
+        callbackOk: () => {
+          disallowUser(user._id, $scope, $http)
             .then(() => {
               let userIdx = -1;
               for (let i = 0; i < $scope.users.length; i += 1) {

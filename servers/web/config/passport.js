@@ -31,7 +31,7 @@ module.exports = (passport) => {
           return done(null, false, { reason: 'Wrong password.' });
         }
 
-        if (!user.permitted) {
+        if (!user.permitted || !user.pending) {
           return done(null, false, { reason: 'A system administrator must allow your access.' });
         }
 

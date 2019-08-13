@@ -48,9 +48,13 @@ const userSchema = Schema({
     type: Boolean,
     default: false
   },
+  pending: {
+    type: Boolean,
+    default: true,
+  },
   permitted: {
     type: Boolean,
-    default: false
+    required: false,
   }
 });
 
