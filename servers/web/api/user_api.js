@@ -33,7 +33,7 @@ module.exports = (app, passport) => {
     }
 
     const userFilter = { _id: req.params.id };
-    const allow = req.param.disallow ? false : true;
+    const allow = req.query.disallow ? false : true;
 
     User
       .findOne(userFilter)
@@ -57,6 +57,40 @@ module.exports = (app, passport) => {
     }
 
     const userFilter = { pending: true };
+
+    User.find(userFilter)
+      .then((users) => {
+        res.send(users);
+      });
+  });
+
+  app.get('/api/user/allowed', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send();
+    }
+
+    if (!req.user.admin) {
+      return res.status(403).send();
+    }
+
+    const userFilter = { pending: false, permitted: true };
+
+    User.find(userFilter)
+      .then((users) => {
+        res.send(users);
+      });
+  });
+
+  app.get('/api/user/disallowed', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send();
+    }
+
+    if (!req.user.admin) {
+      return res.status(403).send();
+    }
+
+    const userFilter = { pending: false, permitted: false };
 
     User.find(userFilter)
       .then((users) => {

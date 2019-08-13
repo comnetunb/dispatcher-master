@@ -3,6 +3,16 @@ const getPendingUsers = function ($scope, $http) {
     .get('/api/user/pending');
 };
 
+const getAllowedUsers = function ($scope, $http) {
+  return $http
+    .get('/api/user/allowed');
+};
+
+const getDisallowedUsers = function ($scope, $http) {
+  return $http
+    .get('/api/user/disallowed');
+};
+
 const allowUser = function (userId, $scope, $http) {
   return $http
     .post(`/api/user/manage/${userId}`);
@@ -36,6 +46,14 @@ app.controller('adminCtrl', function ($scope, $rootScope, $http, $uibModal) {
       .then((users) => {
         $scope.users = users.data;
       });
+    getAllowedUsers($scope, $http)
+      .then((users) => {
+        $scope.allowedUsers = users.data;
+      });
+    getDisallowedUsers($scope, $http)
+      .then((users) => {
+        $scope.disallowedUsers = users.data;
+      });
   };
 
   $scope.allow = function (user) {
@@ -47,17 +65,7 @@ app.controller('adminCtrl', function ($scope, $rootScope, $http, $uibModal) {
         resolve: { user },
         callbackOk: () => {
           allowUser(user._id, $scope, $http)
-            .then(() => {
-              let userIdx = -1;
-              for (let i = 0; i < $scope.users.length; i += 1) {
-                if ($scope.users[i]._id == user._id) {
-                  userIdx = i;
-                }
-              }
-              if (userIdx != -1) {
-                $scope.users.splice(userIdx, 1);
-              }
-            });
+            .then(() => $scope.start());
         },
       },
     );
@@ -72,17 +80,7 @@ app.controller('adminCtrl', function ($scope, $rootScope, $http, $uibModal) {
         resolve: { user },
         callbackOk: () => {
           disallowUser(user._id, $scope, $http)
-            .then(() => {
-              let userIdx = -1;
-              for (let i = 0; i < $scope.users.length; i += 1) {
-                if ($scope.users[i]._id == user._id) {
-                  userIdx = i;
-                }
-              }
-              if (userIdx != -1) {
-                $scope.users.splice(userIdx, 1);
-              }
-            });
+            .then(() => $scope.start());
         },
       },
     );

@@ -1,27 +1,80 @@
 <div class="content-wrapper">
     <div class="container-fluid">
         <h3 style="margin-left: 5px">Administration</h3>
-        <div class="horizontal-rule"></div>
-        <h5>Pending users</h5>
 
-        <table class="table" style="width: 100%">
-            <thead>
-                <tr ng-click="toggle=!toggle" ng-init="toggle=false">
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Allow</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr dir-paginate="user in users |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
-                    <td>{{user.name}}</td>
-                    <td>{{user.email}}</td>
-                    <td>
-                        <a href="#!admin" ng-click="allow(user)"><i class="fa fa-check"></i></a>
-                        <a href="#!admin" ng-click="disallow(user)"><i class="fa fa-times"></i></a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <span ng-if="users.length > 0">
+            <div class="horizontal-rule"></div>
+            <h5>Pending users</h5>
+
+            <table class="table" style="width: 100%">
+                <thead>
+                    <tr ng-click="toggle=!toggle" ng-init="toggle=false">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Allow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="user in users |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                        <td>{{user.name}}</td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <a href="#!admin" ng-click="allow(user)"><i class="fa fa-check"></i></a>
+                            <a href="#!admin" ng-click="disallow(user)"><i class="fa fa-times"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </span>
+
+        <span ng-if="allowedUsers.length > 0">
+            <div class="horizontal-rule"></div>
+            <h5>Allowed users</h5>
+
+            <table class="table" style="width: 100%">
+                <thead>
+                    <tr ng-click="toggle=!toggle" ng-init="toggle=false">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Disallow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        dir-paginate="user in allowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                        <td>{{user.name}}</td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <a href="#!admin" ng-click="disallow(user)"><i class="fa fa-times"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </span>
+
+        <span ng-if="disallowedUsers.length > 0">
+            <div class="horizontal-rule"></div>
+            <h5>Disallowed users</h5>
+
+            <table class="table" style="width: 100%">
+                <thead>
+                    <tr ng-click="toggle=!toggle" ng-init="toggle=false">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Allow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        dir-paginate="user in disallowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                        <td>{{user.name}}</td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <a href="#!admin" ng-click="allow(user)"><i class="fa fa-check"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </span>
     </div>
 </div>
