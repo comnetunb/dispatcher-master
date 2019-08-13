@@ -48,6 +48,10 @@ app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $rou
   $scope.stop = function () {
     $interval.cancel(promise);
   };
+
+  $scope.$on('$destroy', function () {
+    $scope.stop();
+  });
 });
 
 function plotData(taskSetId, $http, $scope) {
