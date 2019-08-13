@@ -137,8 +137,8 @@
                 </strong>
               </span>
             </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#!admin">
+            <div class="dropdown-divider" ng-if="signedUser.admin"></div>
+            <a class="dropdown-item" href="#!admin" ng-if="signedUser.admin">
               <span>
                 <strong>
                   <i class="fa fa-fw fa-cog"></i> Admin
