@@ -230,7 +230,7 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
       diff %= (1000 * 60 * 60);
     }
     if (diff >= (1000 * 60)) {
-      minuteS = `${Math.floor(diff / (1000 * 60))}h `;
+      minuteS = `${Math.floor(diff / (1000 * 60))}m `;
       diff %= (1000 * 60);
     }
     secondS = `${Math.floor(diff / 1000)}s`;
