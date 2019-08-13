@@ -15,7 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr dir-paginate="user in users |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                    <tr pagination-id="allowed" pagination-id="pending" dir-paginate="user in users |  orderBy: !toggle?'-':'+' | itemsPerPage: 5 track by user._id">
                         <td>{{user.name}}</td>
                         <td>{{user.email}}</td>
                         <td>
@@ -25,6 +25,8 @@
                     </tr>
                 </tbody>
             </table>
+            <dir-pagination-controls pagination-id="allowed" max-size="5" direction-links="true" boundary-links="true" class="page-link" ng-if="users.length > 5"></dir-pagination-controls>
+        
         </span>
 
         <span ng-if="allowedUsers.length > 0">
@@ -41,7 +43,7 @@
                 </thead>
                 <tbody>
                     <tr
-                        dir-paginate="user in allowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                        dir-paginate="user in allowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 5 track by user._id">
                         <td>{{user.name}}</td>
                         <td>{{user.email}}</td>
                         <td>
@@ -50,6 +52,7 @@
                     </tr>
                 </tbody>
             </table>
+            <dir-pagination-controls pagination-id="pending" max-size="5" direction-links="true" boundary-links="true" class="page-link" ng-if="allowedUsers.length > 5"></dir-pagination-controls>
         </span>
 
         <span ng-if="disallowedUsers.length > 0">
@@ -65,8 +68,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        dir-paginate="user in disallowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 15 track by user._id">
+                    <tr pagination-id="disallowed" 
+                        dir-paginate="user in disallowedUsers |  orderBy: !toggle?'-':'+' | itemsPerPage: 5 track by user._id">
                         <td>{{user.name}}</td>
                         <td>{{user.email}}</td>
                         <td>
@@ -75,6 +78,7 @@
                     </tr>
                 </tbody>
             </table>
+            <dir-pagination-controls pagination-id="disallowed" max-size="5" direction-links="true" boundary-links="true" class="page-link" ng-if="disallowedUsers.length > 5"></dir-pagination-controls>
         </span>
     </div>
 </div>
