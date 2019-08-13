@@ -83,7 +83,10 @@ module.exports = (app) => {
           }
         }
         res.send(graphsCurves);
-        TaskSet.update({ _id: req.body.params.taskSetId }, { $set: { graphs } });
+        TaskSet.findOne({ _id: req.body.params.taskSetId }).then(a => {
+          a.graphs = graphs;
+          a.save();
+        });
       })
       .catch((e) => {
         console.log(e);
