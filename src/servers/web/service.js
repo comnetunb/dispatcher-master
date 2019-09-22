@@ -1,5 +1,4 @@
 
-const setup = rootRequire('servers/web/setup');
 const express = require('express');
 const router = require('./routers/index.router');
 
@@ -63,7 +62,6 @@ module.exports = () => {
   app.use('/angularjs-chartjs', express.static(`${__dirname}/../../../node_modules/angular-chart.js`));
   app.use('/angular-ui-bootstrap', express.static(`${__dirname}/../../../node_modules/angular-ui-bootstrap/dist`));
   // router(app)
-  setup(app, passport);
   app.use('/api', router);
 
   // Listen requests

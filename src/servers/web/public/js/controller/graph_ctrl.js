@@ -22,9 +22,7 @@ app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $rou
   const taskSetId = $routeParams.task_set_id;
 
   $http
-    .get('/api/graph/plot_info', {
-      params: { taskSetId }
-    })
+    .get(`/api/graphs/${taskSetId}/info`)
     .then(function (response) {
       $scope.axes = response.data.axes;
       $scope.curves = response.data.curves;
@@ -56,10 +54,7 @@ app.controller('graphCtrl', function ($scope, $http, $interval, $rootScope, $rou
 
 function plotData(taskSetId, $http, $scope) {
   $http
-    .post('/api/graph/plot_data', {
-      params: {
-        taskSetId
-      },
+    .post(`/api/graphs/${taskSetId}/data`, {
       body: $scope.graphs.map(g => ({ curve: g.curve, xAxis: g.xAxis, yAxis: g.yAxis })),
     })
     .then(function (response) {

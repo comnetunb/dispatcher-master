@@ -11,7 +11,7 @@ interface ITaskDocument extends Document {
   errorCount: number,
   worker?: string,
   state: OperationState,
-  result?: Result,
+  result?: string,
   startTime?: Date,
   endTime?: Date,
 }
