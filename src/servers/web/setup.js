@@ -11,7 +11,7 @@ module.exports = (app, passport) => {
 };
 
 function setupAPIs(app, passport) {
-  userAPI(app, passport);
+  //userAPI(app, passport);
   taskAPI(app);
   workerAPI(app);
   logAPI(app, passport);

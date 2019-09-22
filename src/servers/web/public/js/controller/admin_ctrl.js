@@ -15,12 +15,12 @@ const getDisallowedUsers = function ($scope, $http) {
 
 const allowUser = function (userId, $scope, $http) {
   return $http
-    .post(`/api/user/manage/${userId}`);
+    .post(`/api/user/manage/${userId}?allow=true`);
 };
 
 const disallowUser = function (userId, $scope, $http) {
   return $http
-    .post(`/api/user/manage/${userId}?disallow=true`);
+    .post(`/api/user/manage/${userId}?allow=false`);
 };
 
 app.controller('approveUserModalCtrl', function ($uibModalInstance, $scope, user) {

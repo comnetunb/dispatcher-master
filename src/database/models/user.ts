@@ -1,13 +1,22 @@
-import { model, Schema, Document } from 'mongoose';
-import { hash, compareSync } from 'bcryptjs';
+import { model, Schema, Document, Model } from 'mongoose';
+import { compareSync, hashSync } from 'bcryptjs';
+import * as express from 'express';
 
-export interface IUser extends Document {
+interface IUserDocument extends Document {
   email: string,
   name: string,
   password: string,
   admin: boolean,
   pending: boolean,
   permitted: boolean,
+}
+
+interface IUser extends IUserDocument {
+  validPassword(password: string): boolean,
+}
+
+interface IUserModel extends Model<IUser> {
+  encryptPassword(password: string): string,
 }
 
 const userSchema: Schema = new Schema({
@@ -42,12 +51,34 @@ const userSchema: Schema = new Schema({
 
 const saltRounds = 10;
 
-userSchema.statics.encryptPassword = (password, callback) => {
-  hash(password, saltRounds, callback);
+userSchema.statics.encryptPassword = (password: string): string => {
+  return hashSync(password, saltRounds);
 };
 
-userSchema.methods.validPassword = function (password) { // eslint-disable-line func-names
+userSchema.methods.validPassword = function (password: string): boolean { // eslint-disable-line func-names
   return compareSync(password, this.password);
 };
 
-export default model<IUser>('User', userSchema);
+// Extending Request to properly type our users
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: IUser
+  }
+  interface Response {
+    user?: IUser
+  }
+}
+
+export interface UserFilter {
+  _id?: string,
+  email?: string,
+  name?: string,
+  password?: string,
+  admin?: boolean,
+  pending?: boolean,
+  permitted?: boolean,
+}
+
+export const User: IUserModel = model<IUser, IUserModel>('User', userSchema);
+
+export default User;
