@@ -93,7 +93,7 @@ app.run(function ($rootScope, $location, $window, $http, gridsterConfig) {
 
   $rootScope.$on('$routeChangeStart', function (event, next) {
     $http
-      .get('/api/user/signed_in')
+      .get('/api/users/signed_in')
       .then(function (response) {
         $rootScope.signedUser = response.data;
 

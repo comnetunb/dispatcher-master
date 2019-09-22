@@ -64,7 +64,7 @@ module.exports = () => {
   app.use('/angular-ui-bootstrap', express.static(`${__dirname}/../../../node_modules/angular-ui-bootstrap/dist`));
   // router(app)
   setup(app, passport);
-  app.route('/api', router);
+  app.use('/api', router);
 
   // Listen requests
   app.listen(8080, '0.0.0.0');

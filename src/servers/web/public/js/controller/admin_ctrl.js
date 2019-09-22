@@ -1,26 +1,26 @@
 const getPendingUsers = function ($scope, $http) {
   return $http
-    .get('/api/user/pending');
+    .get('/api/users/pending');
 };
 
 const getAllowedUsers = function ($scope, $http) {
   return $http
-    .get('/api/user/allowed');
+    .get('/api/users/allowed');
 };
 
 const getDisallowedUsers = function ($scope, $http) {
   return $http
-    .get('/api/user/disallowed');
+    .get('/api/users/disallowed');
 };
 
 const allowUser = function (userId, $scope, $http) {
   return $http
-    .post(`/api/user/manage/${userId}?allow=true`);
+    .post(`/api/users/manage/${userId}?allow=true`);
 };
 
 const disallowUser = function (userId, $scope, $http) {
   return $http
-    .post(`/api/user/manage/${userId}?allow=false`);
+    .post(`/api/users/manage/${userId}?allow=false`);
 };
 
 app.controller('approveUserModalCtrl', function ($uibModalInstance, $scope, user) {

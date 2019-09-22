@@ -1,7 +1,7 @@
 const log = rootRequire('servers/shared/log');
 
 module.exports = (app) => {
-  app.get('/api/log/get_all', (req, res) => {
+  app.get('/api/logs', (req, res) => {
     log
       .getAll(req.query.taskSetId)
       .then((logs) => {
@@ -17,7 +17,7 @@ module.exports = (app) => {
       });
   });
 
-  app.get('/api/log/get_all_from_date', (req, res) => {
+  app.get('/api/logs/date', (req, res) => {
     log
       .getAllFromDate(req.query.lastDate, req.query.taskSetId)
       .then((logs) => {

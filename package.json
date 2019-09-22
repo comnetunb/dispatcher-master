@@ -8,7 +8,7 @@
     "test": "npm run lint",
     "build": "npm run html && tsc",
     "dev":  "nodemon dist/app.js",
-    "html": "copyfiles -V -u 4 -e *.js -e *.ts \"src/servers/web/public/**/*\" dist/servers/web/public"
+    "html": "copyfiles -u 4 -e *.js -e *.ts \"src/servers/web/public/**/*\" dist/servers/web/public"
   },
   "keywords": [
     "dispatcher"

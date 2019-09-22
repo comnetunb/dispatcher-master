@@ -14,7 +14,7 @@ const getAllLogs = function ($scope, $http) {
   }
 
   $http
-    .get('/api/log/get_all', { params })
+    .get('/api/logs', { params })
     .then(function (response) {
       updateLog($scope, response);
     });
@@ -29,7 +29,7 @@ const getAllLogsFromDate = function ($scope, $http) {
   }
 
   $http
-    .get('/api/log/get_all_from_date', { params })
+    .get('/api/logs/date', { params })
     .then(function (response) {
       updateLog($scope, response);
     });

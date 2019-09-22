@@ -1,7 +1,7 @@
 app.controller('signInCtrl', function ($scope, $http, $window, $rootScope, $location) {
   $scope.sign_in = function (signIn) {
     $http
-      .post('/api/user/sign_in', signIn)
+      .post('/api/users/sign_in', signIn)
       .then(function (response) {
         $scope.errorMessage = false;
         $rootScope.signedUser = response.data;
@@ -25,7 +25,7 @@ app.controller('signUpCtrl', function ($scope, $http) {
     }
 
     $http
-      .post('/api/user/sign_up', signUp)
+      .post('/api/users/sign_up', signUp)
       .then(function () {
         $scope.errorMessage = false;
         $scope.successMessage = 'Successful sign up, you may now wait for the approval of your account.';
