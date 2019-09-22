@@ -15,14 +15,29 @@ rootRequire('servers/web/config/passport')(passport);
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-app.use(session({
-  secret: '4df8jb1arc2r84g',
-  resave: false,
-  saveUninitialized: false
-}));
-app.use(cookieParser());
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(session({
+//   secret: '4df8jb1arc2r84g',
+//   resave: false,
+//   saveUninitialized: false
+// }));
+// app.use(cookieParser());
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+app.use('/api', (req, res, next) => {
+  req.user = {
+    _id: '5c45d0255a232615a45d627a',
+    email: 'mikaelmmello@gmail.com',
+    name: 'Mikael',
+    password:
+      '$2a$10$GT5p4X.cTo1y5IhGN5fOBu8.roDk.OQsiLYe9lUILUAavtZOiONgi',
+    __v: 0,
+    permitted: true,
+    pending: false,
+    admin: true,
+  };
+  next();
+});
 
 // Body-parser
 const bodyParser = require('body-parser');

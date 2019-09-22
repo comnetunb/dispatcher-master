@@ -15,6 +15,7 @@ module.exports = (app, passport) => {
   });
 
   app.get('/api/user/signed_in', (req, res) => {
+    return res.send(req.user);
     res.send(req.isAuthenticated() ? req.user : null);
   });
 
