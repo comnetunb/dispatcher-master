@@ -5,7 +5,7 @@ const { taskResult } = dispatcherProtocol.pdu;
 
 // Database Related
 const Task = rootRequire('database/models/task');
-const TaskSet = rootRequire('database/models/task_set');
+const TaskSet = rootRequire('database/models/taskSet');
 const Notification = rootRequire('database/models/notification');
 
 // Shared Related

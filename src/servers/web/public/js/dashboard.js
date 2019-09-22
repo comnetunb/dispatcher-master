@@ -73,7 +73,7 @@ dashboard.controller('taskCtrl', function ($scope, $http, $interval) {
 
 function getAllActiveTasks($scope, $http) {
   $http
-    .get('/api/task/get_executing')
+    .get('/api/tasks/get_executing')
     .then(function (response) {
       $scope.tasks = response.data;
     });

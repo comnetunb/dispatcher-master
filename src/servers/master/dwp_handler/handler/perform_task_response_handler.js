@@ -31,7 +31,7 @@ module.exports.execute = (pdu, worker) => {
         }
 
         task.worker = worker.uuid;
-        task.state = Task.State.EXECUTING;
+        task.state = OperationState.Executing;
         task.save();
 
         return true;

@@ -20,8 +20,8 @@
             </button>
             <div class="dropdown-menu">
               <!--<span class="dropdown-item" ng-click="export(finishedTaskSet._id, 'json')">JSON</span>-->
-              <a class="dropdown-item" ng-href="/api/task/export/?format=json&taskSetId={{taskSet._id}}" download="{{taskSet.name}}.zip">JSON</a>
-              <a class="dropdown-item" ng-href="/api/task/export/?format=csv&taskSetId={{taskSet._id}}" download="{{taskSet.name}}.zip">CSV</a>
+              <a class="dropdown-item" ng-href="/api/tasks/export/?format=json&taskSetId={{taskSet._id}}" download="{{taskSet.name}}.zip">JSON</a>
+              <a class="dropdown-item" ng-href="/api/tasks/export/?format=csv&taskSetId={{taskSet._id}}" download="{{taskSet.name}}.zip">CSV</a>
             </div>
           </div><br>
           <button class="btn btn-large btn-primary" ng-click="openGraphs(taskSet._id)"><span class="fa fa-fw fa-line-chart"></span> Graphs</button><br><br>

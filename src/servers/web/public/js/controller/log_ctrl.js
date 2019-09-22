@@ -37,7 +37,7 @@ const getAllLogsFromDate = function ($scope, $http) {
 
 function getTaskSet($scope, $http) {
   $http
-    .get(`/api/task/${$scope.taskSetId}`)
+    .get(`/api/tasks/${$scope.taskSetId}`)
     .then(function (response) {
       $scope.taskSet = response.data;
     });

@@ -6,3 +6,25 @@ export const enum LogLevel {
   Error,
   Fatal,
 };
+
+export const enum OperationState {
+  Pending,
+  Executing,
+  Finished,
+  Canceled,
+  Sent,
+  Failed,
+};
+
+export const enum TaskSetPriority {
+  Minimum,
+  Low,
+  Normal,
+  High,
+  Urgent,
+};
+
+export const enum Result {
+  Error,
+  Success,
+};

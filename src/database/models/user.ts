@@ -1,6 +1,5 @@
 import { model, Schema, Document, Model } from 'mongoose';
 import { compareSync, hashSync } from 'bcryptjs';
-import * as express from 'express';
 
 interface IUserDocument extends Document {
   email: string,
@@ -11,7 +10,7 @@ interface IUserDocument extends Document {
   permitted: boolean,
 }
 
-interface IUser extends IUserDocument {
+export interface IUser extends IUserDocument {
   validPassword(password: string): boolean,
 }
 

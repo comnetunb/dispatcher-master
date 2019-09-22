@@ -74,7 +74,7 @@ function getAllTaskSets($scope, $http) {
 
 function getTaskSetAndTasks($scope, $http) {
   $http
-    .get(`/api/task/${$scope.taskSetId}?includeTasks=true`)
+    .get(`/api/tasks/${$scope.taskSetId}?includeTasks=true`)
     .then(function (response) {
       $scope.taskSet = response.data;
       $scope.taskSet.tasks.sort((a, b) => {
@@ -110,7 +110,7 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
         templateUrl: 'views/dashboard/modals/task_set_cancel.html',
         callbackOk: () => {
           $http
-            .post('/api/task/cancel_task_set', { id: taskSetId })
+            .post('/api/tasks/cancel-task-set', { id: taskSetId })
             .then(function () {
               $scope.errorMessage = false;
               $location.path('tasks')
@@ -130,7 +130,7 @@ app.controller('detailsCtrl', function ($scope, $location, $uibModal, $interval,
         templateUrl: 'views/dashboard/modals/task_set_removal.html',
         callbackOk: () => {
           $http
-            .post('/api/task/remove_task_set', { id: taskSetId })
+            .post('/api/tasks/remove-task-set', { id: taskSetId })
             .then(function () {
               $scope.errorMessage = false;
               $location.path('tasks')
@@ -244,7 +244,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
   $rootScope.sidebar = true;
 
   $http
-    .get('/api/task/supported_runnables')
+    .get('/api/tasks/supported-runnables')
     .then(function (response) {
       $scope.supportedRunnablesInfo = response.data;
     });
@@ -266,7 +266,7 @@ app.controller('addCtrl', function ($scope, $rootScope, $compile, $http, $locati
     }
 
     $http
-      .post('/api/task/add_task_group_set', addTaskForm)
+      .post('/api/tasks/create-task-set', addTaskForm)
       .then(function () {
         $scope.errorMessage = false;
         $location.path('/tasks');

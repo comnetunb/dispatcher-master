@@ -1,5 +1,5 @@
 const Task = databaseRequire('models/task');
-const TaskSet = databaseRequire('models/task_set');
+const TaskSet = databaseRequire('models/taskSet');
 
 module.exports = (app) => {
   app.get('/api/graph/plot_info', (req, res) => {

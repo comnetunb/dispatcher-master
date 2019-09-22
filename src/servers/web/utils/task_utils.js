@@ -30,7 +30,7 @@ const fs = require('fs');
 const zipFolder = require('zip-folder');
 const Json2csvParser = require('json2csv').Parser;
 
-const TaskSet = databaseRequire('models/task_set');
+const TaskSet = databaseRequire('models/taskSet');
 const Task = databaseRequire('models/task');
 const File = databaseRequire('models/file');
 
