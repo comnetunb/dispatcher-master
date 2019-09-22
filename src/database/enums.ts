@@ -27,4 +27,6 @@ export const enum TaskSetPriority {
 export const enum Result {
   Error,
   Success,
+  Warning,
+  Neutral,
 };
