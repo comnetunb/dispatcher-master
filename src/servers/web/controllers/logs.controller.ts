@@ -1,5 +1,5 @@
 import Log from '../../../database/models/log';
-import * as logger from '../../shared/log';
+import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 

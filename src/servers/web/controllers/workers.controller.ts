@@ -1,6 +1,6 @@
 import Worker from '../../../database/models/worker';
 import * as interfaceManager from '../../shared/interface_manager';
-import * as logger from '../../shared/log';
+import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 

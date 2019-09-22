@@ -1,6 +1,6 @@
 import TaskSet from '../../../database/models/taskSet';
 import Task from '../../../database/models/task';
-import * as logger from '../../shared/log';
+import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';

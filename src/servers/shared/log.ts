@@ -55,3 +55,5 @@ export async function fatal(message: string, taskId?: string): Promise<void> {
   logger.fatal(message);
   await createLog(message, LogLevel.Fatal, taskId);
 };
+
+export default { trace, debug, info, warn, error, fatal };
