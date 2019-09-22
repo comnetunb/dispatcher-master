@@ -1,7 +1,7 @@
 import { model, Schema, Document, Model } from 'mongoose';
 import { compareSync, hashSync } from 'bcryptjs';
 
-interface IUserDocument extends Document {
+export interface IUserDocument extends Document {
   email: string,
   name: string,
   password: string,
