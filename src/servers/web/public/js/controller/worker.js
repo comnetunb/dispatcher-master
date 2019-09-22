@@ -32,7 +32,7 @@ app.controller('workerCtrl', function ($scope, $rootScope, $http, $interval) {
 
 function getAllWorkers($scope, $rootScope, $http) {
   $http
-    .get('/api/worker/get_all')
+    .get('/api/workers')
     .then((response) => {
       $scope.workers = response.data;
     });

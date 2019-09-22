@@ -52,7 +52,7 @@ dashboard.controller('workerCtrl', function ($scope, $http, $interval) {
 
 function getAllWorkers($scope, $http) {
   $http
-    .get('/api/worker/getAll')
+    .get('/api/workers')
     .then(function (response) {
       $scope.workers = response.data;
     });
