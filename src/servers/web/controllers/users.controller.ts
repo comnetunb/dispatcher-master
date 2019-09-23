@@ -30,41 +30,36 @@ export function signIn(req: Request, res: Response, next: NextFunction): void {
   })(req, res, next);
 }
 
-export function signUp(req: Request, res: Response): void {
+export async function signUp(req: Request, res: Response): Promise<void> {
   const userFilter: UserFilter = { email: req.body.email };
 
-  User
-    .findOne(userFilter)
-    .then((user) => {
-      if (user) {
-        res.status(httpStatusCodes.BAD_REQUEST)
-          .send({ reason: 'There already is an account with this e-mail.' });
-        return;
-      }
+  try {
+    const existingUser = await User.findOne(userFilter);
+    if (existingUser) {
+      res.status(httpStatusCodes.BAD_REQUEST)
+        .send({ reason: 'There already is an account with this e-mail.' });
+      return;
+    }
 
-      const { email, name, password } = req.body;
+    const { email, name, password } = req.body;
 
-      const hash = User.encryptPassword(password);
+    const hash = User.encryptPassword(password);
 
-      const newUser = new User({
-        email,
-        name,
-        password: hash
-      });
-
-      return newUser
-        .save()
-        .then(() => {
-          res.send();
-        })
-    })
-    .catch(() => {
-      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ reason: 'An internal error occurred. Please try again later.' });
+    const newUser = new User({
+      email,
+      name,
+      password: hash
     });
+
+    await newUser.save();
+    res.sendStatus(httpStatusCodes.OK);
+  } catch (error) {
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
+      .send({ error });
+  };
 }
 
-export function manageUser(req: Request, res: Response): void | Response {
+export async function manageUser(req: Request, res: Response): Promise<void | Response> {
   if (!req.isAuthenticated()) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
@@ -75,28 +70,27 @@ export function manageUser(req: Request, res: Response): void | Response {
 
   const userFilter: UserFilter = { _id: req.params.id };
   let allow: boolean;
-  if (req.query.allow === false) {
+  if (req.query.allow === 'false') {
     allow = false;
-  } else if (req.query.allow === true) {
+  } else if (req.query.allow === 'true') {
     allow = true;
   } else {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
 
-  User
-    .findOne(userFilter)
-    .then((user) => {
-      user.permitted = allow;
-      user.pending = false;
-      user.save().then(() => res.send());
-    })
-    .catch((error) => {
-      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-        .send({ error });
-    });
+  try {
+    const user = await User.findOne(userFilter);
+    user.permitted = allow;
+    user.pending = false;
+    await user.save();
+    res.sendStatus(httpStatusCodes.OK);
+  } catch (error) {
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
+      .send({ error });
+  }
 }
 
-export function pendingUsers(req: Request, res: Response): void | Response {
+export async function pendingUsers(req: Request, res: Response): Promise<void | Response> {
   if (!req.isAuthenticated()) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
@@ -107,13 +101,11 @@ export function pendingUsers(req: Request, res: Response): void | Response {
 
   const userFilter: UserFilter = { pending: true };
 
-  User.find(userFilter)
-    .then((users) => {
-      res.send(users);
-    });
+  const users = await User.find(userFilter);
+  res.send(users);
 }
 
-export function allowedUsers(req: Request, res: Response): void | Response {
+export async function allowedUsers(req: Request, res: Response): Promise<void | Response> {
   if (!req.isAuthenticated()) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
@@ -124,14 +116,12 @@ export function allowedUsers(req: Request, res: Response): void | Response {
 
   const userFilter: UserFilter = { pending: false, permitted: true };
 
-  User.find(userFilter)
-    .then((users) => {
-      res.send(users);
-    });
+  const users = await User.find(userFilter);
+  res.send(users);
 }
 
 
-export function disallowedUsers(req: Request, res: Response): void | Response {
+export async function disallowedUsers(req: Request, res: Response): Promise<void | Response> {
   if (!req.isAuthenticated()) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
@@ -142,8 +132,6 @@ export function disallowedUsers(req: Request, res: Response): void | Response {
 
   const userFilter: UserFilter = { pending: false, permitted: false };
 
-  User.find(userFilter)
-    .then((users) => {
-      res.send(users);
-    });
+  const users = await User.find(userFilter);
+  res.send(users);
 }

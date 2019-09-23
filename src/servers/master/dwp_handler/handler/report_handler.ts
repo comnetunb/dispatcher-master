@@ -1,30 +1,19 @@
-/*
- *
- * Copyright (c) 2017 Matheus Medeiros Sarmento
- *
- */
+import * as connectionManager from '../../connection_manager';
+import logger from '../../../shared/log';
+import Task from '../../../../database/models/task';
+import { IWorker } from '../../../../database/models/worker';
+import { Report, TerminateTask, ProtocolType, EncapsulatePDU, TaskInfo } from 'dispatcher-protocol';
 
-
-const dispatcherProtocol = require('dispatcher-protocol');
-
-const connectionManager = rootRequire('servers/master/connection_manager');
-
-const Task = rootRequire('database/models/task');
-
-const log = rootRequire('servers/shared/log');
-
-const flags = dispatcherProtocol.common.Flags;
-const { terminateTask } = dispatcherProtocol.pdu;
-
-module.exports.execute = (pdu, worker) => {
-  if (pdu.flags & flags.RESOURCE) {
+export function execute(pdu: Report, worker: IWorker): void {
+  if (pdu.resources) {
     worker.resource.outdated = false;
-    worker.resource.cpu = pdu.resource.cpu;
-    worker.resource.memory = pdu.resource.memory;
+    worker.resource.cpu = pdu.resources.cpu;
+    worker.resource.memory = pdu.resources.memory;
   }
 
-  if (pdu.flags & flags.TASKS) {
-    Promise.all(pdu.tasks.map((taskReceived) => {
+  if (pdu.tasks) {
+    const tasks = pdu.tasks.tasks;
+    Promise.all(tasks.map((taskReceived: TaskInfo) => {
       // Go through all tasks
       return Task
         .findById(taskReceived.id)
@@ -33,9 +22,14 @@ module.exports.execute = (pdu, worker) => {
             return;
           }
 
+          const possibleResponse: TerminateTask = {
+            type: ProtocolType.TerminateTask,
+            taskId: task.id,
+          }
+
           if (task.isFinished() || task.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id }));
+            connectionManager.send(worker.uuid, EncapsulatePDU(possibleResponse));
             return;
           }
 
@@ -43,12 +37,12 @@ module.exports.execute = (pdu, worker) => {
             // There is a worker executing this instance already
             if (task.startTime < taskReceived.startTime) {
               // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker.uuid, terminateTask.format({ taskId: taskReceived.id })); // eslint-disable-line
+              connectionManager.send(worker.uuid, EncapsulatePDU(possibleResponse)); // eslint-disable-line
               return;
             }
 
             // Evaluating by the time they started, the 'newer' worker will finish faster
-            connectionManager.send(task.worker, terminateTask.format({ taskId: taskReceived.id }));
+            connectionManager.send(task.worker, EncapsulatePDU(possibleResponse));
           }
 
           // Associate this instance to this worker
@@ -62,7 +56,7 @@ module.exports.execute = (pdu, worker) => {
         return Task
           .find(taskFilter)
           .then((tasks) => {
-            if (tasks === null) {
+            if (!tasks) {
               return;
             }
 
@@ -71,32 +65,32 @@ module.exports.execute = (pdu, worker) => {
                 .map((task) => {
                   for (const taskReceived in pdu.tasks) { // eslint-disable-line
                     if (pdu.tasks[taskReceived].id === task._id) {
-                      return undefined;
+                      return;
                     }
                   }
-                  return Task.updateToDefaultState(task._id);
+                  return task.updateToDefaultState();
                 }));
           });
       })
       .then(() => {
         worker.updateRunningInstances();
       })
-      .catch((e) => {
-        log.fatal(e);
+      .catch((error) => {
+        logger.fatal(error);
       });
   }
 
-  if (pdu.flags & flags.STATE) {
-    worker.state = pdu.state;
+  if (pdu.state) {
+    worker.state = pdu.state.state;
   }
 
-  if (pdu.flags & flags.ALIAS) {
+  if (pdu.alias) {
     worker.alias = pdu.alias;
   }
 
   worker
     .save()
     .catch((e) => {
-      log.fatal(e);
+      logger.fatal(e);
     });
 };

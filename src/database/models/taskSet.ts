@@ -83,7 +83,7 @@ const taskSetSchema: Schema = new Schema({
   }
 });
 
-taskSetSchema.methods.updateRemainingTasksCount = async (): Promise<ITaskSet> => {
+taskSetSchema.methods.updateRemainingTasksCount = async function (): Promise<ITaskSet> {
   const taskFilter = {
     _taskSet: this._id,
     $or: [
@@ -92,13 +92,10 @@ taskSetSchema.methods.updateRemainingTasksCount = async (): Promise<ITaskSet> =>
       { state: OperationState.Executing }
     ]
   };
-
-  return Task
-    .count(taskFilter)
-    .then((count) => {
-      this.remainingTasksCount = count;
-      return this.save();
-    });
+  const taskSet: ITaskSet = this;
+  const count = await Task.count(taskFilter);
+  taskSet.remainingTasksCount = count;
+  return await taskSet.save();
 };
 
 export const TaskSet: ITaskSetModel = model<ITaskSet, ITaskSetModel>('TaskSet', taskSetSchema);

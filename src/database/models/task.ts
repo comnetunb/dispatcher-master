@@ -76,34 +76,36 @@ const taskSchema: Schema = new Schema({
   }
 });
 
-taskSchema.methods.updateToDefaultState = async (): Promise<ITask> => {
-  const taskSet = await TaskSet.findById(this._taskSet);
-  this.worker = undefined;
-  this.startTime = undefined;
+taskSchema.methods.updateToDefaultState = async function (): Promise<ITask> {
+  const task: ITask = this;
+  const taskSet = await TaskSet.findById(task._taskSet);
+  task.worker = undefined;
+  task.startTime = undefined;
   if (taskSet.state === OperationState.Executing) {
-    this.state = OperationState.Pending;
+    task.state = OperationState.Pending;
   } else {
-    this.state = OperationState.Canceled;
+    task.state = OperationState.Canceled;
   }
 
-  return this.save();
+  return task.save();
 };
 
-taskSchema.methods.flagError = async (): Promise<ITask> => {
-  const taskSet = await TaskSet.findById(this._taskSet);
-  this.worker = undefined;
-  this.startTime = undefined;
-  this.errorCount += 1;
+taskSchema.methods.flagError = async function (): Promise<ITask> {
+  const task: ITask = this;
+  const taskSet = await TaskSet.findById(task._taskSet);
+  task.worker = undefined;
+  task.startTime = undefined;
+  task.errorCount += 1;
 
-  if (this.errorCount > taskSet.errorLimitCount) {
-    this.state = OperationState.Failed;
+  if (task.errorCount > taskSet.errorLimitCount) {
+    task.state = OperationState.Failed;
   } else if (taskSet.state === OperationState.Executing) {
-    this.state = OperationState.Pending;
+    task.state = OperationState.Pending;
   } else {
-    this.state = OperationState.Canceled;
+    task.state = OperationState.Canceled;
   }
 
-  return this.save();
+  return task.save();
 };
 
 taskSchema.methods.isPending = function (): boolean {

@@ -2,7 +2,7 @@ import TaskSet from '../../../database/models/taskSet';
 import Task from '../../../database/models/task';
 import logger from '../../shared/log';
 import { Request, Response } from 'express';
-import taskUtils from '../utils/task_utils';
+import * as taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../database/enums';
 
@@ -88,20 +88,6 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
   }
 }
 
-export async function editTaskSet(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
-  try {
-    await taskUtils.editTaskSet(req.body);
-    res.sendStatus(httpStatusCodes.OK);
-  } catch (error) {
-    logger.error(error);
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
-  }
-}
-
 export function supportedRunnables(req: Request, res: Response): void | Response {
   if (!req.isAuthenticated()) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
@@ -117,36 +103,26 @@ export function supportedRunnables(req: Request, res: Response): void | Response
   }]);
 }
 
-export function exportTaskSet(req: Request, res: Response): void | Response {
-  taskUtils.exportTaskSet(req.query.taskSetId, req.query.format, (zipPath) => {
-    if (!zipPath) {
-      res.sendStatus(httpStatusCodes.INTERNAL_SERVER_ERROR);
-    } else {
-      res.sendFile(zipPath);
-    }
-  });
+export async function exportTaskSet(req: Request, res: Response): Promise<void> {
+  const zipPath = await taskUtils.exportTaskSet(req.query.taskSetId, req.query.format);
+  res.sendFile(zipPath);
 }
 
-export function getTaskSet(req: Request, res: Response): void | Response {
+export async function getTaskSet(req: Request, res: Response): Promise<void | Response> {
   const taskSetFilter = { _id: req.params.id };
 
-  TaskSet
-    .findOne(taskSetFilter)
-    .then((taskSet) => {
-      if (req.query.includeTasks === 'true') {
-        Task
-          .find({ _taskSet: req.params.id })
-          .then((tasks) => {
-            const completeTaskSet = taskSet.toObject();
-            completeTaskSet.tasks = tasks;
-            res.send(completeTaskSet);
-          });
-      } else {
-        res.send(taskSet);
-      }
-    })
-    .catch((error) => {
-      logger.error(error);
-      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
-    });
+  try {
+    const taskSet = await TaskSet.findOne(taskSetFilter);
+    if (req.query.includeTasks === 'true') {
+      const tasks = await Task.find({ _taskSet: req.params.id });
+      const completeTaskSet = taskSet.toObject();
+      completeTaskSet.tasks = tasks;
+      res.send(completeTaskSet);
+    } else {
+      res.send(taskSet);
+    }
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }

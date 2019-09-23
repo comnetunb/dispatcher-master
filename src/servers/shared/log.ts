@@ -26,32 +26,32 @@ async function createLog(message: string, level: LogLevel, taskId?: string): Pro
   return log;
 }
 
-export async function trace(message: string, taskId?: string): Promise<void> {
+export async function trace(message: any, taskId?: string): Promise<void> {
   logger.trace(message);
   await createLog(message, LogLevel.Trace, taskId);
 };
 
-export async function debug(message: string, taskId?: string): Promise<void> {
+export async function debug(message: any, taskId?: string): Promise<void> {
   logger.debug(message);
   await createLog(message, LogLevel.Debug, taskId);
 };
 
-export async function info(message: string, taskId?: string): Promise<void> {
+export async function info(message: any, taskId?: string): Promise<void> {
   logger.info(message);
   await createLog(message, LogLevel.Info, taskId);
 };
 
-export async function warn(message: string, taskId?: string): Promise<void> {
+export async function warn(message: any, taskId?: string): Promise<void> {
   logger.warn(message);
   await createLog(message, LogLevel.Warn, taskId);
 };
 
-export async function error(message: string, taskId?: string): Promise<void> {
+export async function error(message: any, taskId?: string): Promise<void> {
   logger.error(message);
   await createLog(message, LogLevel.Error, taskId);
 };
 
-export async function fatal(message: string, taskId?: string): Promise<void> {
+export async function fatal(message: any, taskId?: string): Promise<void> {
   logger.fatal(message);
   await createLog(message, LogLevel.Fatal, taskId);
 };

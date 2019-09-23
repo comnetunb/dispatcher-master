@@ -1,6 +1,6 @@
 import { model, Schema, Document, Model, DocumentQuery } from 'mongoose';
-import { WorkerState } from '../enums';
 import Task from './task';
+import { WorkerState } from 'dispatcher-protocol';
 
 interface IWorkerDocument extends Document {
   address: string,
@@ -69,29 +69,23 @@ const workerSchema: Schema = new Schema({
   }
 });
 
-workerSchema.statics.getAvailables = function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
+workerSchema.statics.getAvailables = async function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
   const filter = {
     'resource.outdated': false,
     'resource.cpu': { $gt: cpuThreshold },
     'resource.memory': { $gt: memoryThreshold },
-    'state': WorkerState.Running,
+    'state': WorkerState.Executing,
   };
   const worker: IWorkerModel = this;
-  return worker
-    .find(filter)
-    .then((availableWorkers) => {
-      return availableWorkers;
-    });
+  const availableWorkers = await worker.find(filter);
+  return availableWorkers;
 };
 
-workerSchema.methods.updateRunningInstances = function (): Promise<IWorker> {
+workerSchema.methods.updateRunningInstances = async function (): Promise<IWorker> {
   const worker: IWorker = this;
-  return Task
-    .count({ worker: worker.uuid })
-    .then((count) => {
-      worker.runningInstances = count;
-      return worker.save();
-    });
+  const count = await Task.count({ worker: worker.uuid });
+  worker.runningInstances = count;
+  return await worker.save();
 };
 
 workerSchema.index({ address: 1, port: 1 }, { unique: true });

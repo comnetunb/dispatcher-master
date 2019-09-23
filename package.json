@@ -6,9 +6,10 @@
   "scripts": {
     "lint": "esw *.js database servers --color",
     "test": "npm run lint",
-    "build": "npm run html && tsc",
-    "dev": "nodemon dist/app.js",
-    "html": "copyfiles -u 4 -e *.js -e *.ts \"src/servers/web/public/**/*\" dist/servers/web/public"
+    "build": "npm run copy-html && npm run copy-config && tsc",
+    "dev": "tsnd --watch --respawn src/app.ts",
+    "copy-html": "copyfiles -u 4 -e *.js -e *.ts \"src/servers/web/public/**/*\" dist/servers/web/public",
+    "copy-config": "copyfiles -u 3 src/servers/config/config.json dist/servers/config/"
   },
   "keywords": [
     "dispatcher"
@@ -16,13 +17,19 @@
   "author": "Matheus Medeiros Sarmento",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "@types/archiver": "^3.0.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.2",
     "@types/express-session": "^1.15.14",
+    "@types/json2csv": "^4.5.0",
+    "@types/mkdirp": "^0.5.2",
     "@types/mongoose": "^5.5.17",
     "@types/node": "^12.7.5",
+    "@types/nodemailer": "^6.2.1",
     "@types/passport": "^1.0.1",
     "@types/passport-local": "^1.0.33",
+    "@types/tmp": "^0.1.0",
+    "@types/uuid": "^3.4.5",
     "angular": "^1.6.9",
     "angular-animate": "^1.6.10",
     "angular-chart.js": "^1.1.1",
@@ -31,7 +38,7 @@
     "angular-ui-bootstrap": "^2.5.6",
     "angular-utils-pagination": "^0.11.1",
     "angularjs-gauge": "^2.2.0",
-    "archiver": "^2.1.0",
+    "archiver": "^2.1.1",
     "bcryptjs": "^2.4.3",
     "bluebird": "~3.5.0",
     "body-parser": "^1.17.1",
@@ -72,6 +79,7 @@
     "startbootstrap-sb-admin": "^4.0.0",
     "tmp": "0.0.33",
     "traceback": "^0.3.1",
+    "typescript": "^3.6.3",
     "uuid": "^3.2.1",
     "validator": "~8.0.0",
     "zip-folder": "^1.0.0"
@@ -80,6 +88,7 @@
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.11.0",
-    "eslint-watch": "^3.1.4"
+    "eslint-watch": "^3.1.4",
+    "ts-node-dev": "^1.0.0-pre.43"
   }
 }

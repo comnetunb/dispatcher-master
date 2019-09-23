@@ -30,9 +30,3 @@ export const enum Result {
   Warning,
   Neutral,
 };
-
-export const enum WorkerState {
-  Running,
-  Paused,
-  Stopped,
-}
