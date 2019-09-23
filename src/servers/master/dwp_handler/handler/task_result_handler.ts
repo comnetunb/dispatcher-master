@@ -8,12 +8,15 @@ import { IWorker } from '../../../../database/models/worker';
 import { OperationState, Result } from '../../../../database/enums';
 
 export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
-  try {
-    JSON.parse(pdu.output);
-  } catch (error) {
-    logger.error(`${error}\nJSON: ${pdu.output}`, pdu.task.id);
-    pdu.code = ReturnCode.Error;
+  if (pdu.code === ReturnCode.Success) {
+    try {
+      JSON.parse(pdu.output);
+    } catch (error) {
+      pdu.output = `${error}\nJSON: ${pdu.output}`;
+      pdu.code = ReturnCode.Error;
+    }
   }
+
   if (pdu.code === ReturnCode.Success) {
     const taskUpdate = {
       result: pdu.output,
@@ -26,8 +29,8 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
       const task = await Task.findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true });
       logger.info(`Worker ${worker.address}:${worker.port} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
 
-      const taskSet: ITaskSet = task._taskSet;
-      taskSet.updateRemainingTasksCount();
+      const taskSet = await TaskSet.findById(task._taskSet);
+      await taskSet.updateRemainingTasksCount();
 
       await cascadeConclusion(taskSet);
       await worker.updateRunningInstances();
@@ -104,8 +107,15 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
     result = Result.Warning;
   }
 
-  await Notification.create(result, `Task set "${taskSet.name}" has finished`,
-    `Result: ${result}`, taskSet._user, taskSet._id);
+  const notification = new Notification({
+    result,
+    title: `Task set "${taskSet.name}" has finished`,
+    message: `Result: ${result}`,
+    userId: taskSet._user,
+    taskSetId: taskSet._id,
+  });
+
+  await notification.save();
 }
 
 async function sendConclusionEmail(taskSet: ITaskSet): Promise<void> {
