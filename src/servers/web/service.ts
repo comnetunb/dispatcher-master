@@ -1,8 +1,5 @@
 import express from 'express';
-import serveStatic from 'serve-static';
-import passport from 'passport';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
+import proxy from 'http-proxy-middleware';
 import bodyParser from 'body-parser';
 import indexRouter from './routers/index.router';
 import User, { IUser, IUserDocument } from '../../database/models/user';
@@ -11,7 +8,6 @@ import { config as passportConfig } from './config/passport';
 
 const app: express.Application = express();
 
-app.use(serveStatic(`${__dirname}/public`));
 app.use(bodyParser.json({ limit: '50mb' })); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 passportConfig();
@@ -41,22 +37,11 @@ app.use('/api', (req, res, next) => {
   req.user = myUser;
   next();
 });
-app.use('/bootstrap', serveStatic(`${__dirname}/../../../node_modules/bootstrap/dist/`));
-app.use('/angular', serveStatic(`${__dirname}/../../../node_modules/angular/`));
-app.use('/angular-animate', serveStatic(`${__dirname}/../../../node_modules/angular-animate/`));
-app.use('/angular-route', serveStatic(`${__dirname}/../../../node_modules/angular-route/`));
-app.use('/angular-utils-pagination', serveStatic(`${__dirname}/../../../node_modules/angular-utils-pagination/`));
-app.use('/jquery', serveStatic(`${__dirname}/../../../node_modules/jquery/dist/`));
-app.use('/sb-admin', serveStatic(`${__dirname}/../../../node_modules/startbootstrap-sb-admin/`));
-app.use('/jquery-easing', serveStatic(`${__dirname}/../../../node_modules/jquery.easing/`));
-app.use('/popper', serveStatic(`${__dirname}/../../../node_modules/popper.js/dist/`));
-app.use('/dataTables', serveStatic(`${__dirname}/../../../node_modules/datatables/media/`));
-app.use('/font-awesome', serveStatic(`${__dirname}/../../../node_modules/font-awesome/`));
-app.use('/angular-gridster', serveStatic(`${__dirname}/../../../node_modules/angular-gridster/dist`));
-app.use('/angularjs-gauge', serveStatic(`${__dirname}/../../../node_modules/angularjs-gauge/dist`));
-app.use('/angularjs-chartjs', serveStatic(`${__dirname}/../../../node_modules/angular-chart.js`));
-app.use('/angular-ui-bootstrap', serveStatic(`${__dirname}/../../../node_modules/angular-ui-bootstrap/dist`));
+// New hostname+path as specified by question:
+const apiProxy = proxy('**', { target: 'http://localhost:4200' });
+
 app.use('/api', indexRouter);
+app.use(apiProxy);
 
 export = () => {
   app.listen(8080, '0.0.0.0');
