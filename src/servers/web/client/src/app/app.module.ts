@@ -9,6 +9,7 @@ import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCa
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NavbarComponent,
     LoginComponent,
     FrontPageComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,

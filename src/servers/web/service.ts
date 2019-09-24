@@ -43,7 +43,7 @@ app.use('/api', (req, res, next) => {
     admin: true,
   });
 
-  req.user = myUser;
+  // req.user = myUser;
   next();
 });
 // New hostname+path as specified by question:

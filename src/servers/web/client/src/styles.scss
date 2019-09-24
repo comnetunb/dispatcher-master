@@ -205,6 +205,27 @@ footer {
 footer a {
   display: flex;
   align-items: center;
+
+  .form-card {
+    width: 100%;
+    padding: 2em;
+  }
+
+  .form-card-content {
+    align-items: center;
+  }
+
+  .form-card-container {
+    margin-top: 1em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .mat-form-field {
+    width: 100%;
+  }
+
 }
 
 .github-star-badge {
@@ -270,4 +291,25 @@ svg#clouds {
     display: none;
     visibility: hidden;
   }
+}
+
+.form-card {
+  width: 100%;
+  padding: 2em;
+}
+
+.form-card-content {
+  align-items: center;
+}
+
+.form-card-container {
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mat-form-field {
+  width: 100%;
+  margin: 0 1em 0 1em;
 }

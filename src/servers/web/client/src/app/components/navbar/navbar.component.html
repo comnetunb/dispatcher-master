@@ -25,7 +25,7 @@
     </mat-menu>
   </div>
   <ng-template #loggedOut>
-    <button mat-raised-button color="primary" class="mr-2" (click)="registerPage()">Register</button>
-    <button mat-raised-button (click)="loginPage()">Sign In</button>
+    <button mat-raised-button color="primary" class="mr-2" [routerLink]="['/', 'register']">Register</button>
+    <button mat-raised-button [routerLink]="['/', 'login']">Sign In</button>
   </ng-template>
 </div>
