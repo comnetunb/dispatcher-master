@@ -58,16 +58,6 @@ userSchema.methods.validPassword = function (password: string): boolean { // esl
   return compareSync(password, this.password);
 };
 
-// Extending Request to properly type our users
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: IUser
-  }
-  interface Response {
-    user?: IUser
-  }
-}
-
 export interface UserFilter {
   _id?: string,
   email?: string,

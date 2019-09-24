@@ -5,6 +5,15 @@ import indexRouter from './routers/index.router';
 import User, { IUser, IUserDocument } from '../../database/models/user';
 import { config as passportConfig } from './config/passport';
 
+// Extending Request to properly type our users
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: IUser
+  }
+  interface Response {
+    user?: IUser
+  }
+}
 
 const app: express.Application = express();
 
