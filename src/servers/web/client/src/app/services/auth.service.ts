@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import User, { IUser } from '../../../../../../database/models/user';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 const apiRoute = '/api/users';
 
@@ -14,7 +15,8 @@ export class AuthService {
   authenticatedUser?: IUser;
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   async isLoggedIn(): Promise<IUser> {
@@ -33,5 +35,9 @@ export class AuthService {
     }).toPromise();
     this.authenticatedUser = user;
     return user;
+  }
+
+  async logOut(): Promise<void> {
+    await this.http.post(`${apiRoute}/sign_out`, {}, { responseType: 'text' }).toPromise();
   }
 }
