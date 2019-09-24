@@ -17,7 +17,7 @@ export function signOut(req: Request, res: Response): void {
 export function signIn(req: Request, res: Response, next: NextFunction): void {
   passport.authenticate('local', function (err, user, info) {
     if (err) {
-      return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send(err);
+      return res.status(httpStatusCodes.UNAUTHORIZED).send(err);
     }
     if (!user) {
       return res.status(httpStatusCodes.UNAUTHORIZED).json(info);

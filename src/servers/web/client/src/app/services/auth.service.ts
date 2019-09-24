@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import User, { IUser } from '../../../../../../database/models/user';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 
 const apiRoute = '/api/users';
@@ -12,32 +13,50 @@ const apiRoute = '/api/users';
 export class AuthService {
 
 
-  authenticatedUser?: IUser;
+  private currentUserSubject: BehaviorSubject<IUser>;
+  public currentUser: Observable<IUser>;
 
   constructor(
     private http: HttpClient,
     private router: Router
-  ) { }
-
-  async isLoggedIn(): Promise<IUser> {
-    if (this.authenticatedUser == null) {
-      const user = await this.http.get<IUser>(`${apiRoute}/signed_in`).toPromise();
-      this.authenticatedUser = user;
-    }
-
-    return this.authenticatedUser;
+  ) {
+    this.currentUserSubject = new BehaviorSubject<IUser>(JSON.parse(localStorage.getItem('currentUser')));
+    this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  async logIn(username: string, password: string): Promise<IUser> {
-    const user = await this.http.post<IUser>(`${apiRoute}/sign_in`, {
-      username,
-      password,
-    }).toPromise();
-    this.authenticatedUser = user;
-    return user;
+  public get currentUserValue(): IUser {
+    return this.currentUserSubject.value;
   }
 
-  async logOut(): Promise<void> {
-    await this.http.post(`${apiRoute}/sign_out`, {}, { responseType: 'text' }).toPromise();
+  refresh() {
+    console.log('top');
+    console.log(`${apiRoute}/signed_in`);
+
+    const sub = this.http.get<IUser>(`${apiRoute}/signed_in`).subscribe((user) => {
+      if (user == null) return;
+      // store user details and jwt token in local storage to keep user logged in between page refreshes
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      this.currentUserSubject.next(user);
+      sub.unsubscribe();
+    });
+  }
+
+  login(username: string, password: string) {
+    return this.http.post<IUser>(`${apiRoute}/sign_in`, { username, password })
+      .pipe(map(user => {
+        // store user details and jwt token in local storage to keep user logged in between page refreshes
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+        this.router.navigate(['/']);
+      }));
+  }
+
+  logout() {
+    this.http.post(`${apiRoute}/sign_out`, {}, { responseType: 'text' }).subscribe(() => {
+      // remove user from local storage and set current user to null
+      localStorage.removeItem('currentUser');
+      this.currentUserSubject.next(null);
+      this.router.navigate(['/']);
+    });
   }
 }

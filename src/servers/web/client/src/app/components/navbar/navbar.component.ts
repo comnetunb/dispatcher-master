@@ -12,20 +12,28 @@ import { Router } from '@angular/router';
 export class NavbarComponent implements OnInit {
 
   title = SiteTitle;
-  user?: IUser;
+  user: IUser;
 
   constructor(
     private authService: AuthService,
     private router: Router
   ) { }
 
-  async ngOnInit() {
-    this.user = await this.authService.isLoggedIn();
+  ngOnInit() {
+    this.authService.currentUser.subscribe((user) => this.user = user);
+    this.authService.refresh();
   }
 
   async logOut() {
-    await this.authService.logOut();
-    this.router.navigate(['/']);
+    this.authService.logout();
+  }
+
+  loginPage() {
+    this.router.navigate(['/login']);
+  }
+
+  register() {
+    this.router.navigate(['/register']);
   }
 
 }
