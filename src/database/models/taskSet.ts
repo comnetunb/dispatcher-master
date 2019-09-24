@@ -1,5 +1,5 @@
 import { model, Schema, Document, Model } from 'mongoose';
-import { TaskSetPriority, OperationState } from '../enums';
+import { TaskSetPriority, OperationState } from '../../api/enums';
 import { IUser } from './user';
 import Task from './task';
 

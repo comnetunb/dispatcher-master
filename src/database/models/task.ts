@@ -1,5 +1,5 @@
 import { model, Schema, Document, Model } from 'mongoose';
-import { OperationState, Result } from '../enums';
+import { OperationState, Result } from '../../api/enums';
 import TaskSet, { ITaskSet } from './taskSet';
 
 interface ITaskDocument extends Document {

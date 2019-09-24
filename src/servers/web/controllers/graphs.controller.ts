@@ -4,7 +4,7 @@ import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { PlotInfo } from '../api/plotInfo';
-import { OperationState } from '../../../database/enums';
+import { OperationState } from '../../../api/enums';
 
 export function plotInfo(req: Request, res: Response): void | Response {
   const taskFilter = {

@@ -3,7 +3,7 @@ import * as connectionManager from '../../connection_manager';
 import Task from '../../../../database/models/task';
 import { PerformTaskResponse, ReturnCode, TerminateTask, ProtocolType, EncapsulatePDU } from 'dispatcher-protocol';
 import { IWorker } from '../../../../database/models/worker';
-import { OperationState } from '../../../../database/enums';
+import { OperationState } from '../../../../api/enums';
 
 export async function execute(pdu: PerformTaskResponse, worker: IWorker): Promise<void> {
   if (pdu.code === ReturnCode.Executing) {

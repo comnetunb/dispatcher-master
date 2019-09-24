@@ -2,7 +2,7 @@ import { model, Schema, Document, Model } from 'mongoose';
 import { ITaskSet } from './taskSet';
 import { ITask } from './task';
 import { IUser } from './user';
-import { Result } from '../enums';
+import { Result } from '../../api/enums';
 
 interface INotificationDocument extends Document {
   userId: IUser['_id'],

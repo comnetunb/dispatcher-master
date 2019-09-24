@@ -9,7 +9,7 @@ import Task from '../../../database/models/task';
 import File, { IFile } from '../../../database/models/file';
 import { TaskSetData, InputType, InputFile, ParsedInput } from '../api/taskSetData';
 import { IUser } from '../../../database/models/user';
-import { OperationState } from '../../../database/enums';
+import { OperationState } from '../../../api/enums';
 import { ExportFormat } from '../api/exportFormat';
 
 export async function buildTasks(taskSetData: TaskSetData, user: IUser): Promise<void> {

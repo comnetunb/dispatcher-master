@@ -1,7 +1,7 @@
 import { configure, getLogger } from 'log4js';
 import Log, { ILog } from '../../database/models/log';
 import Task from '../../database/models/task';
-import { LogLevel } from '../../database/enums';
+import { LogLevel } from '../../api/enums';
 
 configure({
   appenders: {

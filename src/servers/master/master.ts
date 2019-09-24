@@ -7,7 +7,7 @@ import { event as interfaceManagerEvent } from '../shared/interface_manager';
 import Task, { ITask } from '../../database/models/task';
 import Worker from '../../database/models/worker';
 import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformCommand } from 'dispatcher-protocol';
-import { OperationState } from '../../database/enums';
+import { OperationState } from '../../api/enums';
 import { IFile } from '../../database/models/file';
 
 const config = Config.getConfiguration();

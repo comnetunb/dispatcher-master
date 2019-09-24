@@ -5,7 +5,7 @@ import * as mailer from '../../../shared/mailer';
 import logger from '../../../shared/log';
 import { TaskResult, ReturnCode } from 'dispatcher-protocol';
 import { IWorker } from '../../../../database/models/worker';
-import { OperationState, Result } from '../../../../database/enums';
+import { OperationState, Result } from '../../../../api/enums';
 
 export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   if (pdu.code === ReturnCode.Success) {

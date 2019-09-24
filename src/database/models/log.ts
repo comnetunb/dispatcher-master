@@ -1,5 +1,5 @@
 import { model, Schema, Document, Model, Types } from 'mongoose';
-import { LogLevel } from '../enums';
+import { LogLevel } from '../../api/enums';
 import Task from './task';
 export const SessionId = Types.ObjectId();
 

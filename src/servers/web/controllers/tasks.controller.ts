@@ -4,7 +4,7 @@ import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import * as taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';
-import { OperationState } from '../../../database/enums';
+import { OperationState } from '../../../api/enums';
 
 export function getAllTaskSets(req: Request, res: Response): void | Response {
   if (!req.isAuthenticated()) {
