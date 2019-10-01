@@ -35,11 +35,8 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     this.authService.login(formValue.email, formValue.password)
-      .subscribe((teste) => {
-        console.log(teste);
-      },
+      .subscribe(() => { },
         (error) => {
-          console.log(error);
           this.errorMessage = error.error.error;
         });
   }
