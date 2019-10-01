@@ -38,8 +38,13 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     MatFormFieldModule,
     MatInputModule,
     MatSidenavModule,
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

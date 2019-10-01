@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IUser } from '../../../../../../database/models/user';
 import { RegisterUserRequest } from '../api/register-user-request';
+import { LoginResponse } from '../api/login-response';
 
 const apiRoute = '/api/users';
 
@@ -15,8 +16,8 @@ export class UserService {
     private http: HttpClient
   ) { }
 
-  registerUser(info: RegisterUserRequest): Observable<IUser> {
-    return this.http.post<IUser>(`${apiRoute}/sign_up`, info);
+  registerUser(info: RegisterUserRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${apiRoute}/sign_up`, info);
   }
 
   getAllPendingUsers(): Observable<IUser[]> {

@@ -6,7 +6,11 @@ import { NextFunction } from 'connect';
 import { RegisterUserRequest } from '../client/src/app/api/register-user-request';
 
 export function isSignedIn(req: Request, res: Response): void {
-  res.send(req.isAuthenticated() ? req.user : null);
+  if (req.user) {
+    res.send(req.user);
+  } else {
+    res.sendStatus(httpStatusCodes.UNAUTHORIZED);
+  }
 }
 
 export function signOut(req: Request, res: Response): void {
@@ -14,20 +18,26 @@ export function signOut(req: Request, res: Response): void {
   res.sendStatus(httpStatusCodes.OK);
 }
 
-export function signIn(req: Request, res: Response, next: NextFunction): void {
-  passport.authenticate('local', function (err, user, info) {
-    if (err) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).send(err);
-    }
+export async function signIn(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ email: username.toLowerCase() });
     if (!user) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).json(info);
+      return res.sendStatus(httpStatusCodes.BAD_REQUEST).send({ error: 'User not found.' });
     }
 
-    return req.login(user, function (err2) {
-      if (err) { return next(err2); }
-      return res.json(user);
-    });
-  })(req, res, next);
+    if (!user.validPassword(password)) {
+      return res.sendStatus(httpStatusCodes.UNAUTHORIZED).send({ error: 'Wrong password.' });
+    }
+
+
+    const token = await user.generateAuthToken()
+    user.password = undefined;
+    res.send({ user, token });
+  } catch (error) {
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
+      .send({ error });
+  }
 }
 
 export async function signUp(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -53,10 +63,8 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
     });
 
     const user = await newUser.save();
-    return req.login(user, function (err2) {
-      if (err2) { return next(err2); }
-      res.status(httpStatusCodes.OK).send(user);
-    });
+    const token = await user.generateAuthToken();
+    res.status(httpStatusCodes.CREATED).send({ user, token });
   } catch (error) {
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
       .send({ error });
@@ -64,7 +72,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
 }
 
 export async function manageUser(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
@@ -95,7 +103,7 @@ export async function manageUser(req: Request, res: Response): Promise<void | Re
 }
 
 export async function pendingUsers(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
 
@@ -110,7 +118,7 @@ export async function pendingUsers(req: Request, res: Response): Promise<void | 
 }
 
 export async function allowedUsers(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
 
@@ -126,7 +134,7 @@ export async function allowedUsers(req: Request, res: Response): Promise<void | 
 
 
 export async function disallowedUsers(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.status(httpStatusCodes.UNAUTHORIZED).send();
   }
 

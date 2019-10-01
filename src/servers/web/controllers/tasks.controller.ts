@@ -7,7 +7,7 @@ import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
 
 export function getAllTaskSets(req: Request, res: Response): void | Response {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
@@ -25,7 +25,7 @@ export function getAllTaskSets(req: Request, res: Response): void | Response {
 }
 
 export function createTaskSet(req: Request, res: Response): void | Response {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
@@ -39,7 +39,7 @@ export function createTaskSet(req: Request, res: Response): void | Response {
 }
 
 export async function removeTaskSet(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
@@ -58,7 +58,7 @@ export async function removeTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export async function cancelTaskSet(req: Request, res: Response): Promise<void | Response> {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
@@ -89,7 +89,7 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export function supportedRunnables(req: Request, res: Response): void | Response {
-  if (!req.isAuthenticated()) {
+  if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 

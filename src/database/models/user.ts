@@ -1,5 +1,11 @@
 import { model, Schema, Document, Model } from 'mongoose';
 import { compareSync, hashSync } from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+import { TestJWTKEY } from '../../servers/web/middlewares/auth';
+
+export interface Token {
+  token: string,
+}
 
 export interface IUserDocument extends Document {
   email: string,
@@ -8,10 +14,12 @@ export interface IUserDocument extends Document {
   admin: boolean,
   pending: boolean,
   permitted: boolean,
+  tokens: Token[],
 }
 
 export interface IUser extends IUserDocument {
   validPassword(password: string): boolean,
+  generateAuthToken(): Promise<string>,
 }
 
 interface IUserModel extends Model<IUser> {
@@ -45,7 +53,13 @@ const userSchema: Schema = new Schema({
   permitted: {
     type: Boolean,
     required: false,
-  }
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 });
 
 const saltRounds = 10;
@@ -57,6 +71,15 @@ userSchema.statics.encryptPassword = (password: string): string => {
 userSchema.methods.validPassword = function (password: string): boolean { // eslint-disable-line func-names
   return compareSync(password, this.password);
 };
+
+userSchema.methods.generateAuthToken = async function (): Promise<string> {
+  // Generate an auth token for the user
+  const user = this;
+  const token = jwt.sign({ _id: user._id }, TestJWTKEY);
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+}
 
 export interface UserFilter {
   _id?: string,
