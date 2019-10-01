@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import { RegisterUserRequest } from 'src/app/api/register-user-request';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +17,9 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -48,12 +53,15 @@ export class RegisterComponent implements OnInit {
 
     this.loading = true;
 
-    this.authService.login(formValue.email, formValue.password)
-      .subscribe((teste) => {
-        console.log(teste);
-      },
+    const request: RegisterUserRequest = {
+      email: formValue.email,
+      name: formValue.fullName,
+      password: formValue.password,
+    };
+
+    this.authService.register(request)
+      .subscribe(() => { },
         (error) => {
-          console.log(error);
           this.errorMessage = error.error.error;
         });
   }

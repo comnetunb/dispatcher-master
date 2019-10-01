@@ -3,10 +3,10 @@ import User, { UserFilter } from '../../../database/models/user';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { NextFunction } from 'connect';
+import { RegisterUserRequest } from '../client/src/app/api/register-user-request';
 
 export function isSignedIn(req: Request, res: Response): void {
-  res.send(req.user);
-  // res.send(req.isAuthenticated() ? req.user : null);
+  res.send(req.isAuthenticated() ? req.user : null);
 }
 
 export function signOut(req: Request, res: Response): void {
@@ -23,25 +23,26 @@ export function signIn(req: Request, res: Response, next: NextFunction): void {
       return res.status(httpStatusCodes.UNAUTHORIZED).json(info);
     }
 
-    return req.logIn(user, function (err2) {
+    return req.login(user, function (err2) {
       if (err) { return next(err2); }
       return res.json(user);
     });
   })(req, res, next);
 }
 
-export async function signUp(req: Request, res: Response): Promise<void> {
+export async function signUp(req: Request, res: Response, next: NextFunction): Promise<void> {
   const userFilter: UserFilter = { email: req.body.email };
 
   try {
     const existingUser = await User.findOne(userFilter);
     if (existingUser) {
       res.status(httpStatusCodes.BAD_REQUEST)
-        .send({ reason: 'There already is an account with this e-mail.' });
+        .send({ error: 'There already is an account with this e-mail.' });
       return;
     }
 
-    const { email, name, password } = req.body;
+    const info: RegisterUserRequest = req.body;
+    const { email, name, password } = info;
 
     const hash = User.encryptPassword(password);
 
@@ -51,8 +52,11 @@ export async function signUp(req: Request, res: Response): Promise<void> {
       password: hash
     });
 
-    await newUser.save();
-    res.sendStatus(httpStatusCodes.OK);
+    const user = await newUser.save();
+    return req.login(user, function (err2) {
+      if (err2) { return next(err2); }
+      res.status(httpStatusCodes.OK).send(user);
+    });
   } catch (error) {
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
       .send({ error });
