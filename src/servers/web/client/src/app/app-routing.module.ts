@@ -7,6 +7,7 @@ import { WelcomeNewUserComponent } from './components/welcome-new-user/welcome-n
 import { AllowedGuard } from './guards/allowed.guard';
 import { AuthGuard } from './guards/auth.guard';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { WorkersComponent } from './components/workers/workers.component';
 
 
 const routes: Routes = [];
@@ -37,7 +38,10 @@ const appRoutes: Routes = [
         canActivate: [AuthGuard, AllowedGuard],
         component: DashboardComponent,
         children: [
-
+          {
+            path: 'workers',
+            component: WorkersComponent,
+          }
         ]
       }
     ]

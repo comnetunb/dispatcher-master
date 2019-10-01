@@ -41,12 +41,15 @@ export class AuthService {
     return this.currentTokenSubject.value;
   }
 
-  private storeUser(auth: LoginResponse) {
+  private storeUser(user: IUser, token?: string) {
     // store user details and jwt token in local storage to keep user logged in between page refreshes
-    localStorage.setItem('currentUser', JSON.stringify(auth.user));
-    this.currentUserSubject.next(auth.user);
-    localStorage.setItem('currentToken', auth.token);
-    this.currentTokenSubject.next(auth.token);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.currentUserSubject.next(user);
+
+    if (token) {
+      localStorage.setItem('currentToken', token);
+      this.currentTokenSubject.next(token);
+    }
   }
 
   private eraseStorage(): void {
@@ -59,11 +62,11 @@ export class AuthService {
   }
 
   refresh() {
-    const sub = this.http.get<LoginResponse>(`${apiRoute}/signed_in`).subscribe((res) => {
-      if (res == null || res.user == null) {
+    const sub = this.http.get<IUser>(`${apiRoute}/signed_in`).subscribe((user) => {
+      if (user == null) {
         this.eraseStorage();
       } else {
-        this.storeUser(res);
+        this.storeUser(user);
       }
       sub.unsubscribe();
     }, (error) => {
@@ -81,7 +84,7 @@ export class AuthService {
           return this.eraseStorage();
         }
 
-        this.storeUser(res);
+        this.storeUser(res.user, res.token);
         this.router.navigate(['/dashboard']);
       }));
   }
@@ -93,7 +96,7 @@ export class AuthService {
           return this.eraseStorage();
         }
 
-        this.storeUser(res);
+        this.storeUser(res.user, res.token);
         this.router.navigate(['/dashboard']);
       }));
   }

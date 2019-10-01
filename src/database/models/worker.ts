@@ -15,7 +15,7 @@ interface IWorkerDocument extends Document {
   },
   performance: {
     ratio?: number,
-    leve?: string,
+    level?: string,
   },
   alias?: string,
 }

@@ -1,4 +1,4 @@
-<div class="toolbar" role="banner">
+<mat-toolbar class="toolbar">
   <span>{{title}}</span>
   <div class="spacer"></div>
   <div *ngIf="user; else loggedOut">
@@ -28,4 +28,4 @@
     <button mat-raised-button color="primary" class="mr-2" [routerLink]="['/', 'register']">Register</button>
     <button mat-raised-button [routerLink]="['/', 'login']">Sign In</button>
   </ng-template>
-</div>
+</mat-toolbar>

@@ -1,0 +1,17 @@
+<mat-card class="worker-card">
+  <mat-card-content>
+    <h3>{{name}}</h3>
+
+
+    <section>
+      CPU Usage
+      <mat-progress-bar mode="determinate" [value]="worker.resource.cpu * 100">
+      </mat-progress-bar>
+    </section>
+    <section>
+      Memory Usage
+      <mat-progress-bar mode="determinate" [value]="worker.resource.memory * 100">
+      </mat-progress-bar>
+    </section>
+  </mat-card-content>
+</mat-card>

@@ -7,7 +7,10 @@ import { RegisterUserRequest } from '../client/src/app/api/register-user-request
 
 export function isSignedIn(req: Request, res: Response): void {
   if (req.user) {
-    res.send(req.user);
+    const user = req.user;
+    user.tokens = undefined;
+    user.password = undefined;
+    res.send(user);
   } else {
     res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
@@ -31,8 +34,9 @@ export async function signIn(req: Request, res: Response, next: NextFunction): P
     }
 
 
-    const token = await user.generateAuthToken()
+    const token = await user.generateAuthToken();
     user.password = undefined;
+    user.tokens = undefined;
     res.send({ user, token });
   } catch (error) {
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
@@ -64,6 +68,8 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
 
     const user = await newUser.save();
     const token = await user.generateAuthToken();
+    user.password = undefined;
+    user.tokens = undefined;
     res.status(httpStatusCodes.CREATED).send({ user, token });
   } catch (error) {
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)

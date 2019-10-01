@@ -10,6 +10,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  background-color: #fafafa;
+}
+
 h1,
 h2,
 h3,
@@ -63,6 +67,14 @@ p {
   color: white;
   font-weight: 600;
   padding: 0 1em;
+
+  position: sticky;
+  position: -webkit-sticky;
+  /* For macOS/iOS Safari */
+  top: 0;
+  /* Sets the sticky toolbar to be on top */
+  z-index: 1000;
+  /* Ensure that your app's content doesn't overlap the toolbar */
 }
 
 .toolbar img {
@@ -290,6 +302,9 @@ svg#clouds {
   width: 1920px;
 }
 
+.fill {
+  min-height: 100vh;
+}
 
 /* Responsive Styles */
 @media screen and (max-width: 767px) {
