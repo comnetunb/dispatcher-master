@@ -13,6 +13,7 @@ export class NavbarComponent implements OnInit {
 
   title = SiteTitle;
   user: IUser;
+  isAdmin: boolean;
 
   constructor(
     private authService: AuthService,
@@ -20,7 +21,15 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.authService.currentUser.subscribe((user) => this.user = user);
+    this.authService.currentUser.subscribe((user) => {
+      this.user = user
+
+      if (this.user != null) {
+        this.isAdmin = user.admin;
+      } else {
+        this.isAdmin = false;
+      }
+    });
     this.authService.refresh();
   }
 

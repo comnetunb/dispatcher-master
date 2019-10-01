@@ -16,7 +16,7 @@
       <button mat-menu-item>
         <mat-icon>dashboard</mat-icon> Dashboard
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item *ngIf="isAdmin">
         <mat-icon>settings</mat-icon> Admin
       </button>
       <button mat-menu-item (click)="logOut()">
