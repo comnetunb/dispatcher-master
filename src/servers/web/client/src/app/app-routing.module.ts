@@ -6,6 +6,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { WelcomeNewUserComponent } from './components/welcome-new-user/welcome-new-user.component';
 import { AllowedGuard } from './guards/allowed.guard';
 import { AuthGuard } from './guards/auth.guard';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 
 const routes: Routes = [];
@@ -14,12 +15,28 @@ const appRoutes: Routes = [
   {
     path: '',
     children: [
-      { path: '', component: FrontPageComponent, pathMatch: 'full' },
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      { path: 'welcome', component: WelcomeNewUserComponent },
       {
-        path: 'dashboard', canActivate: [AuthGuard, AllowedGuard], children: [
+        path: '',
+        component: FrontPageComponent,
+        pathMatch: 'full'
+      },
+      {
+        path: 'login',
+        component: LoginComponent
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
+      },
+      {
+        path: 'welcome',
+        component: WelcomeNewUserComponent
+      },
+      {
+        path: 'dashboard',
+        canActivate: [AuthGuard, AllowedGuard],
+        component: DashboardComponent,
+        children: [
 
         ]
       }

@@ -1,0 +1,25 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened fullscreen class="sidenav" [fixedInViewport]="true" [fixedTopGap]="60"
+    [fixedBottomGap]="0">
+    <button mat-menu-item class="sidenav-button">
+      <mat-icon>account_circle</mat-icon> Workers
+    </button>
+    <button mat-menu-item class="sidenav-button">
+      <mat-icon>dashboard</mat-icon> TaskSets
+    </button>
+    <button mat-menu-item class="sidenav-button">
+      <mat-icon>settings</mat-icon> Logs
+    </button>
+    <button mat-menu-item class="sidenav-button">
+      <mat-icon>exit_to_app</mat-icon> Log Out
+    </button>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="content text-align" [hidden]="route.firstChild">
+      Menu at your left side
+    </div>
+
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

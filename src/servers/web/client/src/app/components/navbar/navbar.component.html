@@ -13,7 +13,7 @@
       <button mat-menu-item>
         <mat-icon>account_circle</mat-icon> Profile
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="dashboard()">
         <mat-icon>dashboard</mat-icon> Dashboard
       </button>
       <button mat-menu-item *ngIf="isAdmin">

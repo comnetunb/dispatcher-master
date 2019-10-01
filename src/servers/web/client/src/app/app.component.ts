@@ -7,5 +7,4 @@ import { OperationState } from '../../../../../api/enums';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ok';
 }
