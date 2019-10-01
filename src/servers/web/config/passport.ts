@@ -34,10 +34,6 @@ export function config() {
           return done({ error: 'Wrong password.' });
         }
 
-        if (!user.permitted || user.pending === true) {
-          return done({ error: 'A system administrator must allow your access.' });
-        }
-
         user.password = undefined;
 
         // Success
