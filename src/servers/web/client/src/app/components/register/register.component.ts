@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
-import { UserService } from 'src/app/services/user.service';
-import { RegisterUserRequest } from 'src/app/api/register-user-request';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
+import { RegisterUserRequest } from '../../api/register-user-request';
 import { Router } from '@angular/router';
 
 @Component({

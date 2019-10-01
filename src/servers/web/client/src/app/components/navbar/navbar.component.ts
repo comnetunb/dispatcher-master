@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from 'src/app/services/auth.service';
-import { SiteTitle } from 'src/app/utils';
+import { AuthService } from '../../services/auth.service';
+import { SiteTitle } from '../../utils';
 import { IUser } from '../../../../../../../database/models/user';
 import { Router } from '@angular/router';
 
