@@ -19,6 +19,8 @@ import { LacunaMaterialTableModule } from 'lacuna-mat-table';
 import { LogLevelPipe } from './pipes/log-level.pipe';
 import { LogListComponent } from './components/log-list/log-list.component';
 import { LogsComponent } from './components/logs/logs.component';
+import { TasksetListComponent } from './components/taskset-list/taskset-list.component';
+import { TasksetsComponent } from './components/tasksets/tasksets.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,8 @@ import { LogsComponent } from './components/logs/logs.component';
     LogListComponent,
     LogLevelPipe,
     LogsComponent,
+    TasksetsComponent,
+    TasksetListComponent,
   ],
   imports: [
     BrowserModule,

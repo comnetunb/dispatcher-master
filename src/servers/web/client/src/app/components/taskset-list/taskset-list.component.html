@@ -1,0 +1,40 @@
+<lac-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="desc" showRefresh
+  initialPageSize="25">
+  <h2 lac-table-title>
+    {{customTitle}}
+  </h2>
+
+  <div lac-table-empty>
+    <div class="d-flex justify-content-center">
+      <h4>None were found.</h4>
+    </div>
+  </div>
+
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="startTime">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Start</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.startTime | date:'short'}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="endTime">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>End</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span *ngIf="row.endTime; else notFinished">{{row.endTime | date:'short'}}</span>
+      <ng-template #notFinished>
+        N/A
+      </ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="remainingTasksCount">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Tasks Remaining</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.remainingTasksCount}}</mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columnsToDisplay$; "></mat-row>
+</lac-table>

@@ -89,6 +89,7 @@ export interface UserFilter {
   admin?: boolean,
   pending?: boolean,
   permitted?: boolean,
+  [key: string]: any,
 }
 
 export const User: IUserModel = model<IUser, IUserModel>('User', userSchema);

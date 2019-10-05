@@ -16,7 +16,6 @@ export class WorkerCardComponent implements OnInit {
   }
 
   public get name() {
-    console.log(this.worker);
     if (this.worker.alias) {
       return `${this.worker.alias} (${this.worker.address})`;
     } else {

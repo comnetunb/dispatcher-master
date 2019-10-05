@@ -98,6 +98,21 @@ taskSetSchema.methods.updateRemainingTasksCount = async function (): Promise<ITa
   return await taskSet.save();
 };
 
+export interface TaskSetFilter {
+  _id?: string,
+  name?: string,
+  pending?: boolean,
+  permitted?: boolean,
+  argumentTemplate?: string,
+  priority?: TaskSetPriority,
+  state?: OperationState,
+  startTime?: Date,
+  endTime?: Date,
+  remainingTasksCount?: number,
+  errorLimitCount?: number,
+  [key: string]: any,
+}
+
 export const TaskSet: ITaskSetModel = model<ITaskSet, ITaskSetModel>('TaskSet', taskSetSchema);
 
 export default TaskSet;

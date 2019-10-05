@@ -1,4 +1,4 @@
-import TaskSet from '../../../database/models/taskSet';
+import TaskSet, { TaskSetFilter } from '../../../database/models/taskSet';
 import Task from '../../../database/models/task';
 import logger from '../../shared/log';
 import { Request, Response } from 'express';
@@ -6,12 +6,15 @@ import * as taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
 
-export function getAllTaskSets(req: Request, res: Response): void | Response {
+export function getTaskSets(req: Request, res: Response): void | Response {
   if (req.user == null) {
     return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
   }
 
-  const taskSetFilter = { _user: req.user._id };
+  const taskSetFilter: TaskSetFilter = { _user: req.user._id };
+  if (req.query.state) {
+    taskSetFilter.state = req.query.state;
+  }
 
   TaskSet
     .find(taskSetFilter)

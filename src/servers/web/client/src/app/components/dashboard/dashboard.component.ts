@@ -28,4 +28,20 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/', 'dashboard', 'logs']);
   }
 
+  tasksets() {
+    this.router.navigate(['/', 'dashboard', 'tasksets']);
+  }
+
+  executingTasksets() {
+    this.router.navigate(['/', 'dashboard', 'tasksets', 'executing']);
+  }
+
+  finishedTasksets() {
+    this.router.navigate(['/', 'dashboard', 'tasksets', 'finished']);
+  }
+
+  canceledTasksets() {
+    this.router.navigate(['/', 'dashboard', 'tasksets', 'canceled']);
+  }
+
 }

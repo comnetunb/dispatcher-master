@@ -120,6 +120,7 @@ export async function buildTasks(taskSetData: TaskSetData, user: IUser): Promise
       name: taskSetName,
       argumentTemplate,
       errorLimitCount: errorLimit,
+      state: OperationState.Executing,
       remainingTasksCount: 0,
     });
 

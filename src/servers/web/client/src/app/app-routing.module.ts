@@ -9,6 +9,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { WorkersComponent } from './components/workers/workers.component';
 import { LogsComponent } from './components/logs/logs.component';
+import { OperationState } from '../../../../../api/enums';
+import { TasksetsComponent } from './components/tasksets/tasksets.component';
 
 const routes: Routes = [];
 
@@ -46,6 +48,31 @@ const appRoutes: Routes = [
             path: 'logs',
             component: LogsComponent,
           },
+          {
+            path: 'tasksets',
+            children: [
+              {
+                path: '',
+                component: TasksetsComponent,
+                pathMatch: 'full',
+              },
+              {
+                path: 'executing',
+                data: { tasksetState: OperationState.Executing },
+                component: TasksetsComponent,
+              },
+              {
+                path: 'finished',
+                data: { tasksetState: OperationState.Finished },
+                component: TasksetsComponent,
+              },
+              {
+                path: 'canceled',
+                data: { tasksetState: OperationState.Canceled },
+                component: TasksetsComponent,
+              },
+            ],
+          },
         ]
       }
     ]
@@ -56,7 +83,7 @@ const appRoutes: Routes = [
   imports: [
     RouterModule.forRoot(
       appRoutes,
-      { enableTracing: true } // <-- debugging purposes only
+      { enableTracing: false } // <-- debugging purposes only
     )
   ],
   exports: [

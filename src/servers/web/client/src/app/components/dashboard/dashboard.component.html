@@ -13,13 +13,16 @@
     </button>
 
     <mat-menu #taskSetsMenu="matMenu" xPosition="before">
-      <button mat-menu-item>
-        <mat-icon>playlist_play</mat-icon> Running
+      <button mat-menu-item (click)="tasksets()">
+        <mat-icon>playlist_play</mat-icon> All
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="executingTasksets()">
+        <mat-icon>playlist_play</mat-icon> Executing
+      </button>
+      <button mat-menu-item (click)="finishedTasksets()">
         <mat-icon>playlist_add_check</mat-icon> Finished
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="canceledTasksets()">
         <mat-icon>delete</mat-icon> Canceled
       </button>
     </mat-menu>
