@@ -11,6 +11,7 @@ import { WorkersComponent } from './components/workers/workers.component';
 import { LogsComponent } from './components/logs/logs.component';
 import { OperationState } from '../../../../../api/enums';
 import { TasksetsComponent } from './components/tasksets/tasksets.component';
+import { TasksetCreateComponent } from './components/taskset-create/taskset-create.component';
 
 const routes: Routes = [];
 
@@ -55,6 +56,10 @@ const appRoutes: Routes = [
                 path: '',
                 component: TasksetsComponent,
                 pathMatch: 'full',
+              },
+              {
+                path: 'create',
+                component: TasksetCreateComponent,
               },
               {
                 path: 'executing',

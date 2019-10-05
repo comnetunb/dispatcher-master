@@ -13,6 +13,9 @@
     </button>
 
     <mat-menu #taskSetsMenu="matMenu" xPosition="before">
+      <button mat-menu-item (click)="createTaskset()">
+        <mat-icon>playlist_add</mat-icon> Create
+      </button>
       <button mat-menu-item (click)="tasksets()">
         <mat-icon>playlist_play</mat-icon> All
       </button>

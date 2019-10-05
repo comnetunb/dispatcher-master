@@ -21,6 +21,7 @@ import { LogListComponent } from './components/log-list/log-list.component';
 import { LogsComponent } from './components/logs/logs.component';
 import { TasksetListComponent } from './components/taskset-list/taskset-list.component';
 import { TasksetsComponent } from './components/tasksets/tasksets.component';
+import { TasksetCreateComponent } from './components/taskset-create/taskset-create.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TasksetsComponent } from './components/tasksets/tasksets.component';
     LogsComponent,
     TasksetsComponent,
     TasksetListComponent,
+    TasksetCreateComponent,
   ],
   imports: [
     BrowserModule,
