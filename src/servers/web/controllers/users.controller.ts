@@ -78,10 +78,6 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
 }
 
 export async function manageUser(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
@@ -109,10 +105,6 @@ export async function manageUser(req: Request, res: Response): Promise<void | Re
 }
 
 export async function pendingUsers(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).send();
-  }
-
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }
@@ -124,10 +116,6 @@ export async function pendingUsers(req: Request, res: Response): Promise<void | 
 }
 
 export async function allowedUsers(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).send();
-  }
-
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }
@@ -140,10 +128,6 @@ export async function allowedUsers(req: Request, res: Response): Promise<void | 
 
 
 export async function disallowedUsers(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.status(httpStatusCodes.UNAUTHORIZED).send();
-  }
-
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }

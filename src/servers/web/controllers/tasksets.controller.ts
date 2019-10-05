@@ -7,10 +7,6 @@ import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
 
 export function getTaskSets(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   const taskSetFilter: TaskSetFilter = { _user: req.user._id };
   if (req.query.state) {
     taskSetFilter.state = req.query.state;
@@ -28,10 +24,6 @@ export function getTaskSets(req: Request, res: Response): void | Response {
 }
 
 export function createTaskSet(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   try {
     taskUtils.buildTasks(req.body, req.user);
     return res.sendStatus(httpStatusCodes.OK);
@@ -42,10 +34,6 @@ export function createTaskSet(req: Request, res: Response): void | Response {
 }
 
 export async function removeTaskSet(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   try {
     const taskFilter = { _taskSet: req.body.id };
     const taskSetFilter = { _id: req.body.id };
@@ -61,10 +49,6 @@ export async function removeTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export async function cancelTaskSet(req: Request, res: Response): Promise<void | Response> {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   try {
     const taskFilter = { _taskSet: req.body.id, state: OperationState.Pending };
     const taskSetFilter = { _id: req.body.id, state: OperationState.Executing };
@@ -92,10 +76,6 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export function supportedRunnables(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   return res.send([{
     type: 'java',
     extension: '.jar'

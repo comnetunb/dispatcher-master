@@ -5,10 +5,6 @@ import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 
 export function pauseWorker(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
@@ -18,10 +14,6 @@ export function pauseWorker(req: Request, res: Response): void | Response {
 }
 
 export function resumeWorker(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
@@ -31,10 +23,6 @@ export function resumeWorker(req: Request, res: Response): void | Response {
 }
 
 export function stopWorker(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
@@ -44,10 +32,6 @@ export function stopWorker(req: Request, res: Response): void | Response {
 }
 
 export function getAllWorkers(req: Request, res: Response): void | Response {
-  if (req.user == null) {
-    return res.sendStatus(httpStatusCodes.UNAUTHORIZED);
-  }
-
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
