@@ -3,8 +3,12 @@ import { IUser } from './user';
 
 interface IFileDocument extends Document {
   _user: IUser['_id'],
-  name: String,
-  dataURL: String,
+  name: string,
+  encoding: string,
+  mimetype: string,
+  path: string,
+  size: number,
+  uploadTime: Date,
 }
 
 export interface IFile extends IFileDocument {
@@ -17,16 +21,32 @@ const fileSchema: Schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
-  dataURL: {
+  encoding: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
+  mimetype: {
+    type: String,
+    required: true,
+  },
+  path: {
+    type: String,
+    required: true,
+  },
+  size: {
+    type: Number,
+    required: true,
+  },
+  uploadTime: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export const File: IFileModel = model<IFile, IFileModel>('File', fileSchema);

@@ -5,6 +5,7 @@ import TaskSetsRouter from './tasksets.router';
 import NotificationsRouter from './notifications.router';
 import WorkersRouter from './workers.router';
 import GraphsRouter from './graphs.router';
+import FilesRouter from './files.router';
 const router = Router();
 
 router.use('/users', UsersRouter);
@@ -13,5 +14,6 @@ router.use('/tasksets', TaskSetsRouter);
 router.use('/notifications', NotificationsRouter);
 router.use('/workers', WorkersRouter);
 router.use('/graphs', GraphsRouter);
+router.use('/files', FilesRouter);
 
 export = router;
