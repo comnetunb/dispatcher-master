@@ -20,7 +20,7 @@ export class WorkersComponent implements OnInit {
   ngOnInit() {
 
     this.$toUnsubscribe.push(
-      interval(1000).subscribe(() => {
+      interval(3000).subscribe(() => {
         this.workerService.list().subscribe((workers) => {
           this.workers = workers;
         });
