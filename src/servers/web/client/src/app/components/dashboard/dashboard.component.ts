@@ -24,4 +24,8 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/', 'dashboard', 'workers']);
   }
 
+  logs() {
+    this.router.navigate(['/', 'dashboard', 'logs']);
+  }
+
 }

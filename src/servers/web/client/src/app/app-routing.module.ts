@@ -8,7 +8,7 @@ import { AllowedGuard } from './guards/allowed.guard';
 import { AuthGuard } from './guards/auth.guard';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { WorkersComponent } from './components/workers/workers.component';
-
+import { LogsComponent } from './components/logs/logs.component';
 
 const routes: Routes = [];
 
@@ -41,7 +41,11 @@ const appRoutes: Routes = [
           {
             path: 'workers',
             component: WorkersComponent,
-          }
+          },
+          {
+            path: 'logs',
+            component: LogsComponent,
+          },
         ]
       }
     ]

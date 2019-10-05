@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule } from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -15,6 +15,10 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { WorkersComponent } from './components/workers/workers.component';
 import { WorkerCardComponent } from './components/worker-card/worker-card.component';
 import { TokenInterceptor } from './interceptors/token.interceptor';
+import { LacunaMaterialTableModule } from 'lacuna-mat-table';
+import { LogLevelPipe } from './pipes/log-level.pipe';
+import { LogListComponent } from './components/log-list/log-list.component';
+import { LogsComponent } from './components/logs/logs.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +31,9 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
     DashboardComponent,
     WorkersComponent,
     WorkerCardComponent,
+    LogListComponent,
+    LogLevelPipe,
+    LogsComponent,
   ],
   imports: [
     BrowserModule,
@@ -45,6 +52,7 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
     MatSidenavModule,
     MatProgressBarModule,
     MatToolbarModule,
+    LacunaMaterialTableModule
   ],
   providers: [
     {

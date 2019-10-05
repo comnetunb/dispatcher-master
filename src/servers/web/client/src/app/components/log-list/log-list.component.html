@@ -1,0 +1,24 @@
+<lac-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="desc" showRefresh
+  initialPageSize="25">
+  <h2 lac-table-title>
+    {{customTitle}}
+  </h2>
+
+  <ng-container matColumnDef="date">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Time</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.date | date:'short'}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="level">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Level</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.level | logLevel}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="message">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Message</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.log}}</mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columnsToDisplay$; "></mat-row>
+</lac-table>
