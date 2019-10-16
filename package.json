@@ -7,7 +7,7 @@
     "lint": "esw *.js database servers --color",
     "test": "npm run lint",
     "build": "npm run copy-config && tsc",
-    "dev": "tsnd --watch --respawn src/app.ts",
+    "dev": "tsnd --watch --ignore-watch node_modules --respawn src/app.ts",
     "copy-config": "copyfiles -u 3 src/servers/config/config.json dist/servers/config/"
   },
   "keywords": [

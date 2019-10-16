@@ -58,12 +58,25 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
     const info: RegisterUserRequest = req.body;
     const { email, name, password } = info;
 
+    const count = await User.count({});
     const hash = User.encryptPassword(password);
+    let admin = false;
+    let permitted = false;
+    let pending = true;
+
+    if (count == 0) {
+      admin = true;
+      permitted = true;
+      pending = false;
+    }
 
     const newUser = new User({
       email,
       name,
-      password: hash
+      password: hash,
+      admin,
+      permitted,
+      pending,
     });
 
     const user = await newUser.save();
