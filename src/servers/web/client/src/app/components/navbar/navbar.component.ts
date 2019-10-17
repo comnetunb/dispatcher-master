@@ -22,7 +22,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.authService.currentUser.subscribe((user) => {
-      this.user = user
+      this.user = user;
 
       if (this.user != null) {
         this.isAdmin = user.admin;
@@ -35,6 +35,10 @@ export class NavbarComponent implements OnInit {
 
   dashboard() {
     this.router.navigate(['/dashboard']);
+  }
+
+  profile() {
+    this.router.navigate(['/profile']);
   }
 
   logOut() {

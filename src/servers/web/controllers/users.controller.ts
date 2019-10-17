@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { NextFunction } from 'connect';
 import { RegisterUserRequest } from '../client/src/app/api/register-user-request';
+import { EditUserRequest } from '../client/src/app/api/edit-user-request';
 
 export function isSignedIn(req: Request, res: Response): void {
   if (req.user) {
@@ -88,6 +89,46 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
       .send({ error });
   };
+}
+
+export async function getUser(req: Request, res: Response): Promise<void | Response> {
+  const userId = req.params.id;
+
+  if (!req.user.admin && req.user.id != userId) {
+    return res.sendStatus(httpStatusCodes.FORBIDDEN);
+  }
+
+  let user = await User.findById(userId);
+  return res.send(user);
+}
+
+export async function editUser(req: Request, res: Response): Promise<void | Response> {
+  const userId = req.params.id;
+
+  if (!req.user.admin && req.user.id != userId) {
+    return res.sendStatus(httpStatusCodes.FORBIDDEN);
+  }
+
+  let user = await User.findById(userId);
+  const body: EditUserRequest = req.body;
+  const { email, name, password, newPassword } = body;
+
+  if (req.user.id == userId) {
+    const matches = user.validPassword(password);
+    if (!matches) {
+      return res.sendStatus(httpStatusCodes.FORBIDDEN);
+    }
+  }
+
+  user.email = email;
+  user.name = name;
+
+  if (newPassword) {
+    user.password = User.encryptPassword(newPassword);
+  }
+
+  user = await user.save();
+  return res.send(user);
 }
 
 export async function manageUser(req: Request, res: Response): Promise<void | Response> {

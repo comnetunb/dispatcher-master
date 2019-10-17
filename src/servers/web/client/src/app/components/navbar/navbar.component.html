@@ -10,10 +10,10 @@
 
     <button mat-raised-button [matMenuTriggerFor]="menu">{{user.name}}</button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item>
+      <button mat-menu-item [routerLink]="['/', 'profile']">
         <mat-icon>account_circle</mat-icon> Profile
       </button>
-      <button mat-menu-item (click)="dashboard()">
+      <button mat-menu-item [routerLink]="['/', 'dashboard']">
         <mat-icon>dashboard</mat-icon> Dashboard
       </button>
       <button mat-menu-item *ngIf="isAdmin">

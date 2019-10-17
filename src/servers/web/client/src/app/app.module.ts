@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule } from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,6 +22,8 @@ import { LogsComponent } from './components/logs/logs.component';
 import { TasksetListComponent } from './components/taskset-list/taskset-list.component';
 import { TasksetsComponent } from './components/tasksets/tasksets.component';
 import { TasksetCreateComponent } from './components/taskset-create/taskset-create.component';
+import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
+import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,8 @@ import { TasksetCreateComponent } from './components/taskset-create/taskset-crea
     TasksetsComponent,
     TasksetListComponent,
     TasksetCreateComponent,
+    ProfileDetailsComponent,
+    ProfileEditComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,7 +62,8 @@ import { TasksetCreateComponent } from './components/taskset-create/taskset-crea
     MatSidenavModule,
     MatProgressBarModule,
     MatToolbarModule,
-    LacunaMaterialTableModule
+    LacunaMaterialTableModule,
+    MatDividerModule,
   ],
   providers: [
     {

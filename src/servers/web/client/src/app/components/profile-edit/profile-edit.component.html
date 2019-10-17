@@ -1,0 +1,56 @@
+<div class="form-card-container">
+    <mat-card class="form-card col-xs-12 col-4">
+        <mat-card-header>
+            <mat-card-title>Editing user</mat-card-title>
+            <mat-card-subtitle *ngIf="user">{{user.name}} {{user.email}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-divider></mat-divider>
+        <mat-card-content class="pt-2">
+
+            <form [formGroup]="form" (submit)="submit()">
+                <div class="row">
+                    <mat-form-field>
+                        <input matInput placeholder="Full name" formControlName="fullName">
+                        <mat-error>{{getErrorMessage('fullName')}}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="row">
+                    <mat-form-field>
+                        <input matInput placeholder="E-mail" formControlName="email">
+                        <mat-error>{{getErrorMessage('email')}}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <mat-form-field>
+                            <input matInput type="password" placeholder="New Password" formControlName="newPassword">
+                            <mat-error>{{getErrorMessage('newPassword')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="col-6">
+                        <mat-form-field>
+                            <input matInput type="password" placeholder="Confirm  Password"
+                                formControlName="confirmNewPassword">
+                            <mat-error>{{getErrorMessage('confirmNewPassword')}}</mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <mat-form-field>
+                        <input matInput type="password" placeholder="Current Password"
+                            formControlName="currentPassword">
+                        <mat-error>{{getErrorMessage('currentPassword')}}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <button mat-raised-button color="accent" type="submit" class="mt-2">Submit</button>
+                <button mat-raised-button color="primary" class="mt-2 ml-2" [routerLink]="['..']">Cancel</button>
+                <mat-error class="mt-1 mb-1">{{errorMessage}}</mat-error>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

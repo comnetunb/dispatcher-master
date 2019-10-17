@@ -12,6 +12,8 @@ import { LogsComponent } from './components/logs/logs.component';
 import { OperationState } from '../../../../../api/enums';
 import { TasksetsComponent } from './components/tasksets/tasksets.component';
 import { TasksetCreateComponent } from './components/taskset-create/taskset-create.component';
+import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
+import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
 
 const routes: Routes = [];
 
@@ -35,6 +37,20 @@ const appRoutes: Routes = [
       {
         path: 'welcome',
         component: WelcomeNewUserComponent
+      },
+      {
+        path: 'profile',
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            component: ProfileDetailsComponent,
+          },
+          {
+            path: 'edit',
+            component: ProfileEditComponent,
+          },
+        ],
       },
       {
         path: 'dashboard',
