@@ -24,6 +24,7 @@ import { TasksetsComponent } from './components/tasksets/tasksets.component';
 import { TasksetCreateComponent } from './components/taskset-create/taskset-create.component';
 import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
 import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { ProfileEditComponent } from './components/profile-edit/profile-edit.com
     TasksetCreateComponent,
     ProfileDetailsComponent,
     ProfileEditComponent,
+    FileUploadComponent,
   ],
   imports: [
     BrowserModule,
