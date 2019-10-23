@@ -25,4 +25,8 @@ export class FilesService {
     const req = new HttpRequest('POST', `${apiRoute}/upload`, body, options);
     return this.http.request(req);
   }
+
+  getFiles(): Observable<IFile[]> {
+    return this.http.get<IFile[]>(`${apiRoute}`);
+  }
 }

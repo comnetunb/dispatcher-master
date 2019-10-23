@@ -2,6 +2,11 @@ import { Request, Response } from 'express';
 import File, { IFile } from '../../../database/models/file';
 import HttpStatusCode from '../utils/httpStatusCodes';
 
+export async function getUserFiles(req: Request, res: Response): Promise<void | Response> {
+  const files = await File.find({ _user: req.user._id });
+  return res.send(files);
+}
+
 export async function fileUploadNext(req: Request, res: Response): Promise<void | Response> {
   let fileModel: IFile;
 
