@@ -18,7 +18,9 @@ export function isSignedIn(req: Request, res: Response): void {
 }
 
 export function signOut(req: Request, res: Response): void {
-  req.logOut();
+  const user = req.user;
+  user.tokens = [];
+  user.save();
   res.sendStatus(httpStatusCodes.OK);
 }
 

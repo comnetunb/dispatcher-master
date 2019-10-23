@@ -30,3 +30,9 @@ export const enum Result {
   Warning,
   Neutral,
 };
+
+export const enum Modifier {
+  Number,
+  String,
+  File,
+};

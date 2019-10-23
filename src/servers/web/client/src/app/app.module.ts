@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule, MatSelectModule } from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -25,6 +25,10 @@ import { TasksetCreateComponent } from './components/taskset-create/taskset-crea
 import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
 import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import { UploadFilesUserComponent } from './components/upload-files-user/upload-files-user.component';
+import { UserFilesComponent } from './components/user-files/user-files.component';
+import { UserFilesAddComponent } from './components/user-files-add/user-files-add.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
   declarations: [
@@ -46,6 +50,9 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
     ProfileDetailsComponent,
     ProfileEditComponent,
     FileUploadComponent,
+    UploadFilesUserComponent,
+    UserFilesComponent,
+    UserFilesAddComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,6 +73,8 @@ import { FileUploadComponent } from './components/file-upload/file-upload.compon
     MatToolbarModule,
     LacunaMaterialTableModule,
     MatDividerModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule,
   ],
   providers: [
     {

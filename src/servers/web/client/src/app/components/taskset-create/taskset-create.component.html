@@ -1,18 +1,36 @@
 <div class="content-wrapper">
-  <div class="container-fluid">
+  <div class="container-fluid pt-4">
     <form [formGroup]="form" (submit)="submit()">
 
       <div class="row">
-        <mat-form-field>
+        <mat-form-field class="col">
           <input matInput placeholder="Name" formControlName="name">
           <mat-error>{{getErrorMessage('name')}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col">
+          <input matInput type="number" placeholder="Error Count Limit" formControlName="errorCountLimit">
+          <mat-error>{{getErrorMessage('errorCountLimit')}}</mat-error>
         </mat-form-field>
       </div>
 
       <div class="row">
-        <mat-form-field>
-          <input matInput type="number" placeholder="Error Count Limit" formControlName="errorCountLimit">
-          <mat-error>{{getErrorMessage('errorCountLimit')}}</mat-error>
+        <mat-form-field class="col">
+          <mat-select placeholder="Runnable File" formControlName="runnable" #runnableSelect>
+            <mat-option>
+              <ngx-mat-select-search [formControl]="fileFilterCtrl"></ngx-mat-select-search>
+            </mat-option>
+            <mat-option *ngFor="let file of filteredFiles | async" [value]="file._id">
+              {{file.uploadTime | date: 'short'}} - {{file.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="col">
+          <input matInput placeholder="Template String" (change)="parse($event)" formControlName="template">
+          <mat-error>{{getErrorMessage('template')}}</mat-error>
         </mat-form-field>
       </div>
 
