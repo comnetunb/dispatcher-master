@@ -1,57 +1,32 @@
-<div dnd-droppable (onDropSuccess)="success($event)">
+<mat-card class="m-2">
+    <div *ngIf="files.length == 0">
+        <div class="centered">Nenhum arquivo adicionado...</div>
+    </div>
 
-    <div class="dnd-container">
-        <div class="dnd-highlight" [ngClass]="{'dnd-drag-over': highlightContainer && !readOnly}">
-            <div class="hightligh-text">
-                Clique aqui ou arraste e
-                solte arquivos
-            </div>
-        </div>
-        <div class="dnd-height">
-            <div class="dropzone">
-                <div *ngIf="files.length == 0" (click)="clickFileInput()">
-                    <div class="dnd-text">
-                        <div class="text-bottom">
-                            Clique aqui ou arraste e
-                            solte arquivos
-                        </div>
-                    </div>
-                    <div class="centered">Nenhum arquivo adicionado...</div>
-                </div>
-
-                <div *ngIf="files.length > 0">
-                    <div *ngFor="let item of files; let i = index;">
-                        <div class="d-flex align-items-center px-3 py-3">
-                            <button (click)="delete(item)" class="delete-button mr-2" type="button">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                            <div class="file-data">
-                                <!--<div>
-                            <mat-form-field appearance="outline" style="width: 100%;">
-                                <input matInput placeholder="Nome do documento" formControlName="displayName" />
-                                <mat-error>O nome do documento deve ser informado</mat-error>
-                            </mat-form-field>
-                        </div>-->
-                                <mat-progress-bar mode="determinate" value="{{item.progress}}"
-                                    *ngIf="!item.finished && (item.progress != null && item.progress != 100)">
-                                </mat-progress-bar>
-                                <mat-progress-bar mode="indeterminate"
-                                    *ngIf="!item.finished && (item.progress != null && item.progress == 100)">
-                                </mat-progress-bar>
-                                <h4 class="pl-1" (click)="onFileClick ? onFileClick(item) : viewFile(item)">
-                                    {{item.name}}</h4>
-                            </div>
-                        </div>
-                        <mat-divider></mat-divider>
-                    </div>
+    <div *ngIf="files.length > 0">
+        <div *ngFor="let item of files; let i = index;">
+            <div class="d-flex align-items-center">
+                <button mat-raised-button (click)="delete(item)" class="delete-button mr-2" type="button">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <div class="file-data">
+                    <mat-progress-bar mode="determinate" value="{{item.progress}}"
+                        *ngIf="!item.finished && (item.progress != null && item.progress != 100)">
+                    </mat-progress-bar>
+                    <mat-progress-bar mode="indeterminate"
+                        *ngIf="!item.finished && (item.progress != null && item.progress == 100)">
+                    </mat-progress-bar>
+                    <p (click)="onFileClick ? onFileClick(item) : viewFile(item)">
+                        {{item.name}}</p>
                 </div>
             </div>
-
+            <mat-divider></mat-divider>
         </div>
+
     </div>
 
 
-    <div *ngIf="!readOnly">
+    <div *ngIf="!readOnly" class="float-right">
         <input type="file" (change)="success($event)" id="file-input" hidden #fileInput [multiple]="!single"
             (click)="fileInput.value = null">
         <div>
@@ -60,4 +35,4 @@
             </button>
         </div>
     </div>
-</div>
+</mat-card>

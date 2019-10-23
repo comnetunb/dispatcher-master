@@ -14,6 +14,7 @@ export class FileUploadComponent implements OnInit {
   @ViewChild('fileInput', null) FileInput: ElementRef;
 
   @Input() currentFiles: FormArray;
+  @Input() single: boolean = false;
 
   get files(): IFile[] {
     let allFiles: IFile[] = [];
@@ -49,6 +50,10 @@ export class FileUploadComponent implements OnInit {
     if (event.mouseEvent != undefined) files = event.mouseEvent.dataTransfer.files;
     else if (event.srcElement) files = event.srcElement.files;
     else files = event.target.files;
+
+    if (this.single) {
+      files = files.slice(0, 1);
+    }
 
     for (let file of files) {
       let body = new FormData();
