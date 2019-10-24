@@ -1,7 +1,14 @@
 import { model, Schema, Document, Model } from 'mongoose';
-import { TaskSetPriority, OperationState } from '../../api/enums';
+import { TaskSetPriority, OperationState, InputType } from '../../api/enums';
 import { IUser } from './user';
 import Task from './task';
+
+export interface IInput {
+  index: number;
+  priority: number;
+  type: InputType;
+  input: string;
+}
 
 interface ITaskSetDocument extends Document {
   _user: IUser['_id'],
@@ -16,6 +23,7 @@ interface ITaskSetDocument extends Document {
   endTime?: Date,
   remainingTasksCount: number,
   errorLimitCount: number,
+  inputs: IInput[],
 }
 
 export interface ITaskSet extends ITaskSetDocument {
@@ -57,7 +65,7 @@ const taskSetSchema: Schema = new Schema({
   },
   priority: {
     type: Number,
-    default: TaskSetPriority.Minimum,
+    default: TaskSetPriority.Normal,
     required: true,
   },
   state: {

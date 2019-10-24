@@ -4,227 +4,110 @@ import mkdirp from 'mkdirp';
 import fs from 'fs';
 import archiver from 'archiver';
 import { Parser as Json2csvParser } from 'json2csv';
-import TaskSet from '../../../database/models/taskSet';
-import Task from '../../../database/models/task';
+import TaskSet, { ITaskSet } from '../../../database/models/taskSet';
+import Task, { ITask } from '../../../database/models/task';
 import File, { IFile } from '../../../database/models/file';
-import { TaskSetData, InputType, InputFile, ParsedInput } from '../api/taskSetData';
+import { TaskSetData, InputFile, ParsedInput } from '../api/taskSetData';
 import { IUser } from '../../../database/models/user';
-import { OperationState } from '../../../api/enums';
+import { OperationState, TaskSetPriority, InputType } from '../../../api/enums';
 import { ExportFormat } from '../api/exportFormat';
+import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
+import { mongo } from 'mongoose';
 
-export async function buildTasks(taskSetData: TaskSetData, user: IUser): Promise<void> {
-  const taskSetName = taskSetData.name;
-  const runnableType = taskSetData.runnableInfo.info.type;
-  const runnable = taskSetData.runnableInfo.runnable[0];
-  const { inputs, argumentTemplate, errorLimit } = taskSetData;
+interface ProcessedInput {
+  input: string;
+  index: number;
+  innerIndex: number;
+}
 
-  // Sort by precedence
-  inputs.sort((first, second) => {
-    if (first.precedence > second.precedence) return 1;
-    if (second.precedence > first.precedence) return -1;
+export async function buildTasks(request: CreateTasksetRequest, user: IUser): Promise<ITaskSet> {
+  let taskSet = new TaskSet({
+    name: request.name,
+    _user: user._id,
+    inputs: request.inputs,
+    errorLimitCount: request.errorCountLimit,
+    _runnable: request.runnableId,
+    argumentTemplate: request.template,
+    state: OperationState.Executing,
+    remainingTasksCount: 0,
+    priority: TaskSetPriority.Normal,
+    _files: [],
+  });
+
+  const inputs = request.inputs.sort((a, b) => {
+    if (a.priority > b.priority) return 1;
+    if (a.priority < b.priority) return -1;
     return 0;
   });
 
-  const newFiles: IFile[] = [];
-  const parsedInputs: ParsedInput[] = [];
-
-  for (let input in inputs) { // eslint-disable-line
-    switch (inputs[input].type) {
-      case InputType.Number:
-        parsedInputs.push({
-          data: parseNumber(inputs[input].data as string),
-          directiveIndex: inputs[input].directiveIndex
-        });
-        break;
-
-      case InputType.String:
-        parsedInputs.push({
-          data: parseString(inputs[input].data as string),
-          directiveIndex: inputs[input].directiveIndex
-        });
-        break;
-
-      case InputType.File:
-        const data = [];
-        const files = inputs[input].data as InputFile[];
-
-        for (let file in files) { // eslint-disable-line
-          data.push(files[file].name);
-
-          const newFile = new File({
-            _user: user._id,
-            name: files[file].name,
-            dataURL: files[file].data
-          });
-
-          newFiles.push(newFile);
-        }
-
-        parsedInputs.push({
-          data,
-          directiveIndex: inputs[input].directiveIndex
-        });
-        break;
-
-      default:
+  let processedInputs: string[][] = [];
+  for (let input of inputs) {
+    if (input.type == InputType.CommaSeparatedValues) {
+      processedInputs.push(processCSVInput(input.input));
+    } else if (input.type == InputType.Files) {
+      processedInputs.push(await processFilesInput(input.input));
+    } else if (input.type == InputType.StartEndStep) {
+      processedInputs.push(processStartEndStepInput(input.input));
     }
   }
-
-  // TODO: Get prefix command on database
-  let prefix = '';
-  switch (runnableType) {
-    case 'java':
-      prefix += `java -jar ${runnable.name} `;
-      break;
-
-    case 'python':
-      prefix += `python ${runnable.name} `;
-      break;
-
-    default:
-  }
-
-  // TODO: where does this preprocessing belong?
-  let index = 0;
-  let preProcessedArgumentTemplate = argumentTemplate;
-  let match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
-  while (match != null) {
-    preProcessedArgumentTemplate = preProcessedArgumentTemplate.replace(match[0], `%${index}`);
-    match = /(%n|%s|%f)/g.exec(preProcessedArgumentTemplate);
-    index += 1;
-  }
-
-  const commandLineTemplate = prefix + preProcessedArgumentTemplate;
-
-  try {
-
-    const files = await File.insertMany(newFiles);
-    const fileIds = [];
-
-    for (let file in files) { // eslint-disable-line
-      fileIds.push(files[file]._id);
-    }
-
-    const newRunnable = new File({
-      _user: user._id,
-      name: runnable.name,
-      dataURL: runnable.data
-    });
-
-    const savedRunnable = await newRunnable.save();
-
-    const newTaskSet = new TaskSet({
-      _user: user._id,
-      _runnable: savedRunnable._id,
-      _files: fileIds,
-      name: taskSetName,
-      argumentTemplate,
-      errorLimitCount: errorLimit,
-      state: OperationState.Executing,
-      remainingTasksCount: 0,
-    });
-
-    const taskSet = await newTaskSet.save();
-    const promises: Promise<any>[] = [];
-
-    buildTaskSet(commandLineTemplate, parsedInputs, taskSet._id, promises);
-
-    await Promise.all(promises);
-    await taskSet.updateRemainingTasksCount();
-  } catch (err) {
-    throw String(`An internal error occurred. Please try again later. ${err}`);
-  }
-};
-
-//! Recursive method
-function buildTaskSet(commandLineTemplate: string,
-  parsedInputs: ParsedInput[],
-  taskSetId: string,
-  promises: Promise<any>[],
-  infos = []) {
-
-  if (!parsedInputs.length) {
-    return;
-  }
-
-  const values = parsedInputs[0].data;
-  const index = parsedInputs[0].directiveIndex;
-
-  for (let i = 0; i < values.length; i += 1) { // eslint-disable-line
-    infos.push({
-      value: values[i],
-      index,
-      argumentIndex: i,
-      argumentLength: values.length
-    });
-
-    if (parsedInputs.length > 1) {
-      buildTaskSet(commandLineTemplate, parsedInputs.slice(1), taskSetId, promises, infos);
-    } else {
-      let commandLine = commandLineTemplate;
-      let precedence = 0;
-      let accumulator = 1;
-      const indexes = [];
-      const argumentsArray = [];
-
-      for (let info in infos) { // eslint-disable-line
-        commandLine = commandLine.replace(`%${infos[info].index}`, infos[info].value);
-        precedence += infos[info].argumentIndex * accumulator;
-        accumulator *= infos[info].argumentLength;
-        indexes.push(infos[info].argumentIndex);
-        argumentsArray.push(infos[info].value);
-      }
-
-      const newTask = new Task({
-        _taskSet: taskSetId,
-        indexes,
-        commandLine,
-        precedence,
-        arguments: argumentsArray,
-
-      });
-
-      promises.push(newTask.save());
-    }
-
-    infos.splice(-1, 1);
-  }
+  taskSet = await taskSet.save();
+  await createTasks(taskSet, processedInputs, 0, []);
+  await taskSet.updateRemainingTasksCount();
+  return taskSet;
 }
 
-function parseString(stringNotation: string): string[] {
-  const strings: string[] = [];
-  let cancel = false;
-  let currentString = '';
-  for (let i = 0; i < stringNotation.length; i += 1) {
-    const char = stringNotation[i];
-    switch (char) {
-      case ',':
-        if (cancel) {
-          currentString += char;
-          cancel = false;
-        } else {
-          strings.push(currentString);
-          currentString = '';
-        }
-        break;
-      case '\\':
-        if (cancel) {
-          currentString += char;
-          cancel = false;
-        } else {
-          cancel = true;
-        }
-        break;
-      default:
-        currentString += char;
-    }
+async function getCommandFromTemplateAndInputs(template: string, inputs: ProcessedInput[]) {
+  let processed = template;
+
+  for (let input of inputs) {
+    const idx = input.index;
+    processed = processed.replace(`/(?<!\\)\{${idx}\}/`, input.input);
   }
-  strings.push(currentString);
-  return strings;
+
+  return processed;
 }
 
-function parseNumber(numberNotation: string): number[] {
-  let matches = numberNotation.match(/\d+;\d+;\d+/g);
+async function createTasks(taskset: ITaskSet, inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
+  const promises: Promise<any>[] = [];
+
+  if (curLevel == inputs.length) {
+    const command = await getCommandFromTemplateAndInputs(taskset.argumentTemplate, curInput);
+    let precedence = 0;
+    let indexes = [];
+    let args = [];
+    for (let i = 0; i < curInput.length; i++) {
+      precedence *= inputs[i].length;
+      precedence += curInput[i].innerIndex;
+      indexes.push(curInput[i].innerIndex);
+      args.push(curInput[i].input);
+    }
+
+    const newTask = new Task({
+      _taskSet: taskset._id,
+      commandLine: command,
+      indexes,
+      precedence,
+      arguments: args,
+    });
+    return newTask.save();
+  }
+
+  for (let i = 0; i < inputs[curLevel].length; i++) {
+    const newInput = curInput.slice();
+    newInput.push({
+      input: inputs[curLevel][i],
+      index: curLevel,
+      innerIndex: i,
+    });
+
+    promises.push(createTasks(taskset, inputs, curLevel + 1, newInput));
+  }
+
+  return Promise.all(promises);
+}
+
+function processStartEndStepInput(input: string) {
+  let matches = input.match(/\d+;\d+;\d+/g);
 
   if (matches) {
     const loopValues = matches[0].split(';');
@@ -233,27 +116,74 @@ function parseNumber(numberNotation: string): number[] {
     const endValue = Number(loopValues[1]);
     const increment = Number(loopValues[2]);
 
-    const values: number[] = [];
+    const values: string[] = [];
 
     for (let it = startValue; it <= endValue; it += increment) {
-      values.push(it);
+      values.push(it.toString());
     }
 
     return values;
+  } else {
+    throw 'Invalid Start End Step input';
   }
+}
 
-  // Comma separated notation
-  matches = numberNotation.match(/^\d+(,\d+)*$/g);
+async function processFilesInput(input: string) {
+  const ids = input.split(',');
+  let fileNames: string[] = [];
+  let promises: Promise<void>[] = [];
+  for (let id of ids) {
+    promises.push(new Promise(async (resolve, reject) => {
+      try {
+        const file = await File.findById(id);
+        fileNames.push(file.name);
+        resolve();
+      } catch (err) {
+        reject(`Could not find file of id ${id}`);
+      }
+    }));
+  };
 
-  if (matches) {
-    return matches[0]
-      .split(',')
-      .map((value) => {
-        return Number(value);
-      });
+  const result = await Promise.all(promises);
+  return fileNames;
+}
+
+// https://stackoverflow.com/a/14991797/6149445
+function processCSVInput(input: string) {
+
+  let arr = [];
+  let quote = false;  // true means we're inside a quoted field
+
+  // iterate over each character, keep track of current row and column (of the returned array)
+  for (let row = 0, col = 0, c = 0; c < input.length; c++) {
+    let cc = input[c], nc = input[c + 1];        // current character, next character
+    arr[row] = arr[row] || [];             // create a new row if necessary
+    arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
+
+    // If the current character is a quotation mark, and we're inside a
+    // quoted field, and the next character is also a quotation mark,
+    // add a quotation mark to the current column and skip the next character
+    if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+
+    // If it's just one quotation mark, begin/end quoted field
+    if (cc == '"') { quote = !quote; continue; }
+
+    // If it's a comma and we're not in a quoted field, move on to the next column
+    if (cc == ',' && !quote) { ++col; continue; }
+
+    // If it's a newline (CRLF) and we're not in a quoted field, skip the next character
+    // and move on to the next row and move to column 0 of that new row
+    if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+
+    // If it's a newline (LF or CR) and we're not in a quoted field,
+    // move on to the next row and move to column 0 of that new row
+    if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+    if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+
+    // Otherwise, append the current character to the current column
+    arr[row][col] += cc;
   }
-
-  throw String(`Invalid notation: ${numberNotation}`);
+  return arr;
 }
 
 export async function exportTaskSet(taskSetId: string, format: ExportFormat): Promise<string> {

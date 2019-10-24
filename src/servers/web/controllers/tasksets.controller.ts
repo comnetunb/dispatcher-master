@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import * as taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
+import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 
 export function getTaskSets(req: Request, res: Response): void | Response {
   const taskSetFilter: TaskSetFilter = { _user: req.user._id };
@@ -23,10 +24,11 @@ export function getTaskSets(req: Request, res: Response): void | Response {
     });
 }
 
-export function createTaskSet(req: Request, res: Response): void | Response {
+export async function createTaskSet(req: Request, res: Response): Promise<void | Response> {
   try {
-    taskUtils.buildTasks(req.body, req.user);
-    return res.sendStatus(httpStatusCodes.OK);
+    let request: CreateTasksetRequest = req.body;
+    const taskset = await taskUtils.buildTasks(request, req.user);
+    return res.send(taskset);
   } catch (error) {
     logger.error(error);
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });

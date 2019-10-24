@@ -1,10 +1,5 @@
 import { IRunnableInfo } from '../../../database/models/runnable_info';
-
-export const enum InputType {
-  Number = 'N',
-  String = 'S',
-  File = 'F',
-}
+import { InputType } from '../../../api/enums';
 
 export interface InputFile {
   name: string,

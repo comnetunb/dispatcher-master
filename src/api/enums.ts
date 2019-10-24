@@ -36,3 +36,9 @@ export const enum Modifier {
   String,
   File,
 };
+
+export const enum InputType {
+  CommaSeparatedValues = "CommaSeparatedValues",
+  StartEndStep = "StartEndStep",
+  Files = "Files",
+};

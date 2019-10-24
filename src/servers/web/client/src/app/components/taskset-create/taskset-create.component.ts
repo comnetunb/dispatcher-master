@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
-import { TasksetService } from 'src/app/services/taskset.service';
-import { Modifier } from '../../../../../../../api/enums';
+import { TasksetService } from '../../services/taskset.service';
+import { Modifier, InputType } from '../../../../../../../api/enums';
 import { IFile } from '../../../../../../../database/models/file';
-import { FilesService } from 'src/app/services/files.service';
+import { FilesService } from '../../services/files.service';
 import { ReplaySubject, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { MatSelect } from '@angular/material';
+import { CreateTasksetRequest } from '../../api/create-taskset-request';
+import { IInput } from '../../../../../../../database/models/taskSet';
 
 @Component({
   selector: 'app-taskset-create',
@@ -16,8 +18,8 @@ import { MatSelect } from '@angular/material';
 export class TasksetCreateComponent implements OnInit, OnDestroy {
   Modifier: Modifier;
   form: FormGroup;
-  runnable: FormArray;
   inputs: FormArray;
+  inputTypes: InputType[];
   loading = false;
   files: IFile[];
   errorMessage: string;
@@ -40,11 +42,13 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-
+    this.inputs = this.fb.array([]);
+    this.inputTypes = [];
     this.form = this.fb.group({
       name: ['', Validators.required],
       errorCountLimit: ['5', Validators.required],
       runnable: ['', Validators.required],
+      runnableType: ['', Validators.required],
       template: ['', Validators.required],
       inputs: this.inputs,
     });
@@ -76,19 +80,76 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
 
     let formValue = this.form.value;
 
+    let inputs: IInput[] = [];
+    for (let input of this.inputs.value) {
+      inputs.push({
+        index: parseInt(input.index),
+        priority: parseInt(input.priority),
+        type: input.type,
+        input: input.input,
+      });
+    }
+
+    let request: CreateTasksetRequest = {
+      name: formValue.name,
+      errorCountLimit: formValue.errorCountLimit,
+      runnableId: formValue.runnable,
+      runnableType: formValue.runnableType,
+      template: formValue.template,
+      inputs: inputs,
+    };
+
     this.loading = true;
+    this.tasksetService.create(request).subscribe(ts => {
+      console.log(ts);
+      this.loading = false;
+    }, err => {
+      console.error(err);
+    });
+
   }
 
-  getErrorMessage(formControlName: string) {
+  getErrorMessage(formControlName: string, inputIndex?: number) {
     let formControl = this.form.get(formControlName);
-    switch (formControlName) {
-      case 'email':
-        return formControl.hasError('required') ? 'E-mail is required' :
-          formControl.hasError('email') ? 'Invalid e-mail' :
-            '';
+    if (inputIndex != null) {
+      formControl = this.inputs.at(inputIndex).get(formControlName);
+    }
 
-      case 'password':
-        return formControl.hasError('required') ? 'Password is required' :
+    switch (formControlName) {
+      case 'name':
+        return formControl.hasError('required') ? 'Name is required' :
+          '';
+
+      case 'errorCountLimit':
+        return formControl.hasError('required') ? 'Error count limit is required' :
+          '';
+
+      case 'runnable':
+        return formControl.hasError('required') ? 'Runnable is required' :
+          '';
+
+      case 'runnableType':
+        return formControl.hasError('required') ? 'Runnable type is required' :
+          '';
+
+      case 'template':
+        return formControl.hasError('required') ? 'Command template is required' :
+          '';
+
+      case 'index':
+        return formControl.hasError('required') ? 'Index is required' :
+          '';
+
+      case 'priority':
+        return formControl.hasError('required') ? 'Priority is required' :
+          '';
+
+      case 'type':
+        return formControl.hasError('required') ? 'Input type is required' :
+          '';
+
+      case 'input':
+        return formControl.hasError('required') ? 'Input is required' :
           '';
     }
 
@@ -129,6 +190,34 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
     this.filteredFiles.next(
       this.files.filter(file => file.name.toLowerCase().indexOf(search) > -1)
     );
+  }
+
+  public addInput() {
+    let usedIndexes = {};
+    for (let input of this.inputs.value) {
+      usedIndexes[input.index] = 1;
+    }
+    let curIndex = 0;
+    while (usedIndexes[curIndex] == 1) curIndex++;
+
+    let input = this.fb.group({
+      index: [curIndex, Validators.required],
+      priority: [curIndex, Validators.required],
+      type: ['', Validators.required],
+      input: ['', Validators.required],
+    });
+
+    this.inputs.insert(curIndex, input);
+    this.inputTypes.splice(curIndex, 0, InputType.CommaSeparatedValues);
+
+    input.get('type').valueChanges.subscribe(t => {
+      this.inputTypes[curIndex] = t;
+    });
+  }
+
+  public removeInput(index: number) {
+    this.inputs.removeAt(index);
+    this.inputTypes.splice(index, 1);
   }
 
 }
