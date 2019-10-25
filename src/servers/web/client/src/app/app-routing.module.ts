@@ -15,6 +15,7 @@ import { TasksetCreateComponent } from './components/taskset-create/taskset-crea
 import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
 import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
 import { UploadFilesUserComponent } from './components/upload-files-user/upload-files-user.component';
+import { UserFilesComponent } from './components/user-files/user-files.component';
 
 const routes: Routes = [];
 
@@ -65,6 +66,10 @@ const appRoutes: Routes = [
           {
             path: 'logs',
             component: LogsComponent,
+          },
+          {
+            path: 'files',
+            component: UserFilesComponent,
           },
           {
             path: 'upload',

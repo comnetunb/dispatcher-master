@@ -7,6 +7,38 @@ export async function getUserFiles(req: Request, res: Response): Promise<void | 
   return res.send(files);
 }
 
+export async function getFile(req: Request, res: Response): Promise<void | Response> {
+  const fileId = req.params.id;
+  const file = await File.findById(fileId);
+
+  if (file == null) {
+    return res.sendStatus(HttpStatusCode.NOT_FOUND);
+  }
+
+  if (!req.user.admin && file._user != req.user._id) {
+    return res.sendStatus(HttpStatusCode.NOT_FOUND);
+  }
+
+  return res.send(file);
+}
+
+export async function deleteFile(req: Request, res: Response): Promise<void | Response> {
+  const fileId = req.params.id;
+  const file = await File.findById(fileId);
+
+  if (file == null) {
+    return res.sendStatus(HttpStatusCode.NOT_FOUND);
+  }
+
+  if (!req.user.admin && file._user != req.user._id) {
+    return res.sendStatus(HttpStatusCode.NOT_FOUND);
+  }
+
+  await File.deleteOne({ _id: fileId });
+
+  return res.sendStatus(HttpStatusCode.OK);
+}
+
 export async function fileUploadNext(req: Request, res: Response): Promise<void | Response> {
   let fileModel: IFile;
 

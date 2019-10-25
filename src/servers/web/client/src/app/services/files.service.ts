@@ -26,7 +26,11 @@ export class FilesService {
     return this.http.request(req);
   }
 
-  getFiles(): Observable<IFile[]> {
+  delete(fileId: string): Observable<void> {
+    return this.http.delete<void>(`${apiRoute}/${fileId}`, { responseType: 'text' as 'json' });
+  }
+
+  list(): Observable<IFile[]> {
     return this.http.get<IFile[]>(`${apiRoute}`);
   }
 }

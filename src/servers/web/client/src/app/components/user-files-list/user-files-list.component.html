@@ -1,0 +1,31 @@
+<lac-table [dataSource]="dataSource" matSort matSortActive="uploadTime" matSortDirection="desc" showRefresh
+  initialPageSize="10">
+  <h2 lac-table-title>
+    {{customTitle}}
+  </h2>
+
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+    <mat-cell *matCellDef="let file">{{file.name}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="size">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Size</mat-header-cell>
+    <mat-cell *matCellDef="let file">{{file.size | readableSize}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="uploadTime">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Upload Time</mat-header-cell>
+    <mat-cell *matCellDef="let file">{{file.uploadTime | date:'short'}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="delete">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Delete</mat-header-cell>
+    <mat-cell *matCellDef="let file">
+      <button mat-raised-button color="primary" (click)="delete(file)">Delete</button>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columnsToDisplay$; "></mat-row>
+</lac-table>

@@ -53,7 +53,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       inputs: this.inputs,
     });
 
-    this.fileService.getFiles().subscribe(f => {
+    this.fileService.list().subscribe(f => {
       this.files = f;
 
       // load the initial file list

@@ -27,8 +27,9 @@ import { ProfileEditComponent } from './components/profile-edit/profile-edit.com
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import { UploadFilesUserComponent } from './components/upload-files-user/upload-files-user.component';
 import { UserFilesComponent } from './components/user-files/user-files.component';
-import { UserFilesAddComponent } from './components/user-files-add/user-files-add.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { UserFilesListComponent } from './components/user-files-list/user-files-list.component';
+import { ReadableSizePipe } from './pipes/readable-size.pipe';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     FileUploadComponent,
     UploadFilesUserComponent,
     UserFilesComponent,
-    UserFilesAddComponent,
+    UserFilesListComponent,
+    ReadableSizePipe,
   ],
   imports: [
     BrowserModule,

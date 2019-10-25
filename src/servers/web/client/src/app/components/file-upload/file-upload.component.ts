@@ -32,7 +32,11 @@ export class FileUploadComponent implements OnInit {
   constructor(
     private filesService: FilesService,
     private formBuilder: FormBuilder,
-  ) { }
+  ) {
+    if (this.currentFiles == null) {
+      this.currentFiles = this.formBuilder.array([]);
+    }
+  }
 
   ngOnInit() {
   }

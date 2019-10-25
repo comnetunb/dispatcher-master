@@ -1,13 +1,14 @@
 <mat-card class="m-2">
     <div *ngIf="files.length == 0">
-        <div class="centered">Nenhum arquivo adicionado...</div>
+        <div class="centered">Click on the plus sign to upload files...</div>
     </div>
 
     <div *ngIf="files.length > 0">
         <div *ngFor="let item of files; let i = index;">
             <div class="d-flex align-items-center">
-                <button mat-raised-button (click)="delete(item)" class="delete-button mr-2" type="button">
-                    <mat-icon>delete</mat-icon>
+                <button mat-raised-button class="mr-2" type="button">
+                    <mat-icon *ngIf="!item.finished">hourglass_empty</mat-icon>
+                    <mat-icon *ngIf="item.finished">check</mat-icon>
                 </button>
                 <div class="file-data">
                     <mat-progress-bar mode="determinate" value="{{item.progress}}"
@@ -16,7 +17,7 @@
                     <mat-progress-bar mode="indeterminate"
                         *ngIf="!item.finished && (item.progress != null && item.progress == 100)">
                     </mat-progress-bar>
-                    <p (click)="onFileClick ? onFileClick(item) : viewFile(item)">
+                    <p>
                         {{item.name}}</p>
                 </div>
             </div>
