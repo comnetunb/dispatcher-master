@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ILog } from '../../../../../../../database/models/log';
-import { LogsService } from 'src/app/services/logs.service';
+import { LogsService } from '../../services/logs.service';
 import { SearchService } from 'lacuna-mat-table';
 
 @Component({

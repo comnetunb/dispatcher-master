@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ITaskSet } from '../../../../../../../database/models/taskSet';
 import { SearchService } from 'lacuna-mat-table';
-import { TasksetService } from 'src/app/services/taskset.service';
+import { TasksetService } from '../../services/taskset.service';
 import { OperationState } from '../../../../../../../api/enums';
 
 @Component({

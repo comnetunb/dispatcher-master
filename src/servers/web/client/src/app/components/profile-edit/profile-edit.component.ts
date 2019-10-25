@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
-import { UserService } from 'src/app/services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RegisterUserRequest } from 'src/app/api/register-user-request';
-import { isEqualToAnother } from 'src/app/classes/is-equal-to-anoter-validator';
-import { EditUserRequest } from 'src/app/api/edit-user-request';
+import { RegisterUserRequest } from '../../api/register-user-request';
+import { isEqualToAnother } from '../../classes/is-equal-to-anoter-validator';
+import { EditUserRequest } from '../../api/edit-user-request';
 import { IUser } from '../../../../../../../database/models/user';
 
 @Component({
