@@ -6,7 +6,7 @@
 
   <ng-container matColumnDef="name">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-    <mat-cell *matCellDef="let file">{{file.name}}</mat-cell>
+    <mat-cell *matCellDef="let file"><a href="#" (click)="download(file); false">{{file.name}}</a></mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="size">

@@ -33,4 +33,8 @@ export class FilesService {
   list(): Observable<IFile[]> {
     return this.http.get<IFile[]>(`${apiRoute}`);
   }
+
+  get(fileId: string): Observable<ArrayBuffer> {
+    return this.http.get(`${apiRoute}/${fileId}`, { responseType: 'arraybuffer' });
+  }
 }

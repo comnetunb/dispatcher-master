@@ -30,6 +30,7 @@ import { UserFilesComponent } from './components/user-files/user-files.component
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { UserFilesListComponent } from './components/user-files-list/user-files-list.component';
 import { ReadableSizePipe } from './pipes/readable-size.pipe';
+import { TasksetDetailsComponent } from './components/taskset-details/taskset-details.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { ReadableSizePipe } from './pipes/readable-size.pipe';
     UserFilesComponent,
     UserFilesListComponent,
     ReadableSizePipe,
+    TasksetDetailsComponent,
   ],
   imports: [
     BrowserModule,
