@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule, MatSelectModule, MatListModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule, MatSelectModule, MatListModule, MatDialogModule } from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -35,6 +35,8 @@ import { TaskListComponent } from './components/task-list/task-list.component';
 import { ResultPipePipe } from './pipes/result-pipe.pipe';
 import { StatePipePipe } from './pipes/state-pipe.pipe';
 import { NgxLoadingModule } from 'ngx-loading';
+import { DialogOverviewComponent } from './components/dialog-overview/dialog-overview.component';
+import { DialogAlertComponent } from './components/dialog-alert/dialog-alert.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +66,7 @@ import { NgxLoadingModule } from 'ngx-loading';
     TaskListComponent,
     ResultPipePipe,
     StatePipePipe,
+    DialogAlertComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,6 +91,7 @@ import { NgxLoadingModule } from 'ngx-loading';
     NgxMatSelectSearchModule,
     MatListModule,
     NgxLoadingModule,
+    MatDialogModule,
   ],
   providers: [
     {
@@ -95,6 +99,9 @@ import { NgxLoadingModule } from 'ngx-loading';
       useClass: TokenInterceptor,
       multi: true
     }
+  ],
+  entryComponents: [
+    DialogAlertComponent,
   ],
   bootstrap: [AppComponent]
 })

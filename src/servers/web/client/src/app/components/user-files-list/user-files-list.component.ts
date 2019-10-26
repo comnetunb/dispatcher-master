@@ -3,6 +3,7 @@ import { SearchService, LacunaMaterialTableComponent } from 'lacuna-mat-table';
 import { FilesService } from 'src/app/services/files.service';
 import { IFile } from '../../../../../../../database/models/file';
 import { saveAs } from 'file-saver';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-user-files-list',
@@ -17,7 +18,8 @@ export class UserFilesListComponent implements OnInit {
   @ViewChild(LacunaMaterialTableComponent, { static: false }) lacTable: LacunaMaterialTableComponent<IFile>;
 
   constructor(
-    private filesService: FilesService
+    private filesService: FilesService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit() {
@@ -29,6 +31,7 @@ export class UserFilesListComponent implements OnInit {
       this.lacTable.refresh();
     }, err => {
       console.error(err);
+      this.dialogService.alert(err, `Could not delete ${file.name}`);
     });
   }
 
@@ -40,6 +43,7 @@ export class UserFilesListComponent implements OnInit {
       window.open(url);
     }, err => {
       console.error(err);
+      this.dialogService.alert(err, `Could not download ${file.name}`);
     });
   }
 }

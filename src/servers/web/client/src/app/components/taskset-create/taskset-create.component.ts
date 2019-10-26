@@ -132,6 +132,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.router.navigate(['..', ts._id], { relativeTo: this.route });
     }, err => {
+      this.errorMessage = err.error;
       console.error(err);
     });
 
