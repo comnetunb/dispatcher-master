@@ -1,0 +1,44 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row" *ngIf="taskset">
+      <div class="col">
+        <app-task-list [tasksetId]="taskset._id"></app-task-list>
+      </div>
+      <div class="col-3">
+        <mat-card class="form-card mt-4">
+          <mat-card-header>
+            <mat-card-title>{{taskset.name}}</mat-card-title>
+          </mat-card-header>
+          <mat-divider></mat-divider>
+          <mat-card-content class="pt-2">
+            <mat-list>
+              <h3 mat-subheader>Details</h3>
+              <p mat-line>Name: {{taskset.name}}</p>
+              <p mat-line>Command Template: {{taskset.argumentTemplate}}</p>
+              <p mat-line>Error Limit: {{taskset.errorLimitCount}}</p>
+              <p mat-line>State: {{taskset.state | statePipe}}</p>
+              <p mat-line *ngIf="taskset.startTime">
+                Start Time: {{taskset.startTime | date: 'short'}}
+              </p>
+              <p mat-line *ngIf="!taskset.startTime">
+                Start Time: N/A
+              </p>
+              <p mat-line *ngIf="taskset.endTime">
+                End Time: {{taskset.endTime | date: 'short'}}
+              </p>
+              <p mat-line *ngIf="!taskset.endTime">
+                End Time: N/A
+              </p>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="container-fluid">
+        <app-log-list></app-log-list>
+      </div>
+    </div>
+  </div>
+</div>

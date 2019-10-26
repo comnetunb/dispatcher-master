@@ -16,6 +16,7 @@ import { ProfileDetailsComponent } from './components/profile-details/profile-de
 import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
 import { UploadFilesUserComponent } from './components/upload-files-user/upload-files-user.component';
 import { UserFilesComponent } from './components/user-files/user-files.component';
+import { TasksetDetailsComponent } from './components/taskset-details/taskset-details.component';
 
 const routes: Routes = [];
 
@@ -101,6 +102,10 @@ const appRoutes: Routes = [
                 path: 'canceled',
                 data: { tasksetState: OperationState.Canceled },
                 component: TasksetsComponent,
+              },
+              {
+                path: ':tasksetId',
+                component: TasksetDetailsComponent,
               },
             ],
           },

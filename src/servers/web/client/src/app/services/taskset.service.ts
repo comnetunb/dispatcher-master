@@ -41,4 +41,8 @@ export class TasksetService implements ObservableSearchService {
     return this.http.post<ITaskSet>(`${apiRoute}`, request);
   }
 
+  get(tasksetId: string): Observable<ITaskSet> {
+    return this.http.get<ITaskSet>(`${apiRoute}/${tasksetId}`);
+  }
+
 }

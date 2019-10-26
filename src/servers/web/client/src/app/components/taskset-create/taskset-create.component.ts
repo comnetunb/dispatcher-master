@@ -101,7 +101,6 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.tasksetService.create(request).subscribe(ts => {
-      console.log(ts);
       this.loading = false;
     }, err => {
       console.error(err);

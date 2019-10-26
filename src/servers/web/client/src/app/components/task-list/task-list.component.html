@@ -1,0 +1,55 @@
+<lac-table [dataSource]="dataSource" matSort matSortActive="precedence" matSortDirection="asc" showRefresh
+  initialPageSize="5">
+  <h2 lac-table-title>
+    {{customTitle}}
+  </h2>
+
+  <ng-container matColumnDef="precedence">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Precedence</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.precedence}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="commandLine">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Command</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span>{{row.commandLine}}</span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="startTime">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Start</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span *ngIf="row.startTime; else notFinished">{{row.startTime | date:'short'}}</span>
+      <ng-template #notFinished>
+        N/A
+      </ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="endTime">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>End</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span *ngIf="row.endTime; else notFinished">{{row.endTime | date:'short'}}</span>
+      <ng-template #notFinished>
+        N/A
+      </ng-template>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="errorCount">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Errors</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span>{{row.errorCount}}</span>
+    </mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="state">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>State</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <span>{{row.state | statePipe}}</span>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: columnsToDisplay$; "></mat-row>
+</lac-table>

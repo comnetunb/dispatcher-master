@@ -5,7 +5,7 @@ import httpStatusCodes from '../utils/httpStatusCodes';
 
 export function getAllLogs(req: Request, res: Response): void {
   Log
-    .getAllLogs(req.query.taskSetId)
+    .getAllLogs(req.query.tasksetId)
     .then((logs) => {
       if (!logs) {
         throw String('Failed to get logs');
@@ -21,7 +21,7 @@ export function getAllLogs(req: Request, res: Response): void {
 
 export function getAllLogsStartingFromDate(req: Request, res: Response): void {
   Log
-    .getAllStartingFromDate(req.query.lastDate, req.query.taskSetId)
+    .getAllStartingFromDate(req.query.lastDate, req.query.tasksetId)
     .then((logs) => {
       if (!logs) {
         throw String('Failed to get logs');

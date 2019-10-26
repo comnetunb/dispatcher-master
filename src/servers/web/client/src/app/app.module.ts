@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule, MatSelectModule } from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatTableModule, MatDividerModule, MatSelectModule, MatListModule } from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -31,6 +31,9 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { UserFilesListComponent } from './components/user-files-list/user-files-list.component';
 import { ReadableSizePipe } from './pipes/readable-size.pipe';
 import { TasksetDetailsComponent } from './components/taskset-details/taskset-details.component';
+import { TaskListComponent } from './components/task-list/task-list.component';
+import { ResultPipePipe } from './pipes/result-pipe.pipe';
+import { StatePipePipe } from './pipes/state-pipe.pipe';
 
 @NgModule({
   declarations: [
@@ -57,6 +60,9 @@ import { TasksetDetailsComponent } from './components/taskset-details/taskset-de
     UserFilesListComponent,
     ReadableSizePipe,
     TasksetDetailsComponent,
+    TaskListComponent,
+    ResultPipePipe,
+    StatePipePipe,
   ],
   imports: [
     BrowserModule,
@@ -79,6 +85,7 @@ import { TasksetDetailsComponent } from './components/taskset-details/taskset-de
     MatDividerModule,
     MatSelectModule,
     NgxMatSelectSearchModule,
+    MatListModule,
   ],
   providers: [
     {

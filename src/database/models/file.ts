@@ -9,6 +9,7 @@ interface IFileDocument extends Document {
   path: string,
   size: number,
   uploadTime: Date,
+  content?: string,
 }
 
 export interface IFile extends IFileDocument {

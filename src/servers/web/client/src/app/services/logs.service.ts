@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ILog } from '../../../../../../database/models/log';
 import { Observable, Subject } from 'rxjs';
-import { ObservableSearchService } from 'lacuna-mat-table';
+import { ObservableSearchService, SearchService } from 'lacuna-mat-table';
 
 const apiRoute = '/api/logs';
 
@@ -14,11 +14,21 @@ export class LogsService implements ObservableSearchService {
 
   changed: Observable<string> = this.changedSubject.asObservable();
 
+  sourceFromTaskset(tasksetId: string): SearchService<ILog> {
+    return {
+      list: () => this.listFromTaskset(tasksetId)
+    };
+  }
+
   constructor(
     private http: HttpClient
   ) { }
 
   list(): Observable<ILog[]> {
     return this.http.get<ILog[]>(`${apiRoute}`);
+  }
+
+  listFromTaskset(tasksetId: string): Observable<ILog[]> {
+    return this.http.get<ILog[]>(`${apiRoute}?tasksetId=${tasksetId}`);
   }
 }

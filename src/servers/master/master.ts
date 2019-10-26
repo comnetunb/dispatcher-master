@@ -1,4 +1,5 @@
 import logger from '../shared/log';
+import * as fs from 'fs';
 import * as Config from '../shared/configuration';
 import * as communication from './communication';
 import * as connectionManager from './connection_manager';
@@ -9,6 +10,7 @@ import Worker from '../../database/models/worker';
 import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformCommand } from 'dispatcher-protocol';
 import { OperationState } from '../../api/enums';
 import { IFile } from '../../database/models/file';
+import { ProtocolFile } from 'dispatcher-protocol';
 
 const config = Config.getConfiguration();
 
@@ -103,6 +105,14 @@ async function batchDispatch(): Promise<void> {
 
     await task.save();
     const files: IFile[] = task._taskSet._files;
+    let pduFiles: ProtocolFile[] = [];
+    for (let i = 0; i < files.length; i++) {
+      var content = fs.readFileSync(files[i].path, { encoding: 'base64' });
+      pduFiles.push({
+        name: files[i].name,
+        content,
+      });
+    }
     files.push(task._taskSet._runnable);
     const pdu: PerformTask = {
       type: ProtocolType.PerformTask,
@@ -110,7 +120,7 @@ async function batchDispatch(): Promise<void> {
       task: {
         id: task.id,
       },
-      files,
+      files: pduFiles,
     };
     connectionManager.send(availableWorkers[i].uuid, EncapsulatePDU(pdu));
 

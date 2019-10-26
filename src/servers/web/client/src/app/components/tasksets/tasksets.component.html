@@ -1,5 +1,7 @@
-<div class="content-wrapper">
+<div class="content-wrapper" [hidden]="route.firstChild">
   <div class="container-fluid">
     <app-taskset-list [customTitle]="customTitle" [tasksetState]="tasksetState"></app-taskset-list>
   </div>
 </div>
+
+<router-outlet></router-outlet>

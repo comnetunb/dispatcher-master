@@ -9,7 +9,7 @@ import Task, { ITask } from '../../../database/models/task';
 import File, { IFile } from '../../../database/models/file';
 import { TaskSetData, InputFile, ParsedInput } from '../api/taskSetData';
 import { IUser } from '../../../database/models/user';
-import { OperationState, TaskSetPriority, InputType } from '../../../api/enums';
+import { OperationState, TaskSetPriority, InputType, Result } from '../../../api/enums';
 import { ExportFormat } from '../api/exportFormat';
 import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 import { mongo } from 'mongoose';
@@ -42,12 +42,20 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
 
   let processedInputs: string[][] = [];
   for (let input of inputs) {
+    console.log(input);
     if (input.type == InputType.CommaSeparatedValues) {
-      processedInputs.push(processCSVInput(input.input));
+      console.log('oi1');
+      processedInputs.push(processCSVInput(input.input as string));
     } else if (input.type == InputType.Files) {
-      processedInputs.push(await processFilesInput(input.input));
+      console.log('oi2');
+      processedInputs.push(await processFilesInput(input.input as string[]));
+      let fileIds = input.input as string[];
+      for (let i = 0; i < fileIds.length; i++) {
+        taskSet._files.push(fileIds[i]);
+      }
     } else if (input.type == InputType.StartEndStep) {
-      processedInputs.push(processStartEndStepInput(input.input));
+      console.log('oi3');
+      processedInputs.push(processStartEndStepInput(input.input as string));
     }
   }
   taskSet = await taskSet.save();
@@ -58,10 +66,10 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
 
 async function getCommandFromTemplateAndInputs(template: string, inputs: ProcessedInput[]) {
   let processed = template;
-
   for (let input of inputs) {
     const idx = input.index;
-    processed = processed.replace(`/(?<!\\)\{${idx}\}/`, input.input);
+    const reg = new RegExp(`\(?<!\\\\)\\{${idx}\\}`)
+    processed = processed.replace(reg, input.input);
   }
 
   return processed;
@@ -128,8 +136,7 @@ function processStartEndStepInput(input: string) {
   }
 }
 
-async function processFilesInput(input: string) {
-  const ids = input.split(',');
+async function processFilesInput(ids: string[]) {
   let fileNames: string[] = [];
   let promises: Promise<void>[] = [];
   for (let id of ids) {
@@ -183,7 +190,7 @@ function processCSVInput(input: string) {
     // Otherwise, append the current character to the current column
     arr[row][col] += cc;
   }
-  return arr;
+  return arr[0];
 }
 
 export async function exportTaskSet(taskSetId: string, format: ExportFormat): Promise<string> {

@@ -7,7 +7,7 @@ export interface IInput {
   index: number;
   priority: number;
   type: InputType;
-  input: string;
+  input: string | string[];
 }
 
 interface ITaskSetDocument extends Document {

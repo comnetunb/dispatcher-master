@@ -107,7 +107,6 @@ export class FileUploadComponent implements OnInit {
   }
 
   delete(file: IFile) {
-    console.log(file);
     var index = this.currentFiles.value.findIndex(f => f.id == file.id);
     if (index > -1) {
       this.currentFiles.removeAt(index);
