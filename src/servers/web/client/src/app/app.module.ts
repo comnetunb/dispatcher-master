@@ -34,6 +34,7 @@ import { TasksetDetailsComponent } from './components/taskset-details/taskset-de
 import { TaskListComponent } from './components/task-list/task-list.component';
 import { ResultPipePipe } from './pipes/result-pipe.pipe';
 import { StatePipePipe } from './pipes/state-pipe.pipe';
+import { NgxLoadingModule } from 'ngx-loading';
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { StatePipePipe } from './pipes/state-pipe.pipe';
     MatSelectModule,
     NgxMatSelectSearchModule,
     MatListModule,
+    NgxLoadingModule,
   ],
   providers: [
     {

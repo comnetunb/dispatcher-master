@@ -27,6 +27,7 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
     inputs: request.inputs,
     errorLimitCount: request.errorCountLimit,
     _runnable: request.runnableId,
+    _runnableType: request.runnableType,
     argumentTemplate: request.template,
     state: OperationState.Executing,
     remainingTasksCount: 0,
@@ -44,17 +45,14 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
   for (let input of inputs) {
     console.log(input);
     if (input.type == InputType.CommaSeparatedValues) {
-      console.log('oi1');
       processedInputs.push(processCSVInput(input.input as string));
     } else if (input.type == InputType.Files) {
-      console.log('oi2');
       processedInputs.push(await processFilesInput(input.input as string[]));
       let fileIds = input.input as string[];
       for (let i = 0; i < fileIds.length; i++) {
         taskSet._files.push(fileIds[i]);
       }
     } else if (input.type == InputType.StartEndStep) {
-      console.log('oi3');
       processedInputs.push(processStartEndStepInput(input.input as string));
     }
   }

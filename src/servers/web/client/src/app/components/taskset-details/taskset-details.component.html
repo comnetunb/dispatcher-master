@@ -1,3 +1,4 @@
+<ngx-loading [show]="loading"></ngx-loading>
 <div class="content-wrapper">
   <div class="container-fluid">
     <div class="row" *ngIf="taskset">
@@ -30,6 +31,16 @@
                 End Time: N/A
               </p>
             </mat-list>
+
+            <div class="row">
+              <button mat-raised-button (click)="delete()" class="btn-danger mt-2">Delete</button>
+              <button mat-raised-button (click)="cancel()" class="btn-danger ml-2 mt-2">Cancel</button>
+            </div>
+
+            <div class="row">
+              <button mat-raised-button (click)="clone()" color="primary" class="mt-2">Clone</button>
+              <button mat-raised-button (click)="export()" color="primary" class="ml-2 mt-2">Export</button>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>

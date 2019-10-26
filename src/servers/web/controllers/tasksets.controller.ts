@@ -37,8 +37,8 @@ export async function createTaskSet(req: Request, res: Response): Promise<void |
 
 export async function removeTaskSet(req: Request, res: Response): Promise<void | Response> {
   try {
-    const taskFilter = { _taskSet: req.body.id };
-    const taskSetFilter = { _id: req.body.id };
+    const taskFilter = { _taskSet: req.params.id };
+    const taskSetFilter = { _id: req.params.id };
 
     await Task.remove(taskFilter);
     await TaskSet.remove(taskSetFilter);
@@ -52,25 +52,25 @@ export async function removeTaskSet(req: Request, res: Response): Promise<void |
 
 export async function cancelTaskSet(req: Request, res: Response): Promise<void | Response> {
   try {
-    const taskFilter = { _taskSet: req.body.id, state: OperationState.Pending };
-    const taskSetFilter = { _id: req.body.id, state: OperationState.Executing };
+    const taskFilter = { _taskSet: req.params.id, state: OperationState.Pending };
+    const taskSetFilter = { _id: req.params.id, state: OperationState.Executing };
 
 
-    await Task.update(taskFilter, {
+    await Task.updateMany(taskFilter, {
       $set: {
         state: OperationState.Canceled,
         endTime: new Date(),
       }
-    }, { multi: true });
+    });
 
-    await TaskSet.update(taskSetFilter, {
+    const taskset = await TaskSet.updateOne(taskSetFilter, {
       $set: {
         state: OperationState.Canceled,
         endTime: new Date(),
       }
-    }, { multi: true });
+    });
 
-    res.sendStatus(httpStatusCodes.OK);
+    res.send(taskset);
   } catch (error) {
     logger.error(error);
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });

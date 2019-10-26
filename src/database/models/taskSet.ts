@@ -13,6 +13,7 @@ export interface IInput {
 interface ITaskSetDocument extends Document {
   _user: IUser['_id'],
   _runnable: string,
+  _runnableType: string,
   _files: string[],
   name: string,
   argumentTemplate: string,
@@ -44,6 +45,10 @@ const taskSetSchema: Schema = new Schema({
     ref: 'File',
     required: true
   },
+  _runnableType: {
+    type: String,
+    required: true
+  },
   // [_files] This schema will be used for file arguments for now. Although the
   // best way to do this is to separate into an hierarchy in order to get only
   // the files needed to each task.
@@ -59,7 +64,7 @@ const taskSetSchema: Schema = new Schema({
     type: String,
     required: true
   },
-  graphs: {
+  inputs: {
     type: {},
     default: [],
   },

@@ -9,6 +9,7 @@ import { take, takeUntil } from 'rxjs/operators';
 import { MatSelect } from '@angular/material';
 import { CreateTasksetRequest } from '../../api/create-taskset-request';
 import { IInput } from '../../../../../../../database/models/taskSet';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-taskset-create',
@@ -38,7 +39,9 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private tasksetService: TasksetService,
-    private fileService: FilesService
+    private fileService: FilesService,
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -66,6 +69,31 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
           this.filterFiles();
         });
     });
+
+    let tasksetId = this.route.snapshot.queryParams['tasksetId'];
+    if (tasksetId != null) {
+      this.loading = true;
+      this.tasksetService.get(tasksetId).subscribe(ts => {
+        let value = {
+          name: ts.name,
+          errorCountLimit: ts.errorLimitCount,
+          runnable: ts._runnable,
+          runnableType: ts._runnableType,
+          template: ts.argumentTemplate,
+          inputs: [],
+        };
+        this.form.setValue(value);
+        for (let input of ts.inputs) {
+          this.inputs.push(this.fb.group({
+            index: [input.index, Validators.required],
+            priority: [input.priority, Validators.required],
+            type: [input.type, Validators.required],
+            input: [input.input, Validators.required],
+          }));
+        }
+        this.loading = false;
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -102,6 +130,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.tasksetService.create(request).subscribe(ts => {
       this.loading = false;
+      this.router.navigate(['..', ts._id], { relativeTo: this.route });
     }, err => {
       console.error(err);
     });

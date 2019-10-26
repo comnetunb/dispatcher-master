@@ -45,4 +45,12 @@ export class TasksetService implements ObservableSearchService {
     return this.http.get<ITaskSet>(`${apiRoute}/${tasksetId}`);
   }
 
+  delete(tasksetId: string): Observable<void> {
+    return this.http.delete<void>(`${apiRoute}/${tasksetId}`, { responseType: 'text' as 'json' });
+  }
+
+  cancel(tasksetId: string): Observable<ITaskSet> {
+    return this.http.post<ITaskSet>(`${apiRoute}/${tasksetId}/cancel`, null);
+  }
+
 }
