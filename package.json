@@ -71,6 +71,7 @@
     "passport-local": "~1.0.0",
     "popper.js": "^1.12.9",
     "rimraf": "^2.6.2",
+    "sanitize-filename": "^1.6.3",
     "sb-admin-2": "^3.3.8",
     "startbootstrap-sb-admin": "^4.0.0",
     "tmp": "0.0.33",

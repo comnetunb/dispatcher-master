@@ -89,8 +89,13 @@ export function supportedRunnables(req: Request, res: Response): void | Response
 }
 
 export async function exportTaskSet(req: Request, res: Response): Promise<void> {
-  const zipPath = await taskUtils.exportTaskSet(req.query.taskSetId, req.query.format);
-  res.sendFile(zipPath);
+  try {
+    const zipPath = await taskUtils.exportTaskSet(req.params.id, req.query.format);
+    res.sendFile(zipPath);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }
 
 export async function getTaskSet(req: Request, res: Response): Promise<void | Response> {

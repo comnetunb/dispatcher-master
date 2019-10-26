@@ -54,7 +54,14 @@ export class TasksetDetailsComponent implements OnInit {
   }
 
   export() {
-
+    this.tasksetService.export(this.taskset._id).subscribe(data => {
+      var blob = new Blob([data], { type: 'application/zip' });
+      var url = window.URL.createObjectURL(blob);
+      saveAs(blob, `${this.taskset.name}.zip`);
+      window.open(url);
+    }, err => {
+      console.error(err);
+    });
   }
 
 }

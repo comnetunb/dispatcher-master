@@ -12,12 +12,18 @@ export class WorkersComponent implements OnInit {
   private $toUnsubscribe: Subscription[] = [];
 
   workers: IWorker[] = [];
+  loading: boolean = false;
 
   constructor(
     private workerService: WorkerService
   ) { }
 
   ngOnInit() {
+    this.loading = true;
+    this.workerService.list().subscribe((workers) => {
+      this.workers = workers;
+      this.loading = false;
+    });
 
     this.$toUnsubscribe.push(
       interval(3000).subscribe(() => {

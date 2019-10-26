@@ -1,10 +1,11 @@
+<ngx-loading [show]="loading"></ngx-loading>
 <div class="row container-fluid workers-container">
 
   <div *ngFor="let worker of workers" class="col-6">
     <app-worker-card [worker]="worker"></app-worker-card>
   </div>
 
-  <div class="content text-align">
+  <div class="content text-align" *ngIf="!workers || workers.length == 0">
     <h4>There are no connected workers</h4>
   </div>
 </div>

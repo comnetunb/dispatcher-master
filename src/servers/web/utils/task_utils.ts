@@ -13,6 +13,7 @@ import { OperationState, TaskSetPriority, InputType, Result } from '../../../api
 import { ExportFormat } from '../api/exportFormat';
 import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 import { mongo } from 'mongoose';
+import sanitize from 'sanitize-filename';
 
 interface ProcessedInput {
   input: string;
@@ -43,7 +44,6 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
 
   let processedInputs: string[][] = [];
   for (let input of inputs) {
-    console.log(input);
     if (input.type == InputType.CommaSeparatedValues) {
       processedInputs.push(processCSVInput(input.input as string));
     } else if (input.type == InputType.Files) {
@@ -57,7 +57,9 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
     }
   }
   taskSet = await taskSet.save();
-  await createTasks(taskSet, processedInputs, 0, []);
+  let runnable = await File.findById(taskSet._runnable);
+  let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
+  await createTasks(taskSet._id, template, processedInputs, 0, []);
   await taskSet.updateRemainingTasksCount();
   return taskSet;
 }
@@ -73,11 +75,11 @@ async function getCommandFromTemplateAndInputs(template: string, inputs: Process
   return processed;
 }
 
-async function createTasks(taskset: ITaskSet, inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
+async function createTasks(tasksetId: string, template: string, inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
   const promises: Promise<any>[] = [];
 
   if (curLevel == inputs.length) {
-    const command = await getCommandFromTemplateAndInputs(taskset.argumentTemplate, curInput);
+    const command = await getCommandFromTemplateAndInputs(template, curInput);
     let precedence = 0;
     let indexes = [];
     let args = [];
@@ -89,7 +91,7 @@ async function createTasks(taskset: ITaskSet, inputs: string[][], curLevel: numb
     }
 
     const newTask = new Task({
-      _taskSet: taskset._id,
+      _taskSet: tasksetId,
       commandLine: command,
       indexes,
       precedence,
@@ -106,7 +108,7 @@ async function createTasks(taskset: ITaskSet, inputs: string[][], curLevel: numb
       innerIndex: i,
     });
 
-    promises.push(createTasks(taskset, inputs, curLevel + 1, newInput));
+    promises.push(createTasks(tasksetId, template, inputs, curLevel + 1, newInput));
   }
 
   return Promise.all(promises);
@@ -191,41 +193,36 @@ function processCSVInput(input: string) {
   return arr[0];
 }
 
-export async function exportTaskSet(taskSetId: string, format: ExportFormat): Promise<string> {
+export async function exportTaskSet(tasksetId: string, format: ExportFormat = ExportFormat.JSON): Promise<string> {
   const taskFilter = {
-    _taskSet: taskSetId,
+    _taskSet: tasksetId,
     state: OperationState.Finished,
   };
 
-  const tasks = await Task.find(taskFilter).populate('_taskSet');
+  const taskset = await TaskSet.findById(tasksetId);
+  const tasks = await Task.find(taskFilter);
 
   if (tasks.length < 1) {
-    throw 'There aren\'nt any finished tasks';
+    throw 'There aren\'t any finished tasks';
   }
 
   const tmpPath = tmp.dirSync();
-  const rootPath = `${tmpPath}`;
-  const baseName = `${tasks[0]._taskSet.name}`;
+  const baseName = `${taskset.name}`;
   const promises: Promise<any>[] = [];
 
   for (let task in tasks) { // eslint-disable-line
-    const taskPath: path.FormatInputPathObject = {
-      dir: rootPath,
-      base: baseName,
-    };
-
+    let base = baseName;
     const argumentsArray = tasks[task].arguments;
 
     for (let i = 0; i < argumentsArray.length; i += 1) {
       if (i === argumentsArray.length - 1) {
-        taskPath.base += `-${argumentsArray[i]}.${format}`;
+        base += `-${argumentsArray[i]}.${format}`;
       } else {
-        taskPath.base += `-${argumentsArray[i]}`;
+        base += `-${argumentsArray[i]}`;
       }
     }
-
-    const filePath = path.posix.format(taskPath);
-
+    base = sanitize(base);
+    const filePath = path.join(tmpPath.name, base);
     switch (format) {
       case ExportFormat.JSON:
         promises.push(writeFile(filePath, tasks[task].result));
@@ -245,7 +242,7 @@ export async function exportTaskSet(taskSetId: string, format: ExportFormat): Pr
 
   await Promise.all(promises);
 
-  const zipPath = `${tmpPath}/${tasks[0]._taskSet.name}.zip`;
+  const zipPath = `${tmpPath.name}/${taskset.name}.zip`;
   await zipDirectory(tmpPath.name, zipPath);
   return zipPath;
 };
@@ -266,14 +263,14 @@ function zipDirectory(source: string, out: fs.PathLike): Promise<void> {
   });
 }
 
-function writeFile(filePath: string, any: any) {
+function writeFile(filePath: string, data: any) {
   return new Promise((resolve, reject) => {
     mkdirp(path.dirname(filePath), (e) => {
       if (e) {
         return reject(e);
       }
 
-      return fs.writeFile(filePath, any, resolve);
+      return fs.writeFile(filePath, data, resolve);
     });
   });
 }

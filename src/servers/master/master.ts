@@ -107,13 +107,18 @@ async function batchDispatch(): Promise<void> {
     const files: IFile[] = task._taskSet._files;
     let pduFiles: ProtocolFile[] = [];
     for (let i = 0; i < files.length; i++) {
-      var content = fs.readFileSync(files[i].path, { encoding: 'base64' });
+      let content = fs.readFileSync(files[i].path, { encoding: 'base64' });
       pduFiles.push({
         name: files[i].name,
         content,
       });
     }
-    files.push(task._taskSet._runnable);
+
+    let runnableContent = fs.readFileSync(task._taskSet._runnable.path, { encoding: 'base64' });
+    pduFiles.push({
+      name: task._taskSet._runnable.name,
+      content: runnableContent,
+    });
     const pdu: PerformTask = {
       type: ProtocolType.PerformTask,
       commandLine: task.commandLine,
