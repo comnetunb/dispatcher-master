@@ -16,6 +16,7 @@ interface ITaskSetDocument extends Document {
   _runnableType: string,
   _files: string[],
   name: string,
+  description: string,
   argumentTemplate: string,
   graphs: any[],
   priority: TaskSetPriority,
@@ -59,6 +60,11 @@ const taskSetSchema: Schema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  description: {
+    type: String,
+    required: true,
+    default: '',
   },
   argumentTemplate: {
     type: String,

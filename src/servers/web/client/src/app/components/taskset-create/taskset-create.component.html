@@ -16,6 +16,13 @@
       </div>
 
       <div class="row">
+        <mat-form-field class="col">
+          <textarea matInput placeholder="Description" formControlName="description"></textarea>
+          <mat-error>{{getErrorMessage('description')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
         <mat-form-field class="col-2">
           <mat-select placeholder="Runnable Type" formControlName="runnableType">
             <mat-option value="java -jar">Java (java -jar)</mat-option>

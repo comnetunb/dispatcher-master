@@ -30,6 +30,7 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
 
   let taskSet = new TaskSet({
     name: request.name,
+    description: request.description,
     _user: user._id,
     inputs: request.inputs,
     errorLimitCount: request.errorCountLimit,

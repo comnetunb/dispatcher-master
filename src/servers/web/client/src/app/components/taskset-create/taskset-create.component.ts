@@ -49,6 +49,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
     this.inputTypes = [];
     this.form = this.fb.group({
       name: ['', Validators.required],
+      description: [''],
       errorCountLimit: ['5', Validators.required],
       runnable: ['', Validators.required],
       runnableType: ['', Validators.required],
@@ -77,6 +78,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
         let value = {
           name: ts.name,
           errorCountLimit: ts.errorLimitCount,
+          description: ts.description,
           runnable: ts._runnable,
           runnableType: ts._runnableType,
           template: ts.argumentTemplate,
@@ -120,6 +122,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
 
     let request: CreateTasksetRequest = {
       name: formValue.name,
+      description: formValue.description,
       errorCountLimit: formValue.errorCountLimit,
       runnableId: formValue.runnable,
       runnableType: formValue.runnableType,

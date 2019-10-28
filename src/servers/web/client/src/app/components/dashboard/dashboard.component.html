@@ -1,4 +1,4 @@
-<mat-sidenav-container class="sidenav-container" fullscreen>
+<mat-sidenav-container class="sidenav-container" fullscreen style="margin-top: 64px">
   <mat-sidenav #sidenav mode="side" opened fullscreen class="sidenav" [fixedInViewport]="true" [fixedTopGap]="60"
     [fixedBottomGap]="0">
     <button mat-menu-item class="sidenav-button" (click)="home()">
@@ -39,7 +39,7 @@
     </button>
   </mat-sidenav>
 
-  <mat-sidenav-content style="margin-top: 60px">
+  <mat-sidenav-content class="pb-4">
     <div class="content text-align" [hidden]="route.firstChild">
       Menu at your left side
     </div>
