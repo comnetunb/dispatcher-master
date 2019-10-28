@@ -7,6 +7,7 @@ import { RegisterUserRequest } from '../../api/register-user-request';
 import { isEqualToAnother } from '../../classes/is-equal-to-anoter-validator';
 import { EditUserRequest } from '../../api/edit-user-request';
 import { IUser } from '../../../../../../../database/models/user';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-profile-edit',
@@ -82,7 +83,7 @@ export class ProfileEditComponent implements OnInit {
         this.router.navigate(['..'], { relativeTo: this.route });
       },
         (error) => {
-          this.errorMessage = error.error.error;
+          this.errorMessage = getErrorMessage(error);
         });
   }
 

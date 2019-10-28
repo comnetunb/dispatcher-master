@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { RegisterUserRequest } from '../../api/register-user-request';
 import { Router } from '@angular/router';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-register',
@@ -62,7 +63,7 @@ export class RegisterComponent implements OnInit {
     this.authService.register(request)
       .subscribe(() => { },
         (error) => {
-          this.errorMessage = error.error.error;
+          this.errorMessage = getErrorMessage(error);
         });
   }
 

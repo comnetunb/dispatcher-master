@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ITaskSet } from '../../../../../../../database/models/taskSet';
 import { TasksetService } from 'src/app/services/taskset.service';
 import { DialogService } from 'src/app/services/dialog.service';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-taskset-details',
@@ -29,7 +30,7 @@ export class TasksetDetailsComponent implements OnInit {
       this.loading = false;
     }, err => {
       console.error(err);
-      this.dialogService.alert(err, 'Could not load the Taskset').subscribe(() => {
+      this.dialogService.alert(getErrorMessage(err), 'Could not load the Taskset').subscribe(() => {
         this.router.navigate(['..'], { relativeTo: this.route });
       });
     });
@@ -42,7 +43,7 @@ export class TasksetDetailsComponent implements OnInit {
       this.router.navigate(['..'], { relativeTo: this.route });
     }, err => {
       console.error(err);
-      this.dialogService.alert(err, 'Could not load the Taskset').subscribe(() => {
+      this.dialogService.alert(getErrorMessage(err), 'Could not delete the Taskset').subscribe(() => {
         this.router.navigate(['..'], { relativeTo: this.route });
       });
     });
@@ -64,7 +65,7 @@ export class TasksetDetailsComponent implements OnInit {
       this.loading = false;
     }, err => {
       console.error(err);
-      this.dialogService.alert(err, 'Could not load the Taskset').subscribe(() => {
+      this.dialogService.alert(getErrorMessage(err), 'Could not cancel the Taskset').subscribe(() => {
         this.router.navigate(['..'], { relativeTo: this.route });
       });
     });
@@ -80,7 +81,7 @@ export class TasksetDetailsComponent implements OnInit {
       this.loading = false;
     }, err => {
       console.error(err);
-      this.dialogService.alert(err, 'Could not load the Taskset').subscribe(() => {
+      this.dialogService.alert(getErrorMessage(err), 'Could not export the Taskset').subscribe(() => {
         this.router.navigate(['..'], { relativeTo: this.route });
       });
     });

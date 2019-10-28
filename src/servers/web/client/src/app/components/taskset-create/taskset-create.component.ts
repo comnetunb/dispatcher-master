@@ -10,6 +10,7 @@ import { MatSelect } from '@angular/material';
 import { CreateTasksetRequest } from '../../api/create-taskset-request';
 import { IInput } from '../../../../../../../database/models/taskSet';
 import { Router, ActivatedRoute } from '@angular/router';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-taskset-create',
@@ -136,7 +137,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       this.router.navigate(['..', ts._id], { relativeTo: this.route });
     }, error => {
       this.loading = false;
-      this.errorMessage = error.error.error;
+      this.errorMessage = getErrorMessage(error);
       console.error(error);
     });
 

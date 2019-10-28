@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OperationState } from '../../../../../../../api/enums';
 import { ActivatedRoute } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-tasksets',
@@ -8,28 +9,31 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./tasksets.component.scss']
 })
 export class TasksetsComponent implements OnInit {
-  tasksetState: OperationState;
-  customTitle: string;
+  private tasksetStateSubject: BehaviorSubject<OperationState>;
+  public tasksetState: Observable<OperationState>;
 
   constructor(
     private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
-    this.tasksetState = this.route.snapshot.data['tasksetState'];
-    this.customTitle = this.getTableTitle(this.tasksetState);
+    this.tasksetStateSubject = new BehaviorSubject<OperationState>(null);
+    this.tasksetState = this.tasksetStateSubject.asObservable();
   }
 
-  getTableTitle(state: OperationState) {
-    switch (state) {
-      case OperationState.Executing:
-        return 'TaskSets being executed';
-      case OperationState.Finished:
-        return 'Finished TaskSets';
-      case OperationState.Canceled:
-        return 'TaskSets that were canceled';
-      default:
-        return 'TaskSets';
-    }
+  all() {
+    this.tasksetStateSubject.next(null);
+  }
+
+  executing() {
+    this.tasksetStateSubject.next(OperationState.Executing);
+  }
+
+  finished() {
+    this.tasksetStateSubject.next(OperationState.Finished);
+  }
+
+  canceled() {
+    this.tasksetStateSubject.next(OperationState.Canceled);
   }
 }

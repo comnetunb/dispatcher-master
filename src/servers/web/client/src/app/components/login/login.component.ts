@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-login',
@@ -37,7 +38,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(formValue.email, formValue.password)
       .subscribe(() => { },
         (error) => {
-          this.errorMessage = error.error.error;
+          this.errorMessage = getErrorMessage(error);
         });
   }
 

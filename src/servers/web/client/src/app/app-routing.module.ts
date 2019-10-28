@@ -89,21 +89,6 @@ const appRoutes: Routes = [
                 component: TasksetCreateComponent,
               },
               {
-                path: 'executing',
-                data: { tasksetState: OperationState.Executing },
-                component: TasksetsComponent,
-              },
-              {
-                path: 'finished',
-                data: { tasksetState: OperationState.Finished },
-                component: TasksetsComponent,
-              },
-              {
-                path: 'canceled',
-                data: { tasksetState: OperationState.Canceled },
-                component: TasksetsComponent,
-              },
-              {
                 path: ':tasksetId',
                 component: TasksetDetailsComponent,
               },

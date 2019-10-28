@@ -8,27 +8,13 @@
       <mat-icon>computer</mat-icon> Workers
     </button>
 
-    <button mat-menu-item [matMenuTriggerFor]="taskSetsMenu" class="sidenav-button">
+    <button mat-menu-item class="sidenav-button" (click)="tasksets()">
       <mat-icon>archive</mat-icon> TaskSets
     </button>
 
-    <mat-menu #taskSetsMenu="matMenu" xPosition="before">
-      <button mat-menu-item (click)="createTaskset()">
-        <mat-icon>playlist_add</mat-icon> Create
-      </button>
-      <button mat-menu-item (click)="tasksets()">
-        <mat-icon>playlist_play</mat-icon> All
-      </button>
-      <button mat-menu-item (click)="executingTasksets()">
-        <mat-icon>playlist_play</mat-icon> Executing
-      </button>
-      <button mat-menu-item (click)="finishedTasksets()">
-        <mat-icon>playlist_add_check</mat-icon> Finished
-      </button>
-      <button mat-menu-item (click)="canceledTasksets()">
-        <mat-icon>delete</mat-icon> Canceled
-      </button>
-    </mat-menu>
+    <button mat-menu-item class="sidenav-button" (click)="createTaskset()">
+      <mat-icon>playlist_add</mat-icon> Create
+    </button>
 
     <button mat-menu-item class="sidenav-button" (click)="files()">
       <mat-icon>file_copy</mat-icon> Files

@@ -1,6 +1,26 @@
 <div class="content-wrapper" [hidden]="route.firstChild">
   <div class="container-fluid">
-    <app-taskset-list [customTitle]="customTitle" [tasksetState]="tasksetState"></app-taskset-list>
+    <div class="row" class="mt-2 ml-1">
+      <button mat-raised-button color="primary" (click)="all()">
+        All
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="executing()">
+        Executing
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="finished()">
+        Finished
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="canceled()">
+        Canceled
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <app-taskset-list [tasksetState]="tasksetState"></app-taskset-list>
+      </div>
+    </div>
   </div>
 </div>
 
