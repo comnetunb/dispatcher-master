@@ -31,9 +31,9 @@
     </mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="remainingTasksCount">
-    <mat-header-cell *matHeaderCellDef mat-sort-header>Tasks Remaining</mat-header-cell>
-    <mat-cell *matCellDef="let row">{{row.remainingTasksCount}}</mat-cell>
+  <ng-container matColumnDef="finishedTasks">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Tasks</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.totalTasksCount - row.remainingTasksCount}}/{{row.totalTasksCount}}</mat-cell>
   </ng-container>
 
   <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>

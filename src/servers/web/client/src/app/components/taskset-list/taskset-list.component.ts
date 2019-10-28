@@ -11,7 +11,7 @@ import { OperationState } from '../../../../../../../api/enums';
 })
 export class TasksetListComponent implements OnInit {
 
-  columnsToDisplay$: string[] = ['name', 'startTime', 'endTime', 'remainingTasksCount'];
+  columnsToDisplay$: string[] = ['name', 'startTime', 'endTime', 'finishedTasks'];
   dataSource: SearchService<ITaskSet>;
 
   @Input() customTitle: string;

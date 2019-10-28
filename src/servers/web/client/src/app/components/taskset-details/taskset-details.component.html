@@ -18,6 +18,9 @@
               <p mat-line *ngIf="taskset.description">Description: {{taskset.description}}</p>
               <p mat-line>Command Template: {{taskset.argumentTemplate}}</p>
               <p mat-line>Error Limit: {{taskset.errorLimitCount}}</p>
+              <p mat-line>
+                Tasks: {{taskset.totalTasksCount - taskset.remainingTasksCount}}/{{taskset.totalTasksCount}}
+              </p>
               <p mat-line>State: {{taskset.state | statePipe}}</p>
               <p mat-line *ngIf="taskset.startTime">
                 Start Time: {{taskset.startTime | date: 'short'}}

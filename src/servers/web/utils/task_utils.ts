@@ -39,6 +39,7 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
     argumentTemplate: request.template,
     state: OperationState.Executing,
     remainingTasksCount: 0,
+    totalTasksCount: 0,
     priority: TaskSetPriority.Normal,
     _files: [],
   });
@@ -67,6 +68,9 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
   await createTasks(taskSet._id, template, processedInputs, 0, []);
+  const tasksCount = await Task.count({ _taskSet: taskSet._id });
+  taskSet.totalTasksCount = tasksCount;
+  await taskSet.save();
   await taskSet.updateRemainingTasksCount();
   return taskSet;
 }

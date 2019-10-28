@@ -24,6 +24,7 @@ interface ITaskSetDocument extends Document {
   startTime: Date,
   endTime?: Date,
   remainingTasksCount: number,
+  totalTasksCount: number,
   errorLimitCount: number,
   inputs: IInput[],
 }
@@ -93,6 +94,10 @@ const taskSetSchema: Schema = new Schema({
     type: Date
   },
   remainingTasksCount: {
+    type: Number,
+    required: true,
+  },
+  totalTasksCount: {
     type: Number,
     required: true,
   },
