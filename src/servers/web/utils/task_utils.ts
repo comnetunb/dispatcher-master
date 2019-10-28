@@ -22,6 +22,12 @@ interface ProcessedInput {
 }
 
 export async function buildTasks(request: CreateTasksetRequest, user: IUser): Promise<ITaskSet> {
+  const existingTaskset = await TaskSet.findOne({ name: request.name, _user: user._id });
+  if (existingTaskset != null) {
+    console.log(existingTaskset);
+    throw 'There already exists a Task Set with this name.';
+  }
+
   let taskSet = new TaskSet({
     name: request.name,
     _user: user._id,
