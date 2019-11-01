@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>
+  <mat-icon class="mr-2">report_problem</mat-icon> {{data.title}}
+</h1>
+<div mat-dialog-content class="mb-2">
+  <p>{{data.message}}</p>
+</div>
+<div mat-dialog-actions class="mt-1">
+  <button mat-raised-button [mat-dialog-close]="true" class="danger">Yes</button>
+  <button mat-raised-button [mat-dialog-close]="fale" color="primary">Cancel</button>
+</div>

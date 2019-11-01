@@ -1,0 +1,16 @@
+<mat-sidenav-container class="sidenav-container" fullscreen style="margin-top: 64px">
+  <mat-sidenav #sidenav mode="side" opened fullscreen class="sidenav" [fixedInViewport]="true" [fixedTopGap]="60"
+    [fixedBottomGap]="0">
+    <button mat-menu-item class="sidenav-button" (click)="users()">
+      <mat-icon>people</mat-icon> Users
+    </button>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="pb-4">
+    <div class="content text-align" [hidden]="route.firstChild">
+      Menu at your left side
+    </div>
+
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

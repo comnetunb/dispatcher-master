@@ -37,6 +37,10 @@ import { StatePipePipe } from './pipes/state-pipe.pipe';
 import { NgxLoadingModule } from 'ngx-loading';
 import { DialogOverviewComponent } from './components/dialog-overview/dialog-overview.component';
 import { DialogAlertComponent } from './components/dialog-alert/dialog-alert.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component';
+import { UsersComponent } from './components/users/users.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +71,10 @@ import { DialogAlertComponent } from './components/dialog-alert/dialog-alert.com
     ResultPipePipe,
     StatePipePipe,
     DialogAlertComponent,
+    AdminDashboardComponent,
+    UserListComponent,
+    DialogConfirmComponent,
+    UsersComponent,
   ],
   imports: [
     BrowserModule,
@@ -102,6 +110,7 @@ import { DialogAlertComponent } from './components/dialog-alert/dialog-alert.com
   ],
   entryComponents: [
     DialogAlertComponent,
+    DialogConfirmComponent,
   ],
   bootstrap: [AppComponent]
 })

@@ -1,0 +1,22 @@
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <div class="row" class="mt-2 ml-1">
+      <button mat-raised-button color="primary" (click)="allowed()">
+        Allowed
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="pending()">
+        Pending
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="rejected()">
+        Rejected
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <app-user-list [status]="status"></app-user-list>
+      </div>
+    </div>
+  </div>
+</div>

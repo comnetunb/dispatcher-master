@@ -33,14 +33,6 @@ export class NavbarComponent implements OnInit {
     this.authService.refresh();
   }
 
-  dashboard() {
-    this.router.navigate(['/dashboard']);
-  }
-
-  profile() {
-    this.router.navigate(['/profile']);
-  }
-
   logOut() {
     this.authService.logout();
   }

@@ -17,6 +17,8 @@ import { ProfileEditComponent } from './components/profile-edit/profile-edit.com
 import { UploadFilesUserComponent } from './components/upload-files-user/upload-files-user.component';
 import { UserFilesComponent } from './components/user-files/user-files.component';
 import { TasksetDetailsComponent } from './components/taskset-details/taskset-details.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { UsersComponent } from './components/users/users.component';
 
 const routes: Routes = [];
 
@@ -31,11 +33,21 @@ const appRoutes: Routes = [
       },
       {
         path: 'login',
-        component: LoginComponent
+        component: LoginComponent,
       },
       {
         path: 'register',
         component: RegisterComponent
+      },
+      {
+        path: 'admin',
+        component: AdminDashboardComponent,
+        children: [
+          {
+            path: 'users',
+            component: UsersComponent,
+          },
+        ],
       },
       {
         path: 'welcome',

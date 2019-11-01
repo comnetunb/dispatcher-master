@@ -1,0 +1,35 @@
+<ngx-loading [show]="loading"></ngx-loading>
+<lac-table [dataSource]="dataSource" matSort matSortActive="date" matSortDirection="desc" showRefresh
+  initialPageSize="25">
+  <h2 lac-table-title>
+    {{customTitle}}
+  </h2>
+  <ng-container matColumnDef="name">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
+    <mat-cell *matCellDef="let user">{{user.name}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="email">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
+    <mat-cell *matCellDef="let user">{{user.email}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="admin" *ngIf="userStatus == 'allowed'">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Admin</mat-header-cell>
+    <mat-cell *matCellDef="let user">{{user.admin ? 'Yes' : 'No'}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="action">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Action</mat-header-cell>
+    <mat-cell *matCellDef="let user">
+      <span *ngIf="userStatus == 'rejected' || userStatus == 'pending'">
+        <button mat-raised-button (click)="allow(user)" class="btn-success mr-2">Accept</button>
+      </span>
+      <span *ngIf="userStatus == 'allowed' || userStatus == 'pending'">
+        <button mat-raised-button (click)="disallow(user)" class="btn-danger">Reject</button>
+      </span>
+    </mat-cell>
+  </ng-container>
+  <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
+  <mat-row *matRowDef="let user; columns: columnsToDisplay$; "></mat-row>
+</lac-table>

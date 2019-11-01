@@ -32,10 +32,6 @@ export function stopWorker(req: Request, res: Response): void | Response {
 }
 
 export function getAllWorkers(req: Request, res: Response): void | Response {
-  if (!req.user.admin) {
-    return res.sendStatus(httpStatusCodes.FORBIDDEN);
-  }
-
   Worker
     .find({}, '-_id')
     .then((workers) => {
