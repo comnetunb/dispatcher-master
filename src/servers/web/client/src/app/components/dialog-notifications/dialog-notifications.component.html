@@ -1,0 +1,28 @@
+<h1 mat-dialog-title>
+  Notifications
+</h1>
+<div mat-dialog-content class="mb-2">
+  <div *ngFor="let notification of notificationsFirstPage" class="row">
+    <div class="col">
+      <div class="row">
+        <p><b>{{notification.title}}</b></p>
+      </div>
+      <div class="row">
+        <p>{{notification.message}}</p>
+      </div>
+      <mat-divider></mat-divider>
+    </div>
+    <div class="col-3">
+      <button mat-raised-button (click)="read(notification)" color="primary">
+        <mat-icon>check</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="notifications.length == 0">
+    <p><b>There are no unread notifications</b></p>
+  </div>
+</div>
+<div mat-dialog-actions class="mt-1">
+  <button mat-raised-button mat-dialog-close color="primary">Ok</button>
+</div>

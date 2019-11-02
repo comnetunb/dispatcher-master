@@ -4,6 +4,8 @@ import { DialogOverviewComponent } from '../components/dialog-overview/dialog-ov
 import { Observable } from 'rxjs';
 import { DialogAlertComponent } from '../components/dialog-alert/dialog-alert.component';
 import { DialogConfirmComponent } from '../components/dialog-confirm/dialog-confirm.component';
+import { INotification } from '../../../../../../database/models/notification';
+import { DialogNotificationsComponent } from '../components/dialog-notifications/dialog-notifications.component';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +36,15 @@ export class DialogService {
       },
     });
     return dialogRef.afterClosed();
+  }
 
+  notifications(notifications: INotification[]): Observable<any> {
+    let dialogRef = this.dialog.open(DialogNotificationsComponent, {
+      width: '500px',
+      data: {
+        notifications,
+      },
+    });
+    return dialogRef.afterClosed();
   }
 }

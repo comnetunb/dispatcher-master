@@ -41,6 +41,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { UserListComponent } from './components/user-list/user-list.component';
 import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component';
 import { UsersComponent } from './components/users/users.component';
+import { DialogNotificationsComponent } from './components/dialog-notifications/dialog-notifications.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { UsersComponent } from './components/users/users.component';
     UserListComponent,
     DialogConfirmComponent,
     UsersComponent,
+    DialogNotificationsComponent,
   ],
   imports: [
     BrowserModule,
@@ -111,6 +113,7 @@ import { UsersComponent } from './components/users/users.component';
   entryComponents: [
     DialogAlertComponent,
     DialogConfirmComponent,
+    DialogNotificationsComponent,
   ],
   bootstrap: [AppComponent]
 })

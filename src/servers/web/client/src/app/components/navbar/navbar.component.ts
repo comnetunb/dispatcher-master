@@ -3,6 +3,11 @@ import { AuthService } from '../../services/auth.service';
 import { SiteTitle } from '../../utils';
 import { IUser } from '../../../../../../../database/models/user';
 import { Router } from '@angular/router';
+import { SearchService } from 'lacuna-mat-table';
+import { INotification } from '../../../../../../../database/models/notification';
+import { NotificationService } from 'src/app/services/notification.service';
+import { DialogService } from 'src/app/services/dialog.service';
+import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
   selector: 'app-navbar',
@@ -15,9 +20,14 @@ export class NavbarComponent implements OnInit {
   user: IUser;
   isAdmin: boolean;
 
+  notifications: INotification[] = [];
+  loadingNotifications: boolean = false;
+
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit() {
@@ -30,7 +40,25 @@ export class NavbarComponent implements OnInit {
         this.isAdmin = false;
       }
     });
+    this.loadNotifications();
     this.authService.refresh();
+  }
+
+  openNotifications() {
+    this.dialogService.notifications(this.notifications).subscribe(() => {
+      this.loadNotifications();
+    });
+  }
+
+  loadNotifications() {
+    this.loadingNotifications = true;
+    this.notificationService.unread().subscribe(notifications => {
+      this.notifications = notifications;
+      this.loadingNotifications = false;
+    }, err => {
+      console.error(err);
+      this.dialogService.alert(getErrorMessage(err), 'Could not load notifications');
+    });
   }
 
   logOut() {

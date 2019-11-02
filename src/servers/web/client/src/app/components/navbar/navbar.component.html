@@ -2,11 +2,10 @@
   <span>{{title}}</span>
   <div class="spacer"></div>
   <div *ngIf="user; else loggedOut">
-    <button mat-raised-button [matMenuTriggerFor]="notificationsMenu" class="mr-2">
-      <mat-icon>notifications</mat-icon>
+    <button mat-raised-button class="mr-2" (click)="openNotifications()">
+      <mat-icon *ngIf="notifications.length == 0">notifications</mat-icon>
+      <mat-icon *ngIf="notifications.length != 0" class="unread-notifications">notification_important</mat-icon>
     </button>
-    <mat-menu #notificationsMenu="matMenu">
-    </mat-menu>
 
     <button mat-raised-button [matMenuTriggerFor]="menu">{{user.name}}</button>
     <mat-menu #menu="matMenu">
