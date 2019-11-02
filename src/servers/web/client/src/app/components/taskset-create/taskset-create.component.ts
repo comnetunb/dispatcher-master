@@ -92,6 +92,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
             priority: [input.priority, Validators.required],
             type: [input.type, Validators.required],
             input: [input.input, Validators.required],
+            label: [input.label, Validators.required],
           }));
         }
         this.loading = false;
@@ -118,6 +119,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
         priority: parseInt(input.priority),
         type: input.type,
         input: input.input,
+        label: input.label,
       });
     }
 
@@ -176,6 +178,10 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
 
       case 'priority':
         return formControl.hasError('required') ? 'Priority is required' :
+          '';
+
+      case 'label':
+        return formControl.hasError('required') ? 'Label is required' :
           '';
 
       case 'type':
@@ -239,6 +245,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       priority: [curIndex, Validators.required],
       type: ['', Validators.required],
       input: ['', Validators.required],
+      label: ['', Validators.required],
     });
 
     this.inputs.insert(curIndex, input);

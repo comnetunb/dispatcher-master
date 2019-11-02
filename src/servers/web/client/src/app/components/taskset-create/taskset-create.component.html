@@ -59,42 +59,53 @@
 
       <div formArrayName="inputs" *ngFor="let input of form.get('inputs').controls; let i=index">
         <div [formGroupName]="i" class="row">
-          <mat-form-field class="col-1">
-            <input matInput placeholder="Index" type="number" formControlName="index" [readonly]="true">
-            <mat-error>{{getErrorMessage('index', i)}}</mat-error>
-          </mat-form-field>
-          <mat-form-field class="col-1">
-            <input matInput placeholder="Priority" type="number" formControlName="priority">
-            <mat-error>{{getErrorMessage('priority', i)}}</mat-error>
-          </mat-form-field>
-          <mat-form-field class="col-2">
-            <mat-select placeholder="Type" formControlName="type">
-              <mat-option value="CommaSeparatedValues">Comma Separated Values</mat-option>
-              <mat-option value="StartEndStep">Start End Step</mat-option>
-              <mat-option value="Files">Files</mat-option>
-            </mat-select>
-            <mat-error>{{getErrorMessage('type', i)}}</mat-error>
-          </mat-form-field>
+          <div class="col">
+            <div class="row">
+              <mat-form-field class="col-1">
+                <input matInput placeholder="Index" type="number" formControlName="index" [readonly]="true">
+                <mat-error>{{getErrorMessage('index', i)}}</mat-error>
+              </mat-form-field>
+              <mat-form-field class="col-1">
+                <input matInput placeholder="Priority" type="number" formControlName="priority">
+                <mat-error>{{getErrorMessage('priority', i)}}</mat-error>
+              </mat-form-field>
+              <mat-form-field class="col">
+                <input matInput placeholder="Label" formControlName="label">
+                <mat-error>{{getErrorMessage('label', i)}}</mat-error>
+              </mat-form-field>
+              <mat-form-field class="col">
+                <mat-select placeholder="Type" formControlName="type">
+                  <mat-option value="CommaSeparatedValues">Comma Separated Values</mat-option>
+                  <mat-option value="StartEndStep">Start End Step</mat-option>
+                  <mat-option value="Files">Files</mat-option>
+                </mat-select>
+                <mat-error>{{getErrorMessage('type', i)}}</mat-error>
+              </mat-form-field>
+            </div>
+            <div class="row">
+              <mat-form-field class="col">
+                <input *ngIf="inputTypes[i] != 'Files'" matInput placeholder="Input" formControlName="input">
+                <mat-select *ngIf="inputTypes[i] == 'Files'" multiple placeholder="Files" formControlName="input">
+                  <mat-option>
+                    <ngx-mat-select-search noEntriesFoundLabel="No files were found" placeholderLabel="Search"
+                      [formControl]="fileFilterCtrl"></ngx-mat-select-search>
+                  </mat-option>
+                  <mat-option *ngFor="let file of filteredFiles | async" [value]="file._id">
+                    {{file.uploadTime | date: 'short'}} - {{file.name}}
+                  </mat-option>
+                </mat-select>
+                <mat-error>{{getErrorMessage('input', i)}}</mat-error>
+              </mat-form-field>
 
-          <mat-form-field class="col-6">
-            <input *ngIf="inputTypes[i] != 'Files'" matInput placeholder="Input" formControlName="input">
-            <mat-select *ngIf="inputTypes[i] == 'Files'" multiple placeholder="Files" formControlName="input">
-              <mat-option>
-                <ngx-mat-select-search noEntriesFoundLabel="No files were found" placeholderLabel="Search"
-                  [formControl]="fileFilterCtrl"></ngx-mat-select-search>
-              </mat-option>
-              <mat-option *ngFor="let file of filteredFiles | async" [value]="file._id">
-                {{file.uploadTime | date: 'short'}} - {{file.name}}
-              </mat-option>
-            </mat-select>
-            <mat-error>{{getErrorMessage('input', i)}}</mat-error>
-          </mat-form-field>
-
-          <button mat-mini-fab color="primary" (click)="removeInput(i)" type="button">
-            <mat-icon aria-label="Remove input">remove</mat-icon>
-          </button>
+              <div class="col-1">
+                <button mat-mini-fab color="primary" (click)="removeInput(i)" type="button">
+                  <mat-icon aria-label="Remove input">remove</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-
+        <mat-divider class="mb-2"></mat-divider>
       </div>
 
       <button mat-raised-button color="accent" type="submit" class="mt-2">Submit</button>

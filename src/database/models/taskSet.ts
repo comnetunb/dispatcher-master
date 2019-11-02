@@ -8,6 +8,7 @@ export interface IInput {
   priority: number;
   type: InputType;
   input: string | string[];
+  label: string;
 }
 
 interface ITaskSetDocument extends Document {
