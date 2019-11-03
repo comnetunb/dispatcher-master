@@ -19,6 +19,7 @@ import { UserFilesComponent } from './components/user-files/user-files.component
 import { TasksetDetailsComponent } from './components/taskset-details/taskset-details.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { UsersComponent } from './components/users/users.component';
+import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
 
 const routes: Routes = [];
 
@@ -103,6 +104,12 @@ const appRoutes: Routes = [
               {
                 path: ':tasksetId',
                 component: TasksetDetailsComponent,
+                children: [
+                  {
+                    path: 'graphs',
+                    component: TasksetGraphsComponent,
+                  },
+                ],
               },
             ],
           },

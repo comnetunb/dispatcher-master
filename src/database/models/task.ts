@@ -4,7 +4,7 @@ import TaskSet, { ITaskSet } from './taskSet';
 
 interface ITaskDocument extends Document {
   _taskSet: ITaskSet['_id'],
-  indexes: number[],
+  inputLabels: string[],
   arguments: string[],
   commandLine: string,
   precedence: number,
@@ -37,8 +37,8 @@ const taskSchema: Schema = new Schema({
     ref: 'TaskSet',
     required: true,
   },
-  indexes: [{
-    type: Number,
+  inputLabels: [{
+    type: String,
     required: true,
   }],
   arguments: [{

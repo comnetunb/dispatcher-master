@@ -56,7 +56,7 @@ export class NavbarComponent implements OnInit {
       this.loadingNotifications = false;
     }, err => {
       console.error(err);
-      this.dialogService.alert(getErrorMessage(err), 'Could not load notifications');
+      // this.dialogService.alert(getErrorMessage(err), 'Could not load notifications');
     });
   }
 

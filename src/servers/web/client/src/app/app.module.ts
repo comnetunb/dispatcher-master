@@ -42,6 +42,11 @@ import { UserListComponent } from './components/user-list/user-list.component';
 import { DialogConfirmComponent } from './components/dialog-confirm/dialog-confirm.component';
 import { UsersComponent } from './components/users/users.component';
 import { DialogNotificationsComponent } from './components/dialog-notifications/dialog-notifications.component';
+import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
+import { DialogService } from './services/dialog.service';
+import { GraphComponent } from './components/graph/graph.component';
+import { CommonModule } from '@angular/common';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -77,8 +82,11 @@ import { DialogNotificationsComponent } from './components/dialog-notifications/
     DialogConfirmComponent,
     UsersComponent,
     DialogNotificationsComponent,
+    TasksetGraphsComponent,
+    GraphComponent,
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
@@ -102,13 +110,15 @@ import { DialogNotificationsComponent } from './components/dialog-notifications/
     MatListModule,
     NgxLoadingModule,
     MatDialogModule,
+    ChartsModule,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
       multi: true
-    }
+    },
+    DialogService,
   ],
   entryComponents: [
     DialogAlertComponent,

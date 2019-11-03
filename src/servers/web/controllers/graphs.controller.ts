@@ -1,14 +1,16 @@
 import Task from '../../../database/models/task';
-import TaskSet from '../../../database/models/taskSet';
+import TaskSet, { ITaskSet } from '../../../database/models/taskSet';
 import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { PlotInfo } from '../api/plotInfo';
 import { OperationState } from '../../../api/enums';
+import { TasksetChartInfo, TasksetChartData } from '../client/src/app/classes/taskset-chart-config';
 
 export function plotInfo(req: Request, res: Response): void | Response {
   const taskFilter = {
     _taskSet: req.params.taskSetId,
+    state: OperationState.Finished,
   };
 
   Task
@@ -18,7 +20,6 @@ export function plotInfo(req: Request, res: Response): void | Response {
       const info: PlotInfo = {
         axes: [],
         curves: [],
-        graphs: [],
         argumentTemplate: undefined,
       };
 
@@ -26,19 +27,13 @@ export function plotInfo(req: Request, res: Response): void | Response {
         return res.send(info);
       }
 
+      let taskset: ITaskSet = task._taskSet;
       info.argumentTemplate = task._taskSet.argumentTemplate;
       info.axes = Object.getOwnPropertyNames(JSON.parse(task.result));
 
-      for (let i = 0; i < task.indexes.length; i += 1) {
-        const option = {
-          key: `Argument ${i}`,
-          value: i
-        };
-
-        info.curves.push(option);
+      for (let i = 0; i < taskset.inputs.length; i += 1) {
+        info.curves.push(taskset.inputs[i].label);
       }
-
-      info.graphs = task._taskSet.graphs;
 
       return res.send(info);
     })
@@ -49,7 +44,7 @@ export function plotInfo(req: Request, res: Response): void | Response {
 }
 
 export function plotData(req: Request, res: Response): void | Response {
-  const graphs = req.body.body;
+  const graphs: TasksetChartInfo[] = req.body;
   const taskFilter = {
     _taskSet: req.params.taskSetId,
     state: OperationState.Finished,
@@ -58,39 +53,37 @@ export function plotData(req: Request, res: Response): void | Response {
   Task
     .find(taskFilter)
     .then((tasks) => {
-      const graphsCurves = [];
+      const graphsCurves: TasksetChartData[] = [];
 
       for (let i = 0; i < graphs.length; i += 1) {
-        if (graphs[i].curve !== undefined && graphs[i].xAxis && graphs[i].xAxis) {
-          const curves = {};
+        if (graphs[i].curve && graphs[i].xAxis && graphs[i].yAxis) {
+          const curves: TasksetChartData = {};
+          const curve: string = graphs[i].curve;
+          const xAxis = graphs[i].xAxis;
+          const yAxis = graphs[i].yAxis;
 
-          for (let task in tasks) { // eslint-disable-line
-            const curveIdx = tasks[task].indexes[graphs[i].curve].toString();
-
-            if (!curves.hasOwnProperty(curveIdx)) {
-              curves[curveIdx] = {};
+          for (let task of tasks) { // eslint-disable-line
+            const curveIdx = task.inputLabels.findIndex(i => i == curve);
+            const curveLabel = task.arguments[curveIdx];
+            if (!curves.hasOwnProperty(curveLabel)) {
+              curves[curveLabel] = [];
             }
 
-            const result = JSON.parse(tasks[task].result);
-
-            const xAxisIdx = result[graphs[i].xAxis].toString();
-
-            if (!curves[curveIdx].hasOwnProperty(xAxisIdx)) {
-              curves[curveIdx][xAxisIdx] = [];
-            }
-
-            curves[curveIdx][xAxisIdx].push(result[graphs[i].yAxis]);
+            const result = JSON.parse(task.result);
+            const xAxisResult: number = result[xAxis];
+            const yAxisResult: number = result[yAxis];
+            if (xAxisResult == null || yAxisResult == null) continue;
+            curves[curveLabel].push({
+              x: xAxisResult,
+              y: yAxisResult,
+            });
           }
 
           graphsCurves.push(curves);
         } else {
-          graphsCurves.push(undefined);
+          graphsCurves.push(null);
         }
       }
-      TaskSet.findOne({ _id: req.params.taskSetId }).then(a => {
-        a.graphs = graphs;
-        a.save();
-      });
       res.send(graphsCurves);
     })
     .catch((error) => {

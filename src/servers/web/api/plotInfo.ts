@@ -1,6 +1,5 @@
 export interface PlotInfo {
-  axes: any[],
-  curves: any[],
-  graphs: any[],
+  axes: string[],
+  curves: string[],
   argumentTemplate: string,
 }

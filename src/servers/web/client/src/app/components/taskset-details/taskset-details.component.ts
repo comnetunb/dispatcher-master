@@ -58,6 +58,10 @@ export class TasksetDetailsComponent implements OnInit {
     });
   }
 
+  graphs() {
+    this.router.navigate(['graphs'], { relativeTo: this.route });
+  }
+
   cancel() {
     this.loading = true;
     this.tasksetService.cancel(this.taskset._id).subscribe(ts => {

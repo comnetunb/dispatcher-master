@@ -50,6 +50,7 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
   });
 
   let processedInputs: string[][] = [];
+  let inputLabels: string[] = [];
   for (let input of inputs) {
     if (input.type == InputType.CommaSeparatedValues) {
       processedInputs.push(processCSVInput(input.input as string));
@@ -62,11 +63,13 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
     } else if (input.type == InputType.StartEndStep) {
       processedInputs.push(processStartEndStepInput(input.input as string));
     }
+
+    inputLabels.push(input.label);
   }
   taskSet = await taskSet.save();
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
-  await createTasks(taskSet._id, template, processedInputs, 0, []);
+  await createTasks(taskSet._id, template, inputLabels, processedInputs, 0, []);
   const tasksCount = await Task.count({ _taskSet: taskSet._id });
   taskSet.totalTasksCount = tasksCount;
   await taskSet.save();
@@ -85,7 +88,7 @@ async function getCommandFromTemplateAndInputs(template: string, inputs: Process
   return processed;
 }
 
-async function createTasks(tasksetId: string, template: string, inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
+async function createTasks(tasksetId: string, template: string, inputLabels: string[], inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
   const promises: Promise<any>[] = [];
 
   if (curLevel == inputs.length) {
@@ -93,17 +96,19 @@ async function createTasks(tasksetId: string, template: string, inputs: string[]
     let precedence = 0;
     let indexes = [];
     let args = [];
+    let taskInputLabels = [];
     for (let i = 0; i < curInput.length; i++) {
       precedence *= inputs[i].length;
       precedence += curInput[i].innerIndex;
       indexes.push(curInput[i].innerIndex);
+      taskInputLabels.push(inputLabels[curInput[i].index]);
       args.push(curInput[i].input);
     }
 
     const newTask = new Task({
       _taskSet: tasksetId,
       commandLine: command,
-      indexes,
+      inputLabels: taskInputLabels,
       precedence,
       arguments: args,
     });
@@ -118,7 +123,7 @@ async function createTasks(tasksetId: string, template: string, inputs: string[]
       innerIndex: i,
     });
 
-    promises.push(createTasks(tasksetId, template, inputs, curLevel + 1, newInput));
+    promises.push(createTasks(tasksetId, template, inputLabels, inputs, curLevel + 1, newInput));
   }
 
   return Promise.all(promises);

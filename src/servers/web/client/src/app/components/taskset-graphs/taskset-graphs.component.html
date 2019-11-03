@@ -1,0 +1,50 @@
+<ngx-loading [show]="loading"></ngx-loading>
+<div class="content-wrapper" *ngIf="!loading">
+  <div class="container-fluid">
+    <div class="row" class="mt-2 ml-1">
+      <button mat-raised-button color="primary" (click)="addChart()">
+        Add Chart
+      </button>
+    </div>
+
+    <div class="row" *ngFor="let chart of charts; let i = index">
+      <canvas baseChart [datasets]="chart.datasets" [options]="chart.info.options" [legend]="chart.info.legend"
+        [chartType]="chart.info.type">
+      </canvas>
+
+      <form>
+        <div class="row">
+          <div class="col" class="ml-1">
+            <button mat-raised-button color="primary" class="danger" (click)="removeChart(i)">
+              Remove
+            </button>
+          </div>
+          <div class="form-group col">
+            <label for="curve">Curves</label>
+            <select class="form-control" id="curve" required [(ngModel)]="chart.info.curve" name="curve"
+              #curve="ngModel">
+              <option *ngFor="let curve of plotInfo.curves" [value]="curve">{{curve}}</option>
+            </select>
+          </div>
+
+          <div class="form-group col">
+            <label for="xAxis">X Axis</label>
+            <select class="form-control" id="xAxis" required [(ngModel)]="chart.info.xAxis" name="xAxis"
+              #xAxis="ngModel">
+              <option *ngFor="let axis of plotInfo.axes" [value]="axis">{{axis}}</option>
+            </select>
+          </div>
+
+          <div class="form-group col">
+            <label for="yAxis">Y Axis</label>
+            <select class="form-control" id="yAxis" required [(ngModel)]="chart.info.yAxis" name="yAxis"
+              #yAxis="ngModel">
+              <option *ngFor="let axis of plotInfo.axes" [value]="axis">{{axis}}</option>
+            </select>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

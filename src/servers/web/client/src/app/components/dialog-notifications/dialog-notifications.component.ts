@@ -3,7 +3,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DialogData, DialogNotificationsData } from 'src/app/api/dialog-data';
 import { INotification } from '../../../../../../../database/models/notification';
 import { NotificationService } from 'src/app/services/notification.service';
-import { DialogService } from 'src/app/services/dialog.service';
 import { getErrorMessage } from 'src/app/classes/utils';
 
 @Component({
@@ -21,7 +20,6 @@ export class DialogNotificationsComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<DialogNotificationsComponent>,
     private notificationService: NotificationService,
-    private dialogService: DialogService,
     @Inject(MAT_DIALOG_DATA) public data: DialogNotificationsData
   ) {
     if (data.notifications != null) this.notifications = data.notifications;
@@ -33,7 +31,7 @@ export class DialogNotificationsComponent implements OnInit {
       this.notifications.splice(idx, 1);
     }, err => {
       console.log(err);
-      this.dialogService.alert(getErrorMessage(err), 'Could not mark notification as read');
+      // this.dialogService.alert(getErrorMessage(err), 'Could not mark notification as read');
     });
   }
 
