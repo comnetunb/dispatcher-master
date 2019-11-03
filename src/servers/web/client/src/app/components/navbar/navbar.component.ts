@@ -33,14 +33,13 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
     this.authService.currentUser.subscribe((user) => {
       this.user = user;
-
       if (this.user != null) {
         this.isAdmin = user.admin;
+        this.loadNotifications();
       } else {
         this.isAdmin = false;
       }
     });
-    this.loadNotifications();
     this.authService.refresh();
   }
 
