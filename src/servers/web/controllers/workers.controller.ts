@@ -38,6 +38,6 @@ export function getAllWorkers(req: Request, res: Response): void | Response {
       res.send(workers);
     }).catch((error) => {
       logger.error(error);
-      res.sendStatus(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
     })
 }

@@ -29,18 +29,18 @@ export async function signIn(req: Request, res: Response, next: NextFunction): P
   try {
     const user = await User.findOne({ email: username.toLowerCase() });
     if (!user) {
-      return res.sendStatus(httpStatusCodes.BAD_REQUEST).send({ error: 'User not found.' });
+      return res.status(httpStatusCodes.BAD_REQUEST).send({ error: 'User not found.' });
     }
 
     if (!user.validPassword(password)) {
-      return res.sendStatus(httpStatusCodes.UNAUTHORIZED).send({ error: 'Wrong password.' });
+      return res.status(httpStatusCodes.UNAUTHORIZED).send({ error: 'Wrong password.' });
     }
 
 
     const token = await user.generateAuthToken();
     user.password = undefined;
     user.tokens = undefined;
-    res.send({ user, token });
+    return res.send({ user, token });
   } catch (error) {
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
       .send({ error });
