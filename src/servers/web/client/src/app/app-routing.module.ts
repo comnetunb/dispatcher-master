@@ -20,6 +20,7 @@ import { TasksetDetailsComponent } from './components/taskset-details/taskset-de
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { UsersComponent } from './components/users/users.component';
 import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 const routes: Routes = [];
 
@@ -47,6 +48,10 @@ const appRoutes: Routes = [
           {
             path: 'users',
             component: UsersComponent,
+          },
+          {
+            path: 'settings',
+            component: SettingsComponent,
           },
         ],
       },

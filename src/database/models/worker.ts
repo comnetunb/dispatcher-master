@@ -72,8 +72,8 @@ const workerSchema: Schema = new Schema({
 workerSchema.statics.getAvailables = async function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
   const filter = {
     'resource.outdated': false,
-    'resource.cpu': { $gt: cpuThreshold },
-    'resource.memory': { $gt: memoryThreshold },
+    'resource.cpu': { $lt: cpuThreshold },
+    'resource.memory': { $lt: memoryThreshold },
     'state': WorkerState.Executing,
   };
   const worker: IWorkerModel = this;

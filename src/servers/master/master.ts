@@ -1,18 +1,16 @@
 import logger from '../shared/log';
 import * as fs from 'fs';
-import * as Config from '../shared/configuration';
 import * as communication from './communication';
 import * as connectionManager from './connection_manager';
 import * as workerDiscovery from './worker_discovery';
 import { event as interfaceManagerEvent } from '../shared/interface_manager';
 import Task, { ITask } from '../../database/models/task';
+import Configuration, { IConfiguration } from '../../database/models/configuration';
 import Worker from '../../database/models/worker';
 import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformCommand } from 'dispatcher-protocol';
 import { OperationState } from '../../api/enums';
 import { IFile } from '../../database/models/file';
 import { ProtocolFile } from 'dispatcher-protocol';
-
-const config = Config.getConfiguration();
 
 export = async (): Promise<void> => {
   try {
@@ -23,18 +21,19 @@ export = async (): Promise<void> => {
     workerDiscovery.execute();
 
     // Routines
-    requestResourceRoutine();
-    batchDispatchRoutine();
+    await requestResourceRoutine();
+    await batchDispatchRoutine();
   } catch (e) {
     logger.fatal(e);
   }
 };
 
-function requestResourceRoutine(): void {
+async function requestResourceRoutine(): Promise<void> {
   requestResourceFromAllWorkers();
+  let config = await Configuration.get();
   setInterval(() => {
     requestResourceFromAllWorkers();
-  }, config.requestResourceInterval * 1000);
+  }, config.requestResourceInterval);
 }
 
 function requestResourceFromAllWorkers(): void {
@@ -52,14 +51,15 @@ function requestResourceFromAllWorkers(): void {
   });
 }
 
-function batchDispatchRoutine(): void {
+async function batchDispatchRoutine(): Promise<void> {
+  let config = await Configuration.get();
   setInterval(() => {
     try {
       batchDispatch();
     } catch (err) {
       logger.error(`Could not batch dispatch tasks: ${err}`);
     }
-  }, config.dispatchInterval * 1000);
+  }, config.dispatchInterval);
 }
 
 /**
@@ -69,7 +69,8 @@ function batchDispatchRoutine(): void {
  */
 
 async function batchDispatch(): Promise<void> {
-  const availableWorkers = await Worker.getAvailables(config.cpu.threshold, config.memory.threshold);
+  let config = await Configuration.get();
+  const availableWorkers = await Worker.getAvailables(config.cpuLimit, config.memoryLimit);
   if (!availableWorkers || !availableWorkers.length) {
     return;
   }

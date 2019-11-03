@@ -1,0 +1,50 @@
+<ngx-loading [show]="loading"></ngx-loading>
+<div class="content-wrapper">
+  <div class="container-fluid pt-4">
+    <form [formGroup]="form" (submit)="submit()">
+
+      <div class="row">
+        <mat-form-field class="col">
+          <input matInput placeholder="Worker CPU Limit" type="number" formControlName="cpuLimit">
+          <mat-error>{{getErrorMessage('cpuLimit')}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col">
+          <input matInput placeholder="Worker Memory Limit" type="number" formControlName="memoryLimit">
+          <mat-error>{{getErrorMessage('memoryLimit')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="col">
+          <input matInput placeholder="Request Resource Interval" type="number"
+            formControlName="requestResourceInterval">
+          <mat-error>{{getErrorMessage('requestResourceInterval')}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col">
+          <input matInput placeholder="Dispatch Interval" type="number" formControlName="dispatchInterval">
+          <mat-error>{{getErrorMessage('dispatchInterval')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field class="col">
+          <input matInput placeholder="Email Service" formControlName="emailService">
+          <mat-error>{{getErrorMessage('emailService')}}</mat-error>
+        </mat-form-field>
+        <mat-form-field class="col">
+          <input matInput placeholder="Email User" formControlName="emailUser">
+          <mat-error>{{getErrorMessage('emailUser')}}</mat-error>
+        </mat-form-field>
+        <mat-form-field class="col">
+          <input matInput placeholder="Email Password" formControlName="emailPassword">
+          <mat-error>{{getErrorMessage('emailPassword')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="accent" type="submit" class="mt-2">Submit</button>
+      <mat-error class="mt-1 mb-1">{{errorMessage}}</mat-error>
+    </form>
+  </div>
+</div>

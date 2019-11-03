@@ -7,7 +7,7 @@
       </button>
     </div>
 
-    <div class="row" *ngFor="let chart of charts; let i = index">
+    <div class="row w-50 justify-content-md-center" *ngFor="let chart of charts; let i = index">
       <canvas baseChart [datasets]="chart.datasets" [options]="chart.info.options" [legend]="chart.info.legend"
         [chartType]="chart.info.type">
       </canvas>

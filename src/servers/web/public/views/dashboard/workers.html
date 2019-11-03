@@ -9,12 +9,18 @@
 
     <div gridster>
       <ul>
-        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 0">
-          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{worker.runningInstances}} Tasks</span> <strong>{{worker.alias}} {{worker.address}}</strong></div>
+        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid"
+          ng-show="worker.state === 0">
+          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{worker.runningInstances}} Tasks</span>
+            <strong>{{worker.alias}} {{worker.address}}</strong></div>
           <hr />
           <div class="inner">
-            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - worker.resource.cpu ) * 100" cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
-            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - worker.resource.memory ) * 100" cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( worker.resource.cpu ) * 100"
+              cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0"
+              thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( worker.resource.memory ) * 100"
+              cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0"
+              thresholds="threshold"></ng-gauge>
           </div>
         </li>
       </ul>
@@ -29,12 +35,18 @@
 
     <div gridster>
       <ul>
-        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid" ng-show="worker.state === 1">
-          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{worker.runningInstances}} Tasks</span> <strong>{{worker.alias}} {{worker.address}}</strong></div>
+        <li class="outer" gridster-item="item" ng-repeat="worker in workers track by worker.uuid"
+          ng-show="worker.state === 1">
+          <div class="h6 text-center mt-3"><span class="badge badge-primary">{{worker.runningInstances}} Tasks</span>
+            <strong>{{worker.alias}} {{worker.address}}</strong></div>
           <hr />
           <div class="inner">
-            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - worker.resource.cpu ) * 100" cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
-            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( 1 - worker.resource.memory ) * 100" cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0" thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( worker.resource.cpu ) * 100"
+              cap="flat" label="CPU" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0"
+              thresholds="threshold"></ng-gauge>
+            <ng-gauge size="140" type="arch" thick="10" min="0" max="100" value="( worker.resource.memory ) * 100"
+              cap="flat" label="Memory" background-color="rgba(255,255,255, 1.0)" append="%" fraction-size="0"
+              thresholds="threshold"></ng-gauge>
           </div>
         </li>
       </ul>

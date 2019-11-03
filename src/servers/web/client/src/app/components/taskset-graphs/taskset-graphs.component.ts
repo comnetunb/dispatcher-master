@@ -49,7 +49,9 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
         tension: 0,
         fill: false,
       }
-    }
+    },
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   constructor(
@@ -84,7 +86,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
     for (let info of infos) {
       this.charts.push({
         info,
-        datasets: [],
+        datasets: [{ data: [] }],
       });
     }
     this.graphInterval = interval(2000).subscribe(() => {
@@ -162,7 +164,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
         type: 'scatter',
         legend: true,
       },
-      datasets: [],
+      datasets: [{ data: [] }],
     });
     this.tasksetChartService.set(this.taskset._id, this.charts.map(c => c.info));
   }

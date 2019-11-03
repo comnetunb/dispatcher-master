@@ -47,6 +47,7 @@ import { DialogService } from './services/dialog.service';
 import { GraphComponent } from './components/graph/graph.component';
 import { CommonModule } from '@angular/common';
 import { ChartsModule } from 'ng2-charts';
+import { SettingsComponent } from './components/settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { ChartsModule } from 'ng2-charts';
     DialogNotificationsComponent,
     TasksetGraphsComponent,
     GraphComponent,
+    SettingsComponent,
   ],
   imports: [
     CommonModule,
