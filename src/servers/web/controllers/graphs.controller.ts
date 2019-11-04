@@ -48,6 +48,7 @@ export async function plotInfo(req: Request, res: Response): Promise<void | Resp
 }
 
 export async function plotData(req: Request, res: Response): Promise<void | Response> {
+  console.log(req.params);
   if (!req.params.tasksetId) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
