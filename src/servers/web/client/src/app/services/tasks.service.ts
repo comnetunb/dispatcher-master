@@ -18,8 +18,16 @@ export class TasksService {
   dataSource(tasksetId: string): SearchService<ITask> {
     return {
       list: (): Observable<ITask[]> => {
-        return this.http.get<ITask[]>(`${apiRoute}/${tasksetId}`);
+        return this.http.get<ITask[]>(`${apiRoute}/from-taskset/${tasksetId}`);
       }
     }
+  }
+
+  discard(taskId: string): Observable<ITask> {
+    return this.http.post<ITask>(`${apiRoute}/${taskId}/discard`, null);
+  }
+
+  cancel(taskId: string): Observable<ITask> {
+    return this.http.post<ITask>(`${apiRoute}/${taskId}/cancel`, null);
   }
 }

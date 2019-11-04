@@ -11,6 +11,7 @@ export async function getTasks(req: Request, res: Response): Promise<void | Resp
   if (!req.params.tasksetId) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
+
   try {
     const taskset = await TaskSet.findById(req.params.tasksetId);
 
@@ -21,6 +22,28 @@ export async function getTasks(req: Request, res: Response): Promise<void | Resp
     const taskSetFilter = { _taskSet: req.params.tasksetId };
     const tasks = await Task.find(taskSetFilter);
     return res.send(tasks);
+  } catch (error) {
+    logger.error(error);
+    return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}
+
+export async function discardTask(req: Request, res: Response): Promise<void | Response> {
+  if (!req.params.taskId) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
+
+  try {
+    let task = await Task.findById(req.params.taskId).populate('_taskSet');
+
+    if (!task || (!req.user.admin && task._taskSet._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
+    }
+
+    task.state = OperationState.Canceled;
+    task.result = null;
+    task = await task.save();
+    return res.send(task);
   } catch (error) {
     logger.error(error);
     return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
