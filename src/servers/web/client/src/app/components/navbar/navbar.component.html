@@ -16,7 +16,15 @@
         <mat-icon>dashboard</mat-icon> Dashboard
       </button>
       <button mat-menu-item *ngIf="isAdmin" [routerLink]="['/', 'admin']">
-        <mat-icon>settings</mat-icon> Admin
+        <mat-icon>settings</mat-icon> Admin Area
+      </button>
+      <button mat-menu-item *ngIf="isAdmin" (click)="toggleAdminMode(); $event.stopPropagation()">
+        <span *ngIf="adminMode">
+          <mat-icon>star</mat-icon> Admin Mode
+        </span>
+        <span *ngIf="!adminMode">
+          <mat-icon>star_border</mat-icon> Admin Mode
+        </span>
       </button>
       <button mat-menu-item (click)="logOut()">
         <mat-icon>exit_to_app</mat-icon> Log Out

@@ -12,6 +12,7 @@ export const TestJWTKEY = "abcde";
 export async function auth(req: any, res: Response, next: NextFunction) {
   if (req.path == '/users/sign_in' || req.path == '/users/sign_up') return next();
   const authHeader = req.header('Authorization');
+  const adminModeHeader = req.header('AdminMode');
 
   if (authHeader == null) {
     return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'Not authorized to access this resource' });
@@ -22,8 +23,14 @@ export async function auth(req: any, res: Response, next: NextFunction) {
     const data = jwt.verify(token, TestJWTKEY) as JWTData;
     const user = await User.findOne({ _id: data._id, 'tokens.token': token });
     if (!user) {
-      throw new Error();
+      return res.status(HttpStatusCode.UNAUTHORIZED).send({ error: 'User not found' });
     }
+    if (adminModeHeader && !user.admin) {
+      return res.status(HttpStatusCode.FORBIDDEN).send({ error: 'Can not use admin mode if it is not admin' });
+    } else if (adminModeHeader) {
+      req.adminMode = true;
+    }
+
     req.user = user;
     req.token = token;
     next();

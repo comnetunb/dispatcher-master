@@ -48,6 +48,7 @@ import { GraphComponent } from './components/graph/graph.component';
 import { CommonModule } from '@angular/common';
 import { ChartsModule } from 'ng2-charts';
 import { SettingsComponent } from './components/settings/settings.component';
+import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
 
 @NgModule({
   declarations: [
@@ -118,6 +119,11 @@ import { SettingsComponent } from './components/settings/settings.component';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AdminModeInterceptor,
       multi: true
     },
     DialogService,

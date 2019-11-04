@@ -18,7 +18,8 @@ export class NavbarComponent implements OnInit {
 
   title = SiteTitle;
   user: IUser;
-  isAdmin: boolean;
+  isAdmin: boolean = false;
+  adminMode: boolean = false;
 
   notifications: INotification[] = [];
   loadingNotifications: boolean = false;
@@ -31,6 +32,10 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.authService.currentAdminMode.subscribe((mode) => {
+      this.adminMode = mode;
+    });
+
     this.authService.currentUser.subscribe((user) => {
       this.user = user;
       if (this.user != null) {
@@ -41,6 +46,10 @@ export class NavbarComponent implements OnInit {
       }
     });
     this.authService.refresh();
+  }
+
+  toggleAdminMode() {
+    this.authService.setAdminMode(!this.adminMode);
   }
 
   openNotifications() {

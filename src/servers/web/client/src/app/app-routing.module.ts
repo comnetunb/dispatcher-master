@@ -53,6 +53,10 @@ const appRoutes: Routes = [
             path: 'settings',
             component: SettingsComponent,
           },
+          {
+            path: 'logs',
+            component: LogsComponent,
+          },
         ],
       },
       {
@@ -81,10 +85,6 @@ const appRoutes: Routes = [
           {
             path: 'workers',
             component: WorkersComponent,
-          },
-          {
-            path: 'logs',
-            component: LogsComponent,
           },
           {
             path: 'files',

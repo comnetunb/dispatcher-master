@@ -31,13 +31,12 @@ export function stopWorker(req: Request, res: Response): void | Response {
   res.sendStatus(httpStatusCodes.OK);
 }
 
-export function getAllWorkers(req: Request, res: Response): void | Response {
-  Worker
-    .find({}, '-_id')
-    .then((workers) => {
-      res.send(workers);
-    }).catch((error) => {
-      logger.error(error);
-      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
-    })
+export async function getAllWorkers(req: Request, res: Response): Promise<void | Response> {
+  try {
+    let workers = await Worker.find({}, '-_id');
+    return res.send(workers);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }

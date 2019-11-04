@@ -18,8 +18,12 @@ export class AuthService {
 
   private currentUserSubject: BehaviorSubject<IUser>;
   private currentTokenSubject: BehaviorSubject<string>;
+  private currentAdminModeSubject: BehaviorSubject<boolean>;
+
   public currentUser: Observable<IUser>;
   public currentToken: Observable<string>;
+  public currentAdminMode: Observable<boolean>;
+
   public redirectUrl: string;
 
   constructor(
@@ -29,8 +33,12 @@ export class AuthService {
   ) {
     this.currentUserSubject = new BehaviorSubject<IUser>(JSON.parse(localStorage.getItem('currentUser')));
     this.currentUser = this.currentUserSubject.asObservable();
+
     this.currentTokenSubject = new BehaviorSubject<string>(localStorage.getItem('currentToken'));
     this.currentToken = this.currentTokenSubject.asObservable();
+
+    this.currentAdminModeSubject = new BehaviorSubject<boolean>(localStorage.getItem('adminMode') === 'true');
+    this.currentAdminMode = this.currentAdminModeSubject.asObservable();
   }
 
   public get currentUserValue(): IUser {
@@ -39,6 +47,10 @@ export class AuthService {
 
   public get token(): string {
     return this.currentTokenSubject.value;
+  }
+
+  public get adminMode(): boolean {
+    return this.currentAdminModeSubject.value;
   }
 
   private storeUser(user: IUser, token?: string) {
@@ -105,5 +117,12 @@ export class AuthService {
     this.http.post(`${apiRoute}/sign_out`, {}, { responseType: 'text' }).subscribe(() => {
       this.eraseStorage();
     });
+  }
+
+  setAdminMode(mode: boolean) {
+    if (!this.currentUserValue) return;
+    if (!this.currentUserValue.admin) return;
+
+    this.currentAdminModeSubject.next(mode);
   }
 }

@@ -11,6 +11,7 @@ declare module 'express-serve-static-core' {
   interface Request {
     user?: IUser
     token?: string,
+    adminMode?: boolean,
   }
   interface Response {
     user?: IUser,

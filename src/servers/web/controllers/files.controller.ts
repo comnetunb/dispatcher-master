@@ -5,7 +5,12 @@ import * as fs from 'fs';
 
 export async function getUserFiles(req: Request, res: Response): Promise<void | Response> {
   try {
-    const files = await File.find({ _user: req.user._id }).select('-path');
+    let filter: any = {};
+    if (!req.adminMode) {
+      filter._user = req.user._id;
+    }
+
+    const files = await File.find(filter).select('-path');
     return res.send(files);
   } catch (err) {
     return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send(err);

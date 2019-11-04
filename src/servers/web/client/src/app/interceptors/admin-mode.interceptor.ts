@@ -9,16 +9,16 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class TokenInterceptor implements HttpInterceptor {
+export class AdminModeInterceptor implements HttpInterceptor {
   constructor(
     public authService: AuthService
   ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.authService.token != null) {
+    if (this.authService.adminMode) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${this.authService.token}`,
+          AdminMode: 'true',
         },
       });
     }

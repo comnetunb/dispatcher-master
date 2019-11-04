@@ -7,21 +7,24 @@ import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
 import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 
-export function getTaskSets(req: Request, res: Response): void | Response {
-  const taskSetFilter: TaskSetFilter = { _user: req.user._id };
+export async function getTaskSets(req: Request, res: Response): Promise<void | Response> {
+  const taskSetFilter: TaskSetFilter = {};
+
+  if (!req.adminMode) {
+    taskSetFilter._user = req.user._id;
+  }
+
   if (req.query.state) {
     taskSetFilter.state = req.query.state;
   }
 
-  TaskSet
-    .find(taskSetFilter)
-    .then((taskSet) => {
-      res.send(taskSet);
-    })
-    .catch((error) => {
-      logger.error(error);
-      res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
-    });
+  try {
+    let tasksets = await TaskSet.find(taskSetFilter);
+    return res.send(tasksets);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }
 
 export async function createTaskSet(req: Request, res: Response): Promise<void | Response> {
@@ -36,7 +39,16 @@ export async function createTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export async function removeTaskSet(req: Request, res: Response): Promise<void | Response> {
+  if (!req.params.id) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
   try {
+    const taskset = await TaskSet.findById(req.params.id);
+
+    if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
+    }
+
     const taskFilter = { _taskSet: req.params.id };
     const taskSetFilter = { _id: req.params.id };
 
@@ -51,10 +63,18 @@ export async function removeTaskSet(req: Request, res: Response): Promise<void |
 }
 
 export async function cancelTaskSet(req: Request, res: Response): Promise<void | Response> {
+  if (!req.params.id) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
   try {
+    let taskset = await TaskSet.findById(req.params.id);
+
+    if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
+    }
+
     const taskFilter = { _taskSet: req.params.id, state: OperationState.Pending };
     const taskSetFilter = { _id: req.params.id, state: OperationState.Executing };
-
 
     await Task.updateMany(taskFilter, {
       $set: {
@@ -63,7 +83,7 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
       }
     });
 
-    const taskset = await TaskSet.updateOne(taskSetFilter, {
+    taskset = await TaskSet.updateOne(taskSetFilter, {
       $set: {
         state: OperationState.Canceled,
         endTime: new Date(),
@@ -88,8 +108,17 @@ export function supportedRunnables(req: Request, res: Response): void | Response
   }]);
 }
 
-export async function exportTaskSet(req: Request, res: Response): Promise<void> {
+export async function exportTaskSet(req: Request, res: Response): Promise<void | Response> {
+  if (!req.params.id) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
   try {
+    let taskset = await TaskSet.findById(req.params.id);
+
+    if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
+    }
+
     const zipPath = await taskUtils.exportTaskSet(req.params.id, req.query.format);
     res.sendFile(zipPath);
   } catch (error) {
@@ -99,18 +128,17 @@ export async function exportTaskSet(req: Request, res: Response): Promise<void> 
 }
 
 export async function getTaskSet(req: Request, res: Response): Promise<void | Response> {
-  const taskSetFilter = { _id: req.params.id };
-
+  if (!req.params.id) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
   try {
-    const taskSet = await TaskSet.findOne(taskSetFilter);
-    if (req.query.includeTasks === 'true') {
-      const tasks = await Task.find({ _taskSet: req.params.id });
-      const completeTaskSet = taskSet.toObject();
-      completeTaskSet.tasks = tasks;
-      res.send(completeTaskSet);
-    } else {
-      res.send(taskSet);
+    let taskset = await TaskSet.findById(req.params.id);
+
+    if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
     }
+
+    return res.send(taskset);
   } catch (error) {
     logger.error(error);
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });

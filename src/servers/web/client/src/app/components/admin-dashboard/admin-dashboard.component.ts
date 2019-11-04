@@ -23,4 +23,8 @@ export class AdminDashboardComponent implements OnInit {
   settings() {
     this.router.navigate(['/', 'admin', 'settings']);
   }
+
+  logs() {
+    this.router.navigate(['/', 'admin', 'logs']);
+  }
 }
