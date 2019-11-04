@@ -9,6 +9,7 @@ router.post('/', TaskSetsController.createTaskSet);
 
 router.get('/:id/export', TaskSetsController.exportTaskSet);
 router.post('/:id/cancel', TaskSetsController.cancelTaskSet);
+router.post('/:id/restart', TaskSetsController.restartTaskSet);
 router.get('/:id', TaskSetsController.getTaskSet);
 router.delete('/:id', TaskSetsController.removeTaskSet);
 

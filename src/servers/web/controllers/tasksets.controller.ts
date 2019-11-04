@@ -144,3 +144,43 @@ export async function getTaskSet(req: Request, res: Response): Promise<void | Re
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }
+
+export async function restartTaskSet(req: Request, res: Response): Promise<void | Response> {
+  if (!req.params.id) {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
+  try {
+    let taskset = await TaskSet.findById(req.params.id);
+
+    if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      return res.sendStatus(httpStatusCodes.NOT_FOUND);
+    }
+
+    const taskFilter = { _taskSet: req.params.id };
+    const taskSetFilter = { _id: req.params.id };
+
+    await Task.updateMany(taskFilter, {
+      $set: {
+        errorCount: 0,
+        worker: null,
+        state: OperationState.Pending,
+        result: null,
+        startTime: null,
+        endTime: null,
+      }
+    });
+
+    taskset = await TaskSet.updateOne(taskSetFilter, {
+      $set: {
+        state: OperationState.Executing,
+        startTime: new Date(),
+        endTime: null,
+        remainingTasksCount: taskset.totalTasksCount,
+      }
+    });
+    res.send();
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}

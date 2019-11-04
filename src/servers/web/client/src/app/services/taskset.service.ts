@@ -53,6 +53,10 @@ export class TasksetService implements ObservableSearchService {
     return this.http.post<ITaskSet>(`${apiRoute}/${tasksetId}/cancel`, null);
   }
 
+  restart(tasksetId: string): Observable<ITaskSet> {
+    return this.http.post<ITaskSet>(`${apiRoute}/${tasksetId}/restart`, null);
+  }
+
   export(tasksetId: string): Observable<ArrayBuffer> {
     return this.http.get(`${apiRoute}/${tasksetId}/export`, { responseType: 'arraybuffer' });
   }

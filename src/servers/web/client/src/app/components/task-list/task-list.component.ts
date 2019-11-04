@@ -38,6 +38,10 @@ export class TaskListComponent implements OnInit {
     }
   }
 
+  refresh() {
+    this.lacTable.refresh();
+  }
+
   discard(task: ITask) {
     this.dialogService.confirm(
       'Are you sure you want to discard the results of this task? This change is irreversible!',
@@ -46,7 +50,7 @@ export class TaskListComponent implements OnInit {
         if (!confirm) return;
 
         this.tasksService.discard(task._id).subscribe(() => {
-          this.lacTable.refresh();
+          this.refresh();
         }, err => {
           this.dialogService.alert(err, 'Could not discard task');
         });
@@ -61,7 +65,7 @@ export class TaskListComponent implements OnInit {
         if (!confirm) return;
 
         this.tasksService.cancel(task._id).subscribe(() => {
-          this.lacTable.refresh();
+          this.refresh();
         }, err => {
           this.dialogService.alert(err, 'Could not cancel task');
         });
