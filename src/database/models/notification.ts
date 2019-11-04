@@ -6,7 +6,7 @@ import { Result } from '../../api/enums';
 
 interface INotificationDocument extends Document {
   userId: IUser['_id'],
-  taskSetId?: ITaskSet['_id'],
+  tasksetId?: ITaskSet['_id'],
   taskId?: ITask['_id'],
   title: string,
   message: string,
@@ -23,7 +23,7 @@ interface INotificationModel extends Model<INotification> {
   getUnread(userId: string): Promise<INotification[]>,
   read(userId: string, notificationId: string): Promise<INotification>,
   getAllFromUser(userId: string): Promise<INotification[]>,
-  add(result: Result, title: string, message: string, userId: string, taskSetId?: string, taskId?: string): Promise<INotification>,
+  add(result: Result, title: string, message: string, userId: string, tasksetId?: string, taskId?: string): Promise<INotification>,
 }
 
 const notificationSchema: Schema = new Schema({
@@ -32,7 +32,7 @@ const notificationSchema: Schema = new Schema({
     ref: 'User',
     required: true,
   },
-  taskSetId: {
+  tasksetId: {
     type: Schema.Types.ObjectId,
     ref: 'TaskSet',
   },
@@ -85,13 +85,13 @@ notificationSchema.statics.getAllFromUser = async function (userId: string): Pro
 };
 
 notificationSchema.statics.add = function (result: Result, title: string, message: string,
-  userId: string, taskSetId?: string, taskId?: string): Promise<INotification> {
+  userId: string, tasksetId?: string, taskId?: string): Promise<INotification> {
   const notification = new Notification({
     result,
     title,
     message,
     userId,
-    taskSetId,
+    tasksetId,
     taskId,
   });
 

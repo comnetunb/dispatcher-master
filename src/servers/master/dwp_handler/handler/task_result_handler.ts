@@ -57,9 +57,9 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   }
 };
 
-async function cascadeConclusion(taskSetId: ITaskSet): Promise<void> {
+async function cascadeConclusion(tasksetId: ITaskSet): Promise<void> {
   const taskFilter = {
-    _taskSet: taskSetId,
+    _taskSet: tasksetId,
     $or: [
       { state: OperationState.Pending },
       { state: OperationState.Sent },
@@ -79,7 +79,7 @@ async function cascadeConclusion(taskSetId: ITaskSet): Promise<void> {
   };
 
   const taskSet = await TaskSet
-    .findOneAndUpdate({ _id: taskSetId, state: OperationState.Executing }, taskSetUpdate, { new: true })
+    .findOneAndUpdate({ _id: tasksetId, state: OperationState.Executing }, taskSetUpdate, { new: true })
     .populate('_user');
 
   if (taskSet) {
@@ -112,7 +112,7 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
     title: `Task set "${taskSet.name}" has finished`,
     message: `Result: ${result}`,
     userId: taskSet._user,
-    taskSetId: taskSet._id,
+    tasksetId: taskSet._id,
   });
 
   await notification.save();

@@ -12,8 +12,8 @@ export interface ILog extends Document {
 }
 
 interface ILogModel extends Model<ILog> {
-  getAllLogs(taskSetId?: string): Promise<ILog[]>,
-  getAllStartingFromDate(date: Date, taskSetId?: string): Promise<ILog[]>,
+  getAllLogs(tasksetId?: string): Promise<ILog[]>,
+  getAllStartingFromDate(date: Date, tasksetId?: string): Promise<ILog[]>,
 }
 
 const logSchema: Schema = new Schema({
@@ -39,12 +39,12 @@ const logSchema: Schema = new Schema({
   }
 });
 
-logSchema.statics.getAllLogs = async (taskSetId?: string): Promise<ILog[]> => {
+logSchema.statics.getAllLogs = async (tasksetId?: string): Promise<ILog[]> => {
   let logFilter;
 
-  if (taskSetId) {
+  if (tasksetId) {
     // get all tasks pertaining to taskSet
-    const taskList = await Task.find({ _taskSet: taskSetId }, '_id');
+    const taskList = await Task.find({ _taskSet: tasksetId }, '_id');
     const taskIds = taskList.map(task => task._id);
     logFilter = { taskId: { $in: taskIds } };
   } else {
@@ -55,10 +55,10 @@ logSchema.statics.getAllLogs = async (taskSetId?: string): Promise<ILog[]> => {
 };
 
 logSchema.statics.getAllStartingFromDate =
-  async (date: Date, taskSetId?: string): Promise<ILog[]> => {
+  async (date: Date, tasksetId?: string): Promise<ILog[]> => {
     let logFilter;
-    if (taskSetId) {
-      const taskList = await Task.find({ _taskSet: taskSetId }, '_id');
+    if (tasksetId) {
+      const taskList = await Task.find({ _taskSet: tasksetId }, '_id');
       const taskIds = taskList.map(task => task._id);
       logFilter = { date: { $gt: date }, taskId: { $in: taskIds } };
     } else {

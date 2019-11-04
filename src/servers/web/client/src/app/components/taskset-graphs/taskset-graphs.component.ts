@@ -36,19 +36,11 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
         scaleLabel: {
           display: true,
         },
-        ticks: {
-          min: null,
-          max: null,
-        },
       }],
       yAxes: [{
         display: true,
         scaleLabel: {
           display: true,
-        },
-        ticks: {
-          min: null,
-          max: null,
         },
       }],
     },

@@ -18,7 +18,7 @@ export async function plotInfo(req: Request, res: Response): Promise<void | Resp
     }
 
     const taskFilter = {
-      _taskSet: req.params.taskSetId,
+      _taskSet: req.params.tasksetId,
       state: OperationState.Finished,
     };
 
@@ -48,7 +48,6 @@ export async function plotInfo(req: Request, res: Response): Promise<void | Resp
 }
 
 export async function plotData(req: Request, res: Response): Promise<void | Response> {
-  console.log(req.params);
   if (!req.params.tasksetId) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -60,7 +59,7 @@ export async function plotData(req: Request, res: Response): Promise<void | Resp
 
     const graphs: TasksetChartInfo[] = req.body;
     const taskFilter = {
-      _taskSet: req.params.taskSetId,
+      _taskSet: req.params.tasksetId,
       state: OperationState.Finished,
     };
 
