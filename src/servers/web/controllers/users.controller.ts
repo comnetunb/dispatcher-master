@@ -182,7 +182,6 @@ export async function allowedUsers(req: Request, res: Response): Promise<void | 
   res.send(users);
 }
 
-
 export async function disallowedUsers(req: Request, res: Response): Promise<void | Response> {
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
@@ -192,4 +191,30 @@ export async function disallowedUsers(req: Request, res: Response): Promise<void
 
   const users = await User.find(userFilter);
   res.send(users);
+}
+
+export async function adminUser(req: Request, res: Response): Promise<void | Response> {
+  if (!req.user.admin) {
+    return res.sendStatus(httpStatusCodes.FORBIDDEN);
+  }
+
+  const userFilter: UserFilter = { _id: req.params.id };
+  let admin: boolean;
+  if (req.query.admin === 'false') {
+    admin = false;
+  } else if (req.query.admin === 'true') {
+    admin = true;
+  } else {
+    return res.sendStatus(httpStatusCodes.BAD_REQUEST);
+  }
+
+  try {
+    const user = await User.findOne(userFilter);
+    user.admin = admin;
+    await user.save();
+    res.sendStatus(httpStatusCodes.OK);
+  } catch (error) {
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
+      .send({ error });
+  }
 }

@@ -8,6 +8,7 @@ router.post('/sign_out', UserController.signOut);
 router.get('/signed_in', UserController.isSignedIn);
 
 router.post('/manage/:id', UserController.manageUser);
+router.post('/make-admin/:id', UserController.adminUser);
 router.post('/edit/:id', UserController.editUser);
 
 router.get('/pending', UserController.pendingUsers);

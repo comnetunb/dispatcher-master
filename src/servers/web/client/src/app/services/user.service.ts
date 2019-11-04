@@ -26,10 +26,19 @@ export class UserService {
     return this.http.post<IUser>(`${apiRoute}/edit/${userId}`, info);
   }
 
-  manageUser(userId: string, allow: boolean): Observable<IUser> {
+  adminUser(userId: string, admin: boolean): Observable<void> {
+    let params = new HttpParams();
+    params = params.append('admin', admin ? 'true' : 'false');
+    return this.http.post<void>(`${apiRoute}/make-admin/${userId}`, null, {
+      params,
+      responseType: 'text' as 'json',
+    });
+  }
+
+  manageUser(userId: string, allow: boolean): Observable<void> {
     let params = new HttpParams();
     params = params.append('allow', allow ? 'true' : 'false');
-    return this.http.post<IUser>(`${apiRoute}/manage/${userId}`, null, {
+    return this.http.post<void>(`${apiRoute}/manage/${userId}`, null, {
       params,
       responseType: 'text' as 'json',
     });

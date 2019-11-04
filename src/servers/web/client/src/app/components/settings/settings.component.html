@@ -5,25 +5,25 @@
 
       <div class="row">
         <mat-form-field class="col">
-          <input matInput placeholder="Worker CPU Limit" type="number" formControlName="cpuLimit">
+          <input matInput placeholder="Worker CPU Limit (%/100)" type="number" formControlName="cpuLimit">
           <mat-error>{{getErrorMessage('cpuLimit')}}</mat-error>
         </mat-form-field>
 
         <mat-form-field class="col">
-          <input matInput placeholder="Worker Memory Limit" type="number" formControlName="memoryLimit">
+          <input matInput placeholder="Worker Memory Limit (%/100)" type="number" formControlName="memoryLimit">
           <mat-error>{{getErrorMessage('memoryLimit')}}</mat-error>
         </mat-form-field>
       </div>
 
       <div class="row">
         <mat-form-field class="col">
-          <input matInput placeholder="Request Resource Interval" type="number"
+          <input matInput placeholder="Request Resource Interval (ms)" type="number"
             formControlName="requestResourceInterval">
           <mat-error>{{getErrorMessage('requestResourceInterval')}}</mat-error>
         </mat-form-field>
 
         <mat-form-field class="col">
-          <input matInput placeholder="Dispatch Interval" type="number" formControlName="dispatchInterval">
+          <input matInput placeholder="Dispatch Interval (ms)" type="number" formControlName="dispatchInterval">
           <mat-error>{{getErrorMessage('dispatchInterval')}}</mat-error>
         </mat-form-field>
       </div>

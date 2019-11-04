@@ -22,10 +22,14 @@
   <ng-container matColumnDef="action">
     <mat-header-cell *matHeaderCellDef mat-sort-header>Action</mat-header-cell>
     <mat-cell *matCellDef="let user">
-      <span *ngIf="userStatus == 'rejected' || userStatus == 'pending'">
+      <span *ngIf="currentUser._id != user._id && userStatus == 'rejected' || userStatus == 'pending'">
         <button mat-raised-button (click)="allow(user)" class="btn-success mr-2">Accept</button>
       </span>
-      <span *ngIf="userStatus == 'allowed' || userStatus == 'pending'">
+      <span *ngIf="currentUser._id != user._id && userStatus == 'allowed'">
+        <button mat-raised-button (click)="removeAdmin(user)" *ngIf="user.admin" class="mr-2">Remove Admin</button>
+        <button mat-raised-button (click)="makeAdmin(user)" *ngIf="!user.admin" class="mr-2">Make Admin</button>
+      </span>
+      <span *ngIf="currentUser._id != user._id && userStatus == 'allowed' || userStatus == 'pending'">
         <button mat-raised-button (click)="disallow(user)" class="btn-danger">Reject</button>
       </span>
     </mat-cell>

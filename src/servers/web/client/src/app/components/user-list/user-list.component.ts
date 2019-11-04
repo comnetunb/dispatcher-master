@@ -8,6 +8,7 @@ import { getErrorMessage } from 'src/app/classes/utils';
 import { Observable } from 'rxjs';
 import { OperationState } from '../../../../../../../api/enums';
 import { IFile } from '../../../../../../../database/models/file';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-user-list',
@@ -20,6 +21,7 @@ export class UserListComponent implements OnInit {
   customTitle: string = "Users";
   userStatus: string;
   loading: boolean = false;
+  currentUser: IUser;
 
   @Input() status: Observable<string>;
 
@@ -28,10 +30,12 @@ export class UserListComponent implements OnInit {
   constructor(
     private usersService: UserService,
     private route: ActivatedRoute,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit() {
+    this.currentUser = this.authService.currentUserValue;
     this.loading = true;
     this.status.subscribe(s => {
       this.dataSource = this.usersService.dataSource(s);
@@ -75,6 +79,36 @@ export class UserListComponent implements OnInit {
         if (confirm) {
           this.usersService.manageUser(user._id, true).subscribe(() => {
             this.dialogService.alert('User accepted!');
+            this.lacTable.refresh();
+          }, error => {
+            this.dialogService.alert(getErrorMessage(error));
+            console.error(error);
+          });
+        }
+      });
+  }
+
+  makeAdmin(user: IUser) {
+    this.dialogService.confirm(`Are you sure you want to make user with e-mail ${user.email} an admin?`,
+      'Set user as admin?').subscribe((confirm) => {
+        if (confirm) {
+          this.usersService.adminUser(user._id, true).subscribe(() => {
+            this.dialogService.alert('User now admin!');
+            this.lacTable.refresh();
+          }, error => {
+            this.dialogService.alert(getErrorMessage(error));
+            console.error(error);
+          });
+        }
+      });
+  }
+
+  removeAdmin(user: IUser) {
+    this.dialogService.confirm(`Are you sure you want to remove admin from user with e-mail ${user.email}?`,
+      'Remove admin role from user?').subscribe((confirm) => {
+        if (confirm) {
+          this.usersService.adminUser(user._id, false).subscribe(() => {
+            this.dialogService.alert('User is not an admin anymore!');
             this.lacTable.refresh();
           }, error => {
             this.dialogService.alert(getErrorMessage(error));
