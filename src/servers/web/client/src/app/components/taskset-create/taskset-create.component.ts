@@ -94,6 +94,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
             input: [input.input, Validators.required],
             label: [input.label, Validators.required],
           }));
+          this.inputTypes.push(input.type);
         }
         this.loading = false;
       });
