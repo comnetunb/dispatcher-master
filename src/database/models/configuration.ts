@@ -49,7 +49,7 @@ configurationSchema.statics.get = async function (): Promise<IConfiguration> {
   let configuration = await Configuration.findOne({});
   if (!configuration) {
     let configuration = new Configuration({});
-    configuration.save();
+    await configuration.save();
   }
   return configuration;
 };
