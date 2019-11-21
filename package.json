@@ -43,7 +43,7 @@
     "cookie-parser": "^1.4.3",
     "copyfiles": "^2.1.1",
     "datatables": "^1.10.13",
-    "dispatcher-protocol": "^2.0.0",
+    "dispatcher-protocol": "^4.0.0",
     "ejs": "~2.5.6",
     "express": "^4.15.5",
     "express-fileupload": "^0.1.4",
