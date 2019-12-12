@@ -9,6 +9,7 @@ interface IWorkerDocument extends Document {
   name: string,
   runningInstances: number,
   state: WorkerState,
+  status: WorkerStatus,
   resource: {
     outdated?: boolean,
     cpu?: number,
@@ -102,6 +103,7 @@ workerSchema.statics.getAvailables = async function (cpuThreshold: number, memor
     'resource.cpu': { $lt: cpuThreshold },
     'resource.memory': { $lt: memoryThreshold },
     'state': WorkerState.Executing,
+    'status.online': true,
   };
   const worker: IWorkerModel = this;
   const availableWorkers = await worker.find(filter);
