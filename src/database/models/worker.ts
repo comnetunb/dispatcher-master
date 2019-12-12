@@ -1,6 +1,7 @@
 import { model, Schema, Document, Model, DocumentQuery } from 'mongoose';
 import Task from './task';
 import { WorkerState } from 'dispatcher-protocol';
+import { hashSync, compareSync } from 'bcryptjs';
 
 interface IWorkerDocument extends Document {
   _id: string,
@@ -27,10 +28,12 @@ export interface WorkerStatus {
 
 export interface IWorker extends IWorkerDocument {
   updateRunningInstances(): Promise<IWorker>,
+  validPassword(password: string): boolean,
 }
 
 interface IWorkerModel extends Model<IWorker> {
   getAvailables(cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]>,
+  encryptPassword(password: string): string,
 }
 
 const workerStatusSchema: Schema = new Schema({
@@ -82,6 +85,16 @@ const workerSchema: Schema = new Schema({
     }
   },
 });
+
+const saltRounds = 10;
+
+workerSchema.statics.encryptPassword = (password: string): string => {
+  return hashSync(password, saltRounds);
+};
+
+workerSchema.methods.validPassword = function (password: string): boolean { // eslint-disable-line func-names
+  return compareSync(password, this.password);
+};
 
 workerSchema.statics.getAvailables = async function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
   const filter = {
