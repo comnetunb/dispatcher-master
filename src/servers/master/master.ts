@@ -2,7 +2,6 @@ import logger from '../shared/log';
 import * as fs from 'fs';
 import * as communication from './communication';
 import * as connectionManager from './connection_manager';
-import * as workerDiscovery from './worker_discovery';
 import { event as interfaceManagerEvent } from '../shared/interface_manager';
 import Task, { ITask } from '../../database/models/task';
 import Configuration, { IConfiguration } from '../../database/models/configuration';
@@ -18,7 +17,6 @@ export = async (): Promise<void> => {
 
     // After cleanUp, start all services
     communication.execute();
-    workerDiscovery.execute();
 
     // Routines
     await requestResourceRoutine();
