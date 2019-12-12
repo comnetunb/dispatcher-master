@@ -8,6 +8,7 @@ interface IConfigurationDocument extends Document {
   emailService: string,
   emailUser: string,
   emailPassword: string,
+  authTimeout: number,
 }
 
 export interface IConfiguration extends IConfigurationDocument {
@@ -42,6 +43,10 @@ const configurationSchema: Schema = new Schema({
   },
   emailPassword: {
     type: String,
+  },
+  authTimeout: {
+    type: Number,
+    default: 10000,
   },
 });
 
