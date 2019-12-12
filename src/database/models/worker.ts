@@ -3,9 +3,9 @@ import Task from './task';
 import { WorkerState } from 'dispatcher-protocol';
 
 interface IWorkerDocument extends Document {
-  address: string,
-  port: number,
-  uuid: string,
+  _id: string,
+  password: string,
+  name: string,
   runningInstances: number,
   state: WorkerState,
   resource: {
@@ -17,7 +17,12 @@ interface IWorkerDocument extends Document {
     ratio?: number,
     level?: string,
   },
-  alias?: string,
+}
+
+export interface WorkerStatus {
+  online: boolean;
+  remoteAddress?: string;
+  remotePort?: number;
 }
 
 export interface IWorker extends IWorkerDocument {
@@ -28,19 +33,31 @@ interface IWorkerModel extends Model<IWorker> {
   getAvailables(cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]>,
 }
 
-const workerSchema: Schema = new Schema({
-  address: {
-    type: String,
-    required: true
+const workerStatusSchema: Schema = new Schema({
+  online: {
+    type: Boolean,
+    default: false,
   },
-  port: {
+  remoteAddress: {
+    type: String,
+  },
+  remotePort: {
     type: Number,
-    required: true
   },
-  // Internal id
-  uuid: {
+});
+
+const workerSchema: Schema = new Schema({
+  password: {
     type: String,
     required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: workerStatusSchema,
+    default: false,
   },
   runningInstances: {
     type: Number,
@@ -64,9 +81,6 @@ const workerSchema: Schema = new Schema({
       default: 'Undefined'
     }
   },
-  alias: {
-    type: String
-  }
 });
 
 workerSchema.statics.getAvailables = async function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
@@ -83,7 +97,7 @@ workerSchema.statics.getAvailables = async function (cpuThreshold: number, memor
 
 workerSchema.methods.updateRunningInstances = async function (): Promise<IWorker> {
   const worker: IWorker = this;
-  const count = await Task.count({ worker: worker.uuid });
+  const count = await Task.count({ worker: worker._id });
   worker.runningInstances = count;
   return await worker.save();
 };
