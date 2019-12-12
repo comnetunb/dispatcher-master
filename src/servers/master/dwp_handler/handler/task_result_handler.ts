@@ -27,7 +27,7 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
 
     try {
       const task = await Task.findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true });
-      logger.info(`Worker ${worker.address}:${worker.port} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
+      logger.info(`Worker ${worker.status.remoteAddress} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
 
       const taskSet = await TaskSet.findById(task._taskSet);
       await taskSet.updateRemainingTasksCount();

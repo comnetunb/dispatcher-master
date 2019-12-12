@@ -1,15 +1,14 @@
 import logger from '../../shared/log';
-import * as net from 'net';
 import * as performTaskResponseHandler from './handler/perform_task_response_handler';
 import * as reportHandler from './handler/report_handler';
 import * as terminateTaskResponseHandler from './handler/terminate_task_response_handler';
 import * as taskResultHandler from './handler/task_result_handler';
 import * as languageHandler from './handler/language_handler';
 import Worker, { IWorker } from '../../../database/models/worker';
+import io from 'socket.io';
 import { ProtocolType, PDU, Report, PerformTaskResponse, TaskResult, TerminateTaskResponse, GetLanguageCommand } from 'dispatcher-protocol';
 
-export async function treat(packet: string, socket: net.Socket): Promise<void> {
-  const filter = { address: socket.remoteAddress, port: socket.remotePort };
+export async function treat(packet: string, socket: io.Socket): Promise<void> {
   let pdu: PDU;
 
   try {
@@ -19,7 +18,7 @@ export async function treat(packet: string, socket: net.Socket): Promise<void> {
     return;
   }
 
-  const worker = await Worker.findOne(filter);
+  const worker = socket.worker;
   if (!worker) {
     throw String('Worker not found');
   }

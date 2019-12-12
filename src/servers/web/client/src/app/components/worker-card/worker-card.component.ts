@@ -16,10 +16,10 @@ export class WorkerCardComponent implements OnInit {
   }
 
   public get name() {
-    if (this.worker.alias) {
-      return `${this.worker.alias} (${this.worker.address})`;
+    if (this.worker.name) {
+      return `${this.worker.name} (${this.worker.status.remoteAddress})`;
     } else {
-      return `${this.worker.address}`;
+      return `${this.worker.status.remoteAddress}`;
     }
   }
 

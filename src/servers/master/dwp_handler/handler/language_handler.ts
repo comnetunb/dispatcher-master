@@ -24,5 +24,5 @@ export function getCommands(pdu: GetLanguageCommand, worker: IWorker) {
     });
   }
 
-  connectionManager.send(worker.uuid, EncapsulatePDU(response));
+  connectionManager.send(worker._id, EncapsulatePDU(response));
 };

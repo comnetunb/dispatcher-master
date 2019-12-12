@@ -27,14 +27,14 @@ export = async (): Promise<void> => {
 };
 
 async function requestResourceRoutine(): Promise<void> {
-  requestResourceFromAllWorkers();
+  await requestResourceFromAllWorkers();
   let config = await Configuration.get();
-  setInterval(() => {
-    requestResourceFromAllWorkers();
+  setInterval(async () => {
+    await requestResourceFromAllWorkers();
   }, config.requestResourceInterval);
 }
 
-function requestResourceFromAllWorkers(): void {
+async function requestResourceFromAllWorkers(): Promise<void> {
   const getResource: GetReport = {
     type: ProtocolType.GetReport,
     resources: true,
@@ -44,8 +44,9 @@ function requestResourceFromAllWorkers(): void {
     alias: false,
   };
 
-  connectionManager.getAll().forEach((connection) => {
-    connectionManager.send(connection.id, EncapsulatePDU(getResource));
+  const workers = await connectionManager.getAll();
+  workers.forEach((worker) => {
+    connectionManager.send(worker._id, EncapsulatePDU(getResource));
   });
 }
 
@@ -99,7 +100,7 @@ async function batchDispatch(): Promise<void> {
   for (let i = 0; i < tasks.length; i += 1) {
     let task = tasks[i];
     task.state = OperationState.Sent;
-    task.worker = availableWorkers[i].uuid;
+    task.worker = availableWorkers[i]._id;
     task.startTime = new Date();
 
     await task.save();
@@ -126,12 +127,12 @@ async function batchDispatch(): Promise<void> {
       },
       files: pduFiles,
     };
-    connectionManager.send(availableWorkers[i].uuid, EncapsulatePDU(pdu));
+    connectionManager.send(availableWorkers[i]._id, EncapsulatePDU(pdu));
 
     const taskSetName = task._taskSet.name;
 
     logger.info(`Dispatched task with precedence ${task.precedence} (${task._id}) from set `
-      + `${taskSetName} to ${availableWorkers[i].address}`, task._id);
+      + `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`, task._id);
 
     setTimeout(async () => {
       const taskRefreshed = await Task.findById(task._id);
@@ -140,7 +141,7 @@ async function batchDispatch(): Promise<void> {
       }
 
       if (taskRefreshed.isSent()) {
-        logger.warn(`Timeout from worker ${availableWorkers[i].address}:${availableWorkers[i].port}`, task._id);
+        logger.warn(`Timeout from worker ${availableWorkers[i].status.remoteAddress}`, task._id);
         taskRefreshed.updateToDefaultState();
       }
     }, 10000);
@@ -198,8 +199,8 @@ interfaceManagerEvent.on('worker_command', (address: string, command: Command) =
         resources: false,
       };
 
-      connectionManager.send(worker.uuid, EncapsulatePDU(performCommand));
-      connectionManager.send(worker.uuid, EncapsulatePDU(getReport));
+      connectionManager.send(worker._id, EncapsulatePDU(performCommand));
+      connectionManager.send(worker._id, EncapsulatePDU(getReport));
     })
     .catch((error) => {
       logger.fatal(error);

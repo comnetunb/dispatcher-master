@@ -29,7 +29,7 @@ export function execute(pdu: Report, worker: IWorker): void {
 
           if (task.isFinished() || task.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker.uuid, EncapsulatePDU(possibleResponse));
+            connectionManager.send(worker._id, EncapsulatePDU(possibleResponse));
             return;
           }
 
@@ -37,7 +37,7 @@ export function execute(pdu: Report, worker: IWorker): void {
             // There is a worker executing this instance already
             if (task.startTime < taskReceived.startTime) {
               // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker.uuid, EncapsulatePDU(possibleResponse)); // eslint-disable-line
+              connectionManager.send(worker._id, EncapsulatePDU(possibleResponse)); // eslint-disable-line
               return;
             }
 
@@ -46,12 +46,12 @@ export function execute(pdu: Report, worker: IWorker): void {
           }
 
           // Associate this instance to this worker
-          task.worker = worker.uuid;
+          task.worker = worker._id;
           task.save();
         });
     }))
       .then(() => {
-        const taskFilter = { worker: worker.uuid };
+        const taskFilter = { worker: worker._id };
 
         return Task
           .find(taskFilter)
@@ -85,7 +85,7 @@ export function execute(pdu: Report, worker: IWorker): void {
   }
 
   if (pdu.alias) {
-    worker.alias = pdu.alias;
+    // worker.name = pdu.alias;
   }
 
   worker
