@@ -88,7 +88,7 @@ export class RegisterComponent implements OnInit {
       case 'confirmPassword':
         return formControl.hasError('required') ? 'Confirm your password' :
           formControl.hasError('notEqual') ? 'Passwords do not match' :
-            'weeqewq';
+            '';
     }
 
     return 'Invalid field'; // should not happen
