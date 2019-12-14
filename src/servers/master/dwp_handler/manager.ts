@@ -8,16 +8,7 @@ import Worker, { IWorker } from '../../../database/models/worker';
 import io from 'socket.io';
 import { ProtocolType, PDU, Report, PerformTaskResponse, TaskResult, TerminateTaskResponse, GetLanguageCommand } from 'dispatcher-protocol';
 
-export async function treat(packet: string, socket: io.Socket): Promise<void> {
-  let pdu: PDU;
-
-  try {
-    pdu = JSON.parse(packet.toString());
-  } catch (e) {
-    logger.fatal(e);
-    return;
-  }
-
+export async function treat(pdu: PDU, socket: io.Socket): Promise<void> {
   const worker = socket.worker;
   if (!worker) {
     throw String('Worker not found');

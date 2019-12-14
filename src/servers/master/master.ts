@@ -22,15 +22,19 @@ export = async (): Promise<void> => {
     await requestResourceRoutine();
     await batchDispatchRoutine();
   } catch (e) {
-    logger.fatal(e);
+    let error: Error = e;
+    logger.fatal(error.message);
   }
 };
 
 async function requestResourceRoutine(): Promise<void> {
-  await requestResourceFromAllWorkers();
   let config = await Configuration.get();
   setInterval(async () => {
-    await requestResourceFromAllWorkers();
+    try {
+      await requestResourceFromAllWorkers();
+    } catch (err) {
+      logger.error(`Could not request resources from workers: ${err}`);
+    }
   }, config.requestResourceInterval);
 }
 
@@ -46,7 +50,7 @@ async function requestResourceFromAllWorkers(): Promise<void> {
 
   const workers = await connectionManager.getAll();
   workers.forEach((worker) => {
-    connectionManager.send(worker._id, EncapsulatePDU(getResource));
+    connectionManager.send(worker._id, getResource);
   });
 }
 
@@ -127,7 +131,7 @@ async function batchDispatch(): Promise<void> {
       },
       files: pduFiles,
     };
-    connectionManager.send(availableWorkers[i]._id, EncapsulatePDU(pdu));
+    connectionManager.send(availableWorkers[i]._id, pdu);
 
     const taskSetName = task._taskSet.name;
 
@@ -196,8 +200,8 @@ interfaceManagerEvent.on('worker_command', (address: string, command: Command) =
         resources: false,
       };
 
-      connectionManager.send(worker._id, EncapsulatePDU(performCommand));
-      connectionManager.send(worker._id, EncapsulatePDU(getReport));
+      connectionManager.send(worker._id, performCommand);
+      connectionManager.send(worker._id, getReport);
     })
     .catch((error) => {
       logger.fatal(error);

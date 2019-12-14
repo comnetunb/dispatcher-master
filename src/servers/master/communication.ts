@@ -6,7 +6,7 @@ import EventEmitter from 'events';
 import * as connectionManager from './connection_manager';
 import * as dwpManager from './dwp_handler/manager';
 import logger from '../shared/log';
-import { ExposeFirstPDU, RemoveFirstPDU, GetReport, ProtocolType, EncapsulatePDU } from 'dispatcher-protocol';
+import { ExposeFirstPDU, RemoveFirstPDU, GetReport, ProtocolType, EncapsulatePDU, PDU } from 'dispatcher-protocol';
 
 import http from 'http';
 import io from 'socket.io';
@@ -18,8 +18,6 @@ const server = io(httpServer);
 export const event = new EventEmitter();
 
 const postAuthenticate = (socket: io.Socket, data: any) => {
-  let buffer = '';
-
   // Ask everything
   const getReport: GetReport = {
     type: ProtocolType.GetReport,
@@ -30,24 +28,13 @@ const postAuthenticate = (socket: io.Socket, data: any) => {
     supportedLanguages: true,
   }
 
-  connectionManager.send(socket.worker._id, EncapsulatePDU(getReport));
+  connectionManager.send(socket.worker._id, getReport);
 
-  socket.on('data', (data: Buffer): void => {
-    // Treat chunk data
-    buffer += data;
-
-    let packet;
+  socket.on('data', (data: PDU): void => {
     try {
-      do {
-        // This may throw an exception
-        packet = ExposeFirstPDU(buffer);
-
-        // This may throw an exception
-        buffer = RemoveFirstPDU(buffer);
-
-        dwpManager.treat(packet, socket);
-      } while (buffer.length !== 0);
+      dwpManager.treat(data, socket);
     } catch (e) {
+      logger.error(data);
       // It is normal to end up here
       // Do not treat exception!
     }

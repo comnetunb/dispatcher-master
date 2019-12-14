@@ -29,7 +29,7 @@ export function execute(pdu: Report, worker: IWorker): void {
 
           if (task.isFinished() || task.isCanceled()) {
             // It was canceled or finished. Terminate it
-            connectionManager.send(worker._id, EncapsulatePDU(possibleResponse));
+            connectionManager.send(worker._id, possibleResponse);
             return;
           }
 
@@ -37,12 +37,12 @@ export function execute(pdu: Report, worker: IWorker): void {
             // There is a worker executing this instance already
             if (task.startTime < taskReceived.startTime) {
               // Evaluating by the time they started, the 'older' worker will finish faster
-              connectionManager.send(worker._id, EncapsulatePDU(possibleResponse)); // eslint-disable-line
+              connectionManager.send(worker._id, possibleResponse); // eslint-disable-line
               return;
             }
 
             // Evaluating by the time they started, the 'newer' worker will finish faster
-            connectionManager.send(task.worker, EncapsulatePDU(possibleResponse));
+            connectionManager.send(task.worker, possibleResponse);
           }
 
           // Associate this instance to this worker

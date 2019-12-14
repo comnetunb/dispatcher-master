@@ -20,7 +20,7 @@ export async function execute(pdu: PerformTaskResponse, worker: IWorker): Promis
           taskId: task.id,
         }
         // There is already a worker executing it
-        connectionManager.send(worker._id, EncapsulatePDU(response));
+        connectionManager.send(worker._id, response);
         return;
       }
 

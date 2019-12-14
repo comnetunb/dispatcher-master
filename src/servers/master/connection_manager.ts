@@ -5,6 +5,7 @@ import { findSocket } from './communication';
 import { IOptions } from 'minimatch';
 import io from 'socket.io';
 import Worker, { IWorker } from '../../database/models/worker';
+import { PDU, CommandData, PDUHeader, ProtocolVersion } from 'dispatcher-protocol';
 
 export async function getAll(): Promise<IWorker[]> {
   return await Worker.find({
@@ -12,11 +13,21 @@ export async function getAll(): Promise<IWorker[]> {
   });
 }
 
-export function send(workerId: string, packet: string): void {
+export function send(workerId: string, data: CommandData): void {
   const socket = findSocket(workerId);
   if (socket === null) {
     throw new Error('Connection not found');
   }
 
-  socket.write(packet);
+  let header: PDUHeader = {
+    ts: new Date(),
+    v: ProtocolVersion,
+  }
+
+  let packet: PDU = {
+    header,
+    data,
+  }
+
+  socket.emit('data', packet);
 };
