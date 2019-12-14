@@ -168,9 +168,6 @@ async function cleanUp(): Promise<void> {
     .push(Task
       .update(taskFilter, taskUpdate, { multi: true }));
 
-  // Remove all workers since it is the master startup
-  promises.push(Worker.remove({}));
-
   await Promise.all(promises);
 }
 
