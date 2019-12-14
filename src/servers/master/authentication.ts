@@ -102,7 +102,6 @@ const disconnect = async (socket: io.Socket) => {
 const forbidConnections = async (nsp: io.Namespace) => {
   nsp.on('connect', async (socket) => {
     if (!socket.auth) {
-      logger.debug(`removing socket from ${nsp.name}`);
       delete nsp.connected[socket.id];
     }
   });
@@ -113,7 +112,6 @@ const forbidConnections = async (nsp: io.Namespace) => {
  */
 const restoreConnection = async (nsp: io.Namespace, socket: io.Socket) => {
   if (_.find(nsp.sockets, { id: socket.id })) {
-    logger.debug(`restoring socket to ${nsp.name}`);
     nsp.connected[socket.id] = socket;
   }
 }
