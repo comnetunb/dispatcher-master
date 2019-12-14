@@ -1,5 +1,5 @@
 <ngx-loading [show]="loading"></ngx-loading>
-<div class="row container-fluid workers-container">
+<div class="row container-fluid workers-container" [hidden]="route.firstChild">
 
   <div *ngFor="let worker of workers" class="col-6">
     <app-worker-card [worker]="worker"></app-worker-card>
@@ -9,3 +9,5 @@
     <h4>There are no connected workers</h4>
   </div>
 </div>
+
+<router-outlet></router-outlet>

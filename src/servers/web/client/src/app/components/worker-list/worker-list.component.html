@@ -2,6 +2,10 @@
   initialPageSize="25">
   <h2 lac-table-title>
     {{customTitle}}
+
+    <button mat-raised-button class="ml-2" color="primary" [routerLink]="['new']">
+      New worker
+    </button>
   </h2>
 
   <ng-container matColumnDef="name">

@@ -51,6 +51,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
 import { AdminWorkersComponent } from './components/admin-workers/admin-workers.component';
 import { WorkerListComponent } from './components/worker-list/worker-list.component';
+import { WorkerCreateComponent } from './components/worker-create/worker-create.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { WorkerListComponent } from './components/worker-list/worker-list.compon
     SettingsComponent,
     AdminWorkersComponent,
     WorkerListComponent,
+    WorkerCreateComponent,
   ],
   imports: [
     CommonModule,

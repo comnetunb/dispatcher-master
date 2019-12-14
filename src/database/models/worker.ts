@@ -1,12 +1,12 @@
-import { model, Schema, Document, Model, DocumentQuery } from 'mongoose';
+import { model, Schema, Document, Model, DocumentQuery, mongo } from 'mongoose';
 import Task from './task';
 import { WorkerState } from 'dispatcher-protocol';
 import { hashSync, compareSync } from 'bcryptjs';
 
 interface IWorkerDocument extends Document {
-  _id: string,
   password: string,
   name: string,
+  description: string,
   runningInstances: number,
   state: WorkerState,
   status: WorkerStatus,
@@ -56,6 +56,10 @@ const workerSchema: Schema = new Schema({
     required: true
   },
   name: {
+    type: String,
+    required: true
+  },
+  description: {
     type: String,
     required: true
   },

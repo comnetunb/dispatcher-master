@@ -1,0 +1,41 @@
+<ngx-loading [show]="loading"></ngx-loading>
+<div class="content-wrapper">
+  <div class="container-fluid pt-4">
+    <h1>Create worker</h1>
+
+    <form [formGroup]="form" (submit)="submit()">
+      <div class="row">
+        <mat-form-field>
+          <input matInput placeholder="Name" formControlName="name">
+          <mat-error>{{getErrorMessage('name')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <mat-form-field>
+          <textarea matInput placeholder="Description" formControlName="description"></textarea>
+          <mat-error>{{getErrorMessage('description')}}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row">
+        <div class="col-6">
+          <mat-form-field>
+            <input matInput type="password" placeholder="Password" formControlName="password">
+            <mat-error>{{getErrorMessage('password')}}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-6">
+          <mat-form-field>
+            <input matInput type="password" placeholder="Confirm Password" formControlName="confirmPassword">
+            <mat-error>{{getErrorMessage('confirmPassword')}}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <button mat-raised-button color="accent" type="submit" class="mt-2">Submit</button>
+      <mat-error class="mt-1 mb-1">{{errorMessage}}</mat-error>
+    </form>
+  </div>
+</div>
