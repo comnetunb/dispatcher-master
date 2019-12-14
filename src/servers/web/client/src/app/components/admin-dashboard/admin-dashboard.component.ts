@@ -20,6 +20,10 @@ export class AdminDashboardComponent implements OnInit {
     this.router.navigate(['/', 'admin', 'users']);
   }
 
+  workers() {
+    this.router.navigate(['/', 'admin', 'workers']);
+  }
+
   settings() {
     this.router.navigate(['/', 'admin', 'settings']);
   }

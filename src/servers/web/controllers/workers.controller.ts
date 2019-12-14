@@ -40,3 +40,13 @@ export async function getOnlineWorkers(req: Request, res: Response): Promise<voi
     res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }
+
+export async function getAllWorkers(req: Request, res: Response): Promise<void | Response> {
+  try {
+    let workers = await Worker.find();
+    return res.send(workers);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}

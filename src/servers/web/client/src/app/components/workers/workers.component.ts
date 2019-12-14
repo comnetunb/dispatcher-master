@@ -20,14 +20,14 @@ export class WorkersComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true;
-    this.workerService.list().subscribe((workers) => {
+    this.workerService.listOnline().subscribe((workers) => {
       this.workers = workers;
       this.loading = false;
     });
 
     this.$toUnsubscribe.push(
       interval(3000).subscribe(() => {
-        this.workerService.list().subscribe((workers) => {
+        this.workerService.listOnline().subscribe((workers) => {
           this.workers = workers;
         });
       })

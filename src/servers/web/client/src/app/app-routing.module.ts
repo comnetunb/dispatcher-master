@@ -21,6 +21,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { UsersComponent } from './components/users/users.component';
 import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { AdminWorkersComponent } from './components/admin-workers/admin-workers.component';
 
 const routes: Routes = [];
 
@@ -48,6 +49,10 @@ const appRoutes: Routes = [
           {
             path: 'users',
             component: UsersComponent,
+          },
+          {
+            path: 'workers',
+            component: AdminWorkersComponent,
           },
           {
             path: 'settings',

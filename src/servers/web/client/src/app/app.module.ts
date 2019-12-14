@@ -49,6 +49,8 @@ import { CommonModule } from '@angular/common';
 import { ChartsModule } from 'ng2-charts';
 import { SettingsComponent } from './components/settings/settings.component';
 import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
+import { AdminWorkersComponent } from './components/admin-workers/admin-workers.component';
+import { WorkerListComponent } from './components/worker-list/worker-list.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +89,8 @@ import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
     TasksetGraphsComponent,
     GraphComponent,
     SettingsComponent,
+    AdminWorkersComponent,
+    WorkerListComponent,
   ],
   imports: [
     CommonModule,
