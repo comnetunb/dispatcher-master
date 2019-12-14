@@ -68,11 +68,15 @@ export function execute(): void {
   });
 };
 
-export function findSocket(workerId: string): io.Socket {
+export function findSocket(workerId: any): io.Socket {
+  let socket: io.Socket = null;
   _.each(server.nsps, (nsp) => {
-    _.each(nsp.connected, (socket) => {
-      if (socket.worker.id === workerId) return socket;
+    _.each(nsp.connected, (s) => {
+      if (s.worker._id.toString() == workerId.toString()) {
+        socket = s;
+      }
     });
   });
-  return null;
+
+  return socket;
 }
