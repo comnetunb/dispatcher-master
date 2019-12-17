@@ -13,7 +13,7 @@ declare module 'socket.io' {
   }
 }
 
-export async function socketIOAuth(server: io.Server, postAuthenticate: (socket: io.Socket, data: any) => any) {
+export async function socketIOAuth(server: io.Server, postAuthenticate: (socket: io.Socket, data: any) => any, disconnect: (socket: io.Socket) => any) {
   let config = await Configuration.get();
   var timeout = config.authTimeout;
 
@@ -23,7 +23,6 @@ export async function socketIOAuth(server: io.Server, postAuthenticate: (socket:
     socket.on('authentication', async (data) => {
       const success = await authenticate(socket, data);
       if (success) {
-
         logger.debug(`Authenticated socket ${socket.id}, worker ${socket.worker.name} (${socket.worker._id})`);
         _.each(server.nsps, function (nsp) {
           restoreConnection(nsp, socket);
@@ -62,6 +61,8 @@ const authenticate = async (socket: io.Socket, data: any): Promise<boolean> => {
 
     worker.status.online = true;
     worker.status.remoteAddress = socket.conn.remoteAddress;
+    worker.status.connectionId = socket.id;
+    await worker.save();
 
     socket.auth = true;
     socket.worker = worker;
@@ -69,33 +70,6 @@ const authenticate = async (socket: io.Socket, data: any): Promise<boolean> => {
     return true;
   } catch (err) {
     return false;
-  }
-}
-
-const disconnect = async (socket: io.Socket) => {
-  logger.debug(`Socket ${socket.id} disconnected.`);
-  if (!socket.worker) return;
-
-  try {
-    socket.worker.status.online = false;
-    socket.worker.status.remoteAddress = null;
-    await socket.worker.save();
-    logger.debug(`Worker ${socket.worker.name} is now offline.`);
-
-    const taskFilter = { worker: socket.worker._id };
-
-    const tasks = await Task.find(taskFilter);
-
-    if (tasks.length > 0) {
-      logger.debug(`Clearing tasks from worker ${socket.worker.name}.`);
-
-      tasks.map((task) => {
-        return task.updateToDefaultState();
-      });
-
-    }
-  } catch (err) {
-    logger.fatal(err);
   }
 }
 

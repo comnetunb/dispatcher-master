@@ -7,7 +7,7 @@ const checkVersionCommand = {
   java: 'java -version'
 };
 
-export function getCommands(pdu: GetLanguageCommand, worker: IWorker) {
+export async function getCommands(pdu: GetLanguageCommand, worker: IWorker): Promise<void> {
   const languages = pdu.languages;
   const response: LanguageCommand = {
     type: ProtocolType.LanguageCommand,
@@ -24,5 +24,5 @@ export function getCommands(pdu: GetLanguageCommand, worker: IWorker) {
     });
   }
 
-  connectionManager.send(worker._id, response);
+  await connectionManager.send(worker, response);
 };

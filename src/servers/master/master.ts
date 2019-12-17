@@ -5,7 +5,7 @@ import * as connectionManager from './connection_manager';
 import { event as interfaceManagerEvent } from '../shared/interface_manager';
 import Task, { ITask } from '../../database/models/task';
 import Configuration, { IConfiguration } from '../../database/models/configuration';
-import Worker from '../../database/models/worker';
+import Worker, { IWorker } from '../../database/models/worker';
 import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformCommand } from 'dispatcher-protocol';
 import { OperationState } from '../../api/enums';
 import { IFile } from '../../database/models/file';
@@ -49,8 +49,12 @@ async function requestResourceFromAllWorkers(): Promise<void> {
   };
 
   const workers = await connectionManager.getAll();
-  workers.forEach((worker) => {
-    connectionManager.send(worker._id, getResource);
+  workers.forEach(async (worker) => {
+    try {
+      await connectionManager.send(worker, getResource);
+    } catch (err) {
+      logger.error(`Could not send GetReport command to worker ${worker.name}: ${err}`);
+    }
   });
 }
 
@@ -102,53 +106,63 @@ async function batchDispatch(): Promise<void> {
   const promises: Promise<ITask>[] = [];
 
   for (let i = 0; i < tasks.length; i += 1) {
-    let task = tasks[i];
-    task.state = OperationState.Sent;
-    task.worker = availableWorkers[i]._id;
-    task.startTime = new Date();
+    try {
+      let task = tasks[i];
+      task.state = OperationState.Sent;
+      task.worker = availableWorkers[i]._id;
+      task.startTime = new Date();
 
-    await task.save();
-    const files: IFile[] = task._taskSet._files;
-    let pduFiles: ProtocolFile[] = [];
-    for (let i = 0; i < files.length; i++) {
-      let content = fs.readFileSync(files[i].path, { encoding: 'base64' });
+      await task.save();
+      const files: IFile[] = task._taskSet._files;
+      let pduFiles: ProtocolFile[] = [];
+      for (let i = 0; i < files.length; i++) {
+        let content = fs.readFileSync(files[i].path, { encoding: 'base64' });
+        pduFiles.push({
+          name: files[i].name,
+          content,
+        });
+      }
+
+      let runnableContent = fs.readFileSync(task._taskSet._runnable.path, { encoding: 'base64' });
       pduFiles.push({
-        name: files[i].name,
-        content,
+        name: task._taskSet._runnable.name,
+        content: runnableContent,
       });
+      const pdu: PerformTask = {
+        type: ProtocolType.PerformTask,
+        commandLine: task.commandLine,
+        task: {
+          id: task.id,
+        },
+        files: pduFiles,
+      };
+
+      await connectionManager.send(availableWorkers[i], pdu);
+
+      const taskSetName = task._taskSet.name;
+
+      logger.info(`Dispatched task with precedence ${task.precedence} (${task._id}) from set `
+        + `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`, task._id);
+
+      setTimeout(async () => {
+        try {
+          const taskRefreshed = await Task.findById(task._id);
+          if (!taskRefreshed) {
+            logger.error(`Could not find task with id ${task._id} that was just dispatched to worker ${availableWorkers[i].name}`);
+            return;
+          }
+
+          if (taskRefreshed.isSent()) {
+            logger.warn(`Timeout from worker ${availableWorkers[i].status.remoteAddress}`, task._id);
+            await taskRefreshed.updateToDefaultState();
+          }
+        } catch (err) {
+          logger.error(`Could not verify if worker ${availableWorkers[i].name} properly started task ${task._id}`);
+        }
+      }, 10000);
+    } catch (err) {
+
     }
-
-    let runnableContent = fs.readFileSync(task._taskSet._runnable.path, { encoding: 'base64' });
-    pduFiles.push({
-      name: task._taskSet._runnable.name,
-      content: runnableContent,
-    });
-    const pdu: PerformTask = {
-      type: ProtocolType.PerformTask,
-      commandLine: task.commandLine,
-      task: {
-        id: task.id,
-      },
-      files: pduFiles,
-    };
-    connectionManager.send(availableWorkers[i]._id, pdu);
-
-    const taskSetName = task._taskSet.name;
-
-    logger.info(`Dispatched task with precedence ${task.precedence} (${task._id}) from set `
-      + `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`, task._id);
-
-    setTimeout(async () => {
-      const taskRefreshed = await Task.findById(task._id);
-      if (!taskRefreshed) {
-        throw String('Task not found!');
-      }
-
-      if (taskRefreshed.isSent()) {
-        logger.warn(`Timeout from worker ${availableWorkers[i].status.remoteAddress}`, task._id);
-        taskRefreshed.updateToDefaultState();
-      }
-    }, 10000);
   };
 }
 
@@ -176,34 +190,30 @@ async function cleanUp(): Promise<void> {
 }
 
 // TODO: use uuid instead of address
-interfaceManagerEvent.on('worker_command', (address: string, command: Command) => {
-  const workerFilter = { address };
+interfaceManagerEvent.on('worker_command', async (workerId: string, command: Command) => {
+  try {
+    const worker = await Worker.findById(workerId);
+    if (!worker) {
+      throw String('Worker not found');
+    }
 
-  Worker
-    .findOne(workerFilter)
-    .then((worker) => {
-      if (!worker) {
-        throw String('Worker not found');
-      }
+    const performCommand: PerformCommand = {
+      type: ProtocolType.PerformCommand,
+      command,
+    };
 
-      const performCommand: PerformCommand = {
-        type: ProtocolType.PerformCommand,
-        command,
-      };
+    const getReport: GetReport = {
+      type: ProtocolType.GetReport,
+      state: true,
+      tasks: true,
+      alias: false,
+      supportedLanguages: false,
+      resources: false,
+    };
 
-      const getReport: GetReport = {
-        type: ProtocolType.GetReport,
-        state: true,
-        tasks: true,
-        alias: false,
-        supportedLanguages: false,
-        resources: false,
-      };
-
-      connectionManager.send(worker._id, performCommand);
-      connectionManager.send(worker._id, getReport);
-    })
-    .catch((error) => {
-      logger.fatal(error);
-    });
+    await connectionManager.send(worker, performCommand);
+    await connectionManager.send(worker, getReport);
+  } catch (err) {
+    logger.fatal(`Could not execute command for worker with id ${workerId}: ${err}`);
+  }
 });

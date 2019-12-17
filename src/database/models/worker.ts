@@ -24,6 +24,7 @@ interface IWorkerDocument extends Document {
 export interface WorkerStatus {
   online: boolean;
   remoteAddress?: string;
+  connectionId?: string;
 }
 
 export interface IWorker extends IWorkerDocument {
@@ -43,6 +44,9 @@ const workerStatusSchema: Schema = new Schema({
     default: false,
   },
   remoteAddress: {
+    type: String,
+  },
+  connectionId: {
     type: String,
   },
 });
@@ -91,7 +95,7 @@ const workerSchema: Schema = new Schema({
 const saltRounds = 10;
 
 workerSchema.statics.resetAllConnections = async (): Promise<void> => {
-  await Worker.updateMany({}, { $set: { status: { online: false, remoteAddress: null } } });
+  await Worker.updateMany({}, { $set: { status: { online: false, remoteAddress: null, connectionId: null } } });
 };
 
 workerSchema.statics.encryptPassword = (password: string): string => {
