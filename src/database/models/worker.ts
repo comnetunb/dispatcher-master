@@ -24,7 +24,6 @@ interface IWorkerDocument extends Document {
 export interface WorkerStatus {
   online: boolean;
   remoteAddress?: string;
-  remotePort?: number;
 }
 
 export interface IWorker extends IWorkerDocument {
@@ -34,6 +33,7 @@ export interface IWorker extends IWorkerDocument {
 
 interface IWorkerModel extends Model<IWorker> {
   getAvailables(cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]>,
+  resetAllConnections(): Promise<void>,
   encryptPassword(password: string): string,
 }
 
@@ -44,9 +44,6 @@ const workerStatusSchema: Schema = new Schema({
   },
   remoteAddress: {
     type: String,
-  },
-  remotePort: {
-    type: Number,
   },
 });
 
@@ -92,6 +89,10 @@ const workerSchema: Schema = new Schema({
 });
 
 const saltRounds = 10;
+
+workerSchema.statics.resetAllConnections = async (): Promise<void> => {
+  await Worker.updateMany({}, { $set: { status: { online: false, remoteAddress: null } } });
+};
 
 workerSchema.statics.encryptPassword = (password: string): string => {
   return hashSync(password, saltRounds);

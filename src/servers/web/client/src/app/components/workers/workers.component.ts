@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
 import { WorkerService } from '../../services/worker.service';
 import { IWorker } from '../../../../../../../database/models/worker';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-workers',
@@ -15,7 +16,8 @@ export class WorkersComponent implements OnInit {
   loading: boolean = false;
 
   constructor(
-    private workerService: WorkerService
+    private workerService: WorkerService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {

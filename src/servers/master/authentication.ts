@@ -24,7 +24,7 @@ export async function socketIOAuth(server: io.Server, postAuthenticate: (socket:
       const success = await authenticate(socket, data);
       if (success) {
 
-        logger.debug(`Authenticated socket ${socket.id}, worker ${socket.worker._id} ${socket.worker.name}`);
+        logger.debug(`Authenticated socket ${socket.id}, worker ${socket.worker.name} (${socket.worker._id})`);
         _.each(server.nsps, function (nsp) {
           restoreConnection(nsp, socket);
         });

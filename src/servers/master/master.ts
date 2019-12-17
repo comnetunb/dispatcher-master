@@ -56,9 +56,9 @@ async function requestResourceFromAllWorkers(): Promise<void> {
 
 async function batchDispatchRoutine(): Promise<void> {
   let config = await Configuration.get();
-  setInterval(() => {
+  setInterval(async () => {
     try {
-      batchDispatch();
+      await batchDispatch();
     } catch (err) {
       logger.error(`Could not batch dispatch tasks: ${err}`);
     }

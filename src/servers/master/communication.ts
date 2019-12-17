@@ -11,6 +11,7 @@ import { ExposeFirstPDU, RemoveFirstPDU, GetReport, ProtocolType, EncapsulatePDU
 import http from 'http';
 import io from 'socket.io';
 import { socketIOAuth } from './authentication';
+import Worker, { IWorker } from '../../database/models/worker';
 
 const httpServer = http.createServer();
 const server = io(httpServer);
@@ -41,7 +42,9 @@ const postAuthenticate = (socket: io.Socket, data: any) => {
   });
 }
 
-export function execute(): void {
+export async function execute(): Promise<void> {
+
+  await Worker.resetAllConnections();
 
   socketIOAuth(server, postAuthenticate);
   // Open worker
