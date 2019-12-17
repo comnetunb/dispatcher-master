@@ -34,7 +34,7 @@ export function stopWorker(req: Request, res: Response): void | Response {
 
 export async function getOnlineWorkers(req: Request, res: Response): Promise<void | Response> {
   try {
-    let workers = await Worker.find({ 'status.online': true }, '-_id');
+    let workers = await Worker.find({ 'status.online': true });
     return res.send(workers);
   } catch (error) {
     logger.error(error);

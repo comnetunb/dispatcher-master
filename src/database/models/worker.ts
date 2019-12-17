@@ -66,7 +66,7 @@ const workerSchema: Schema = new Schema({
   },
   status: {
     type: workerStatusSchema,
-    default: false,
+    default: { online: false },
   },
   runningInstances: {
     type: Number,
