@@ -7,15 +7,17 @@ import User, { IUser, IUserDocument } from '../../database/models/user';
 import { auth } from './middlewares/auth';
 
 // Extending Request to properly type our users
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: IUser
-    token?: string,
-    adminMode?: boolean,
-  }
-  interface Response {
-    user?: IUser,
-    token?: string,
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IUser
+      token?: string,
+      adminMode?: boolean,
+    }
+    interface Response {
+      user?: IUser,
+      token?: string,
+    }
   }
 }
 
@@ -26,22 +28,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(cookieParser());
 
-app.use('/api', (req, res, next) => {
-  const myUser = new User({
-    _id: '5c45d0255a232615a45d627a',
-    email: 'mikaelmmello@gmail.com',
-    name: 'Mikael',
-    password:
-      '$2a$10$GT5p4X.cTo1y5IhGN5fOBu8.roDk.OQsiLYe9lUILUAavtZOiONgi',
-    __v: 0,
-    permitted: true,
-    pending: false,
-    admin: true,
-  });
-
-  // req.user = myUser;
-  next();
-});
 // New hostname+path as specified by question:
 const apiProxy = proxy('**', { target: 'http://localhost:4200' });
 

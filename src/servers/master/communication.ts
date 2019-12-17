@@ -1,13 +1,10 @@
-import uuidv1 from 'uuid/v1';
-
 import * as net from 'net';
 import _ from 'lodash';
 import EventEmitter from 'events';
 import * as connectionManager from './connection_manager';
 import * as dwpManager from './dwp_handler/manager';
 import logger from '../shared/log';
-import { ExposeFirstPDU, RemoveFirstPDU, GetReport, ProtocolType, EncapsulatePDU, PDU } from 'dispatcher-protocol';
-
+import { GetReport, ProtocolType, PDU } from 'dispatcher-protocol';
 import http from 'http';
 import io from 'socket.io';
 import { socketIOAuth } from './authentication';

@@ -1,4 +1,3 @@
-import passport from 'passport';
 import User, { UserFilter } from '../../../database/models/user';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';

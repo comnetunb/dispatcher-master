@@ -184,12 +184,11 @@ async function cleanUp(): Promise<void> {
 
   promises
     .push(Task
-      .update(taskFilter, taskUpdate, { multi: true }));
+      .updateMany(taskFilter, taskUpdate, { multi: true }));
 
   await Promise.all(promises);
 }
 
-// TODO: use uuid instead of address
 interfaceManagerEvent.on('worker_command', async (workerId: string, command: Command) => {
   try {
     const worker = await Worker.findById(workerId);

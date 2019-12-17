@@ -7,7 +7,7 @@ mongoose.connection.on('error', (err) => {
 });
 
 const mongoUrl: string = 'mongodb://localhost/ons';
-const mongoOptions = { useMongoClient: true };
+const mongoOptions = { useUnifiedTopology: true, useNewUrlParser: true };
 
 export = (): Promise<typeof mongoose> => {
   return mongoose.connect(mongoUrl, mongoOptions);
