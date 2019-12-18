@@ -13,6 +13,25 @@
     <mat-cell *matCellDef="let row">{{row.name}}</mat-cell>
   </ng-container>
 
+  <ng-container matColumnDef="status">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.status | workerStatus}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="tasks">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Running Instances</mat-header-cell>
+    <mat-cell *matCellDef="let row">{{row.runningInstances}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="config">
+    <mat-header-cell *matHeaderCellDef mat-sort-header>Configuration File</mat-header-cell>
+    <mat-cell *matCellDef="let row">
+      <button mat-raised-button class="ml-2" color="primary" (click)="downloadConfigFile(row)">
+        <mat-icon>get_app</mat-icon> config.json
+      </button>
+    </mat-cell>
+  </ng-container>
+
   <mat-header-row *matHeaderRowDef="columnsToDisplay$"></mat-header-row>
   <mat-row *matRowDef="let row; columns: columnsToDisplay$; "></mat-row>
 </lac-table>

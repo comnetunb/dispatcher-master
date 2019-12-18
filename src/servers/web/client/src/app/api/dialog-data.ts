@@ -8,3 +8,7 @@ export interface DialogData {
 export interface DialogNotificationsData {
   notifications: INotification[];
 }
+
+export interface DialogConfigFileData {
+  workerId: string;
+}

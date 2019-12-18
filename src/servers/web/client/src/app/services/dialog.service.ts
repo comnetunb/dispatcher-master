@@ -6,6 +6,7 @@ import { DialogAlertComponent } from '../components/dialog-alert/dialog-alert.co
 import { DialogConfirmComponent } from '../components/dialog-confirm/dialog-confirm.component';
 import { INotification } from '../../../../../../database/models/notification';
 import { DialogNotificationsComponent } from '../components/dialog-notifications/dialog-notifications.component';
+import { DialogConfigFileComponent } from '../components/dialog-config-file/dialog-config-file.component';
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +44,16 @@ export class DialogService {
       width: '500px',
       data: {
         notifications,
+      },
+    });
+    return dialogRef.afterClosed();
+  }
+
+  configFile(workerId: string): Observable<any> {
+    let dialogRef = this.dialog.open(DialogConfigFileComponent, {
+      width: '500px',
+      data: {
+        workerId,
       },
     });
     return dialogRef.afterClosed();

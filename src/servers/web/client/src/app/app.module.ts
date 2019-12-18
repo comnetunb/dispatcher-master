@@ -52,6 +52,8 @@ import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
 import { AdminWorkersComponent } from './components/admin-workers/admin-workers.component';
 import { WorkerListComponent } from './components/worker-list/worker-list.component';
 import { WorkerCreateComponent } from './components/worker-create/worker-create.component';
+import { WorkerStatusPipe } from './pipes/worker-status.pipe';
+import { DialogConfigFileComponent } from './components/dialog-config-file/dialog-config-file.component';
 
 @NgModule({
   declarations: [
@@ -93,6 +95,8 @@ import { WorkerCreateComponent } from './components/worker-create/worker-create.
     AdminWorkersComponent,
     WorkerListComponent,
     WorkerCreateComponent,
+    WorkerStatusPipe,
+    DialogConfigFileComponent,
   ],
   imports: [
     CommonModule,
@@ -138,6 +142,7 @@ import { WorkerCreateComponent } from './components/worker-create/worker-create.
     DialogAlertComponent,
     DialogConfirmComponent,
     DialogNotificationsComponent,
+    DialogConfigFileComponent,
   ],
   bootstrap: [AppComponent]
 })

@@ -1,0 +1,34 @@
+<h1>Generate config file</h1>
+
+
+<form [formGroup]="form" (submit)="submit()">
+  <div class="row">
+    <mat-form-field>
+      <input matInput placeholder="Server Hostname" formControlName="serverHostname">
+      <mat-error>{{getErrorMessage('serverHostname')}}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field>
+      <input matInput type="number" placeholder="serverPort" formControlName="serverPort">
+      <mat-error>{{getErrorMessage('serverPort')}}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field>
+      <input matInput placeholder="Worker ID" formControlName="workerId">
+      <mat-error>{{getErrorMessage('workerId')}}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="row">
+    <mat-form-field>
+      <input matInput placeholder="Worker Password" formControlName="workerPassword">
+      <mat-error>{{getErrorMessage('workerPassword')}}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <button mat-raised-button color="accent" type="submit" class="mt-2">Submit</button>
+</form>
