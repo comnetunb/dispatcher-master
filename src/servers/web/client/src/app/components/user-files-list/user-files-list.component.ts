@@ -37,10 +37,8 @@ export class UserFilesListComponent implements OnInit {
 
   download(file: IFile) {
     this.filesService.get(file._id).subscribe(data => {
-      var blob = new Blob([data], { type: file.mimetype });
-      var url = window.URL.createObjectURL(blob);
-      saveAs(blob, file.name);
-      window.open(url);
+      var ff = new File([data], file.name, { type: file.mimetype });
+      saveAs(ff);
     }, err => {
       console.error(err);
       this.dialogService.alert(err, `Could not download ${file.name}`);
