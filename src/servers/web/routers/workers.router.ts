@@ -5,8 +5,10 @@ const router = Router();
 router.get('/', WorkersController.getAllWorkers);
 router.post('/', WorkersController.createWorker);
 router.get('/online', WorkersController.getOnlineWorkers);
-router.post('/:address/pause', WorkersController.pauseWorker);
-router.post('/:address/resume', WorkersController.resumeWorker);
-router.post('/:address/stop', WorkersController.stopWorker);
+router.get('/:workerId', WorkersController.getWorker);
+router.put('/:workerId', WorkersController.editWorker);
+// router.post('/:address/pause', WorkersController.pauseWorker);
+// router.post('/:address/resume', WorkersController.resumeWorker);
+// router.post('/:address/stop', WorkersController.stopWorker);
 
 export = router;

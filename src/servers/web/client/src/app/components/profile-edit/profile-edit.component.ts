@@ -54,7 +54,7 @@ export class ProfileEditComponent implements OnInit {
         newPassword: null,
         confirmNewPassword: null,
       });
-    })
+    });
   }
 
   submit() {

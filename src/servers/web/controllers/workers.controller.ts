@@ -4,6 +4,7 @@ import logger from '../../shared/log';
 import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { WorkerCreateRequest } from '../client/src/app/api/worker-create-request';
+import { WorkerEditRequest } from '../client/src/app/api/worker-edit-request';
 
 export function pauseWorker(req: Request, res: Response): void | Response {
   if (!req.user.admin) {
@@ -30,6 +31,35 @@ export function stopWorker(req: Request, res: Response): void | Response {
 
   interfaceManager.stopWorker(req.params.address);
   res.sendStatus(httpStatusCodes.OK);
+}
+
+export async function getWorker(req: Request, res: Response): Promise<void | Response> {
+  try {
+    let worker = await Worker.findById(req.params.workerId);
+    return res.send(worker);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}
+
+export async function editWorker(req: Request, res: Response): Promise<void | Response> {
+  try {
+    let body: WorkerEditRequest = req.body;
+    let worker = await Worker.findById(req.params.workerId);
+    if (!worker) throw 'Worker not found';
+
+    worker.name = body.name;
+    worker.description = body.description;
+    if (body.newPassword) {
+      worker.password = Worker.encryptPassword(body.newPassword);
+    }
+    await worker.save();
+    return res.send(worker);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }
 
 export async function getOnlineWorkers(req: Request, res: Response): Promise<void | Response> {

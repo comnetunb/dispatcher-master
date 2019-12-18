@@ -23,6 +23,7 @@ import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-grap
 import { SettingsComponent } from './components/settings/settings.component';
 import { AdminWorkersComponent } from './components/admin-workers/admin-workers.component';
 import { WorkerCreateComponent } from './components/worker-create/worker-create.component';
+import { WorkerEditComponent } from './components/worker-edit/worker-edit.component';
 
 const routes: Routes = [];
 
@@ -58,6 +59,10 @@ const appRoutes: Routes = [
               {
                 path: 'new',
                 component: WorkerCreateComponent,
+              },
+              {
+                path: ':id',
+                component: WorkerEditComponent,
               }
             ],
           },

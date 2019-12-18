@@ -54,6 +54,7 @@ import { WorkerListComponent } from './components/worker-list/worker-list.compon
 import { WorkerCreateComponent } from './components/worker-create/worker-create.component';
 import { WorkerStatusPipe } from './pipes/worker-status.pipe';
 import { DialogConfigFileComponent } from './components/dialog-config-file/dialog-config-file.component';
+import { WorkerEditComponent } from './components/worker-edit/worker-edit.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { DialogConfigFileComponent } from './components/dialog-config-file/dialo
     WorkerCreateComponent,
     WorkerStatusPipe,
     DialogConfigFileComponent,
+    WorkerEditComponent,
   ],
   imports: [
     CommonModule,
