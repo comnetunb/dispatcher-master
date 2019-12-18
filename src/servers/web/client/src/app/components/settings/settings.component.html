@@ -3,6 +3,23 @@
   <div class="container-fluid pt-4">
     <form [formGroup]="form" (submit)="submit()">
 
+
+      <div class="row mb-2">
+        <div class="col">
+          <h4>Worker Requirements</h4>
+          <p>
+            Limits of CPU and Memory usage that a worker can have in order to be eligible for receiving more tasks.
+          </p>
+          <p>
+            A value of 0.6 in the CPU limit means that only workers using up to 60% of their CPU time are elligible for
+            receiving new tasks.
+          </p>
+          <p>
+            This setting is a global value that can be individually overriden when editing a specific worker.
+          </p>
+        </div>
+      </div>
+
       <div class="row">
         <mat-form-field class="col">
           <input matInput placeholder="Worker CPU Limit (%/100)" type="number" formControlName="cpuLimit">
@@ -13,6 +30,22 @@
           <input matInput placeholder="Worker Memory Limit (%/100)" type="number" formControlName="memoryLimit">
           <mat-error>{{getErrorMessage('memoryLimit')}}</mat-error>
         </mat-form-field>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col">
+
+          <h4>Intervals</h4>
+
+          <p>
+            Request Resource Interval - Period in seconds between requests to connected workers for their current
+            resource
+            usage data.
+          </p>
+          <p>
+            Dispatch Interval - Period in seconds between dispatching of pending tasks to any available workers.
+          </p>
+        </div>
       </div>
 
       <div class="row">
@@ -26,6 +59,18 @@
           <input matInput placeholder="Dispatch Interval (sec)" type="number" formControlName="dispatchInterval">
           <mat-error>{{getErrorMessage('dispatchInterval')}}</mat-error>
         </mat-form-field>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col">
+
+          <h4>Email</h4>
+
+          <p>
+            Email information required to send result emails when a task is finished. Service must be in <a
+              href="https://nodemailer.com/smtp/well-known/">this list</a>.
+          </p>
+        </div>
       </div>
 
       <div class="row">
