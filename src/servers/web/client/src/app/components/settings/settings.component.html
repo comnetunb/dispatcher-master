@@ -17,13 +17,13 @@
 
       <div class="row">
         <mat-form-field class="col">
-          <input matInput placeholder="Request Resource Interval (ms)" type="number"
+          <input matInput placeholder="Request Resource Interval (sec)" type="number"
             formControlName="requestResourceInterval">
           <mat-error>{{getErrorMessage('requestResourceInterval')}}</mat-error>
         </mat-form-field>
 
         <mat-form-field class="col">
-          <input matInput placeholder="Dispatch Interval (ms)" type="number" formControlName="dispatchInterval">
+          <input matInput placeholder="Dispatch Interval (sec)" type="number" formControlName="dispatchInterval">
           <mat-error>{{getErrorMessage('dispatchInterval')}}</mat-error>
         </mat-form-field>
       </div>

@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import Configuration, { IConfiguration } from '../../../database/models/configuration';
 import { EditSettingsRequest } from '../client/src/app/api/edit-settings-request';
+import { startRoutines } from '../../master/master';
 
 export async function get(req: Request, res: Response): Promise<void | Response> {
   if (!req.user.admin) {
@@ -36,6 +37,7 @@ export async function set(req: Request, res: Response): Promise<void | Response>
     settings.emailUser = newSettings.emailUser;
     settings.emailPassword = newSettings.emailPassword;
     await settings.save();
+    await startRoutines();
     return res.send(settings);
   } catch (error) {
     logger.error(error);

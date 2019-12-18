@@ -10,8 +10,12 @@ import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformC
 import { OperationState } from '../../api/enums';
 import { IFile } from '../../database/models/file';
 import { ProtocolFile } from 'dispatcher-protocol';
+import { request } from 'http';
 
-export = async (): Promise<void> => {
+let requestResourceInterval: NodeJS.Timeout;
+let batchDispatchInterval: NodeJS.Timeout;
+
+export default async (): Promise<void> => {
   try {
     await cleanUp();
 
@@ -27,15 +31,40 @@ export = async (): Promise<void> => {
   }
 };
 
+export async function startRoutines(): Promise<void> {
+  if (requestResourceInterval) {
+    clearInterval(requestResourceInterval);
+    requestResourceInterval = null;
+  }
+  if (batchDispatchInterval) {
+    clearInterval(batchDispatchInterval);
+    requestResourceInterval = null;
+  }
+
+  await requestResourceRoutine();
+  await batchDispatchRoutine();
+}
+
 async function requestResourceRoutine(): Promise<void> {
   let config = await Configuration.get();
-  setInterval(async () => {
+  requestResourceInterval = setInterval(async () => {
     try {
       await requestResourceFromAllWorkers();
     } catch (err) {
       logger.error(`Could not request resources from workers: ${err}`);
     }
-  }, config.requestResourceInterval);
+  }, config.requestResourceInterval * 1000);
+}
+
+async function batchDispatchRoutine(): Promise<void> {
+  let config = await Configuration.get();
+  batchDispatchInterval = setInterval(async () => {
+    try {
+      await batchDispatch();
+    } catch (err) {
+      logger.error(`Could not batch dispatch tasks: ${err}`);
+    }
+  }, config.dispatchInterval * 1000);
 }
 
 async function requestResourceFromAllWorkers(): Promise<void> {
@@ -56,17 +85,6 @@ async function requestResourceFromAllWorkers(): Promise<void> {
       logger.error(`Could not send GetReport command to worker ${worker.name}: ${err}`);
     }
   });
-}
-
-async function batchDispatchRoutine(): Promise<void> {
-  let config = await Configuration.get();
-  setInterval(async () => {
-    try {
-      await batchDispatch();
-    } catch (err) {
-      logger.error(`Could not batch dispatch tasks: ${err}`);
-    }
-  }, config.dispatchInterval);
 }
 
 /**
