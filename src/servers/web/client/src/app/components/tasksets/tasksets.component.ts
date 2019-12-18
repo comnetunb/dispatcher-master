@@ -17,7 +17,7 @@ export class TasksetsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.tasksetStateSubject = new BehaviorSubject<OperationState>(null);
+    this.tasksetStateSubject = new BehaviorSubject<OperationState>(OperationState.Executing);
     this.tasksetState = this.tasksetStateSubject.asObservable();
   }
 

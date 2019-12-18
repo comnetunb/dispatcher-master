@@ -1,10 +1,7 @@
 <div class="content-wrapper" [hidden]="route.firstChild">
   <div class="container-fluid">
     <div class="row" class="mt-2 ml-1">
-      <button mat-raised-button color="primary" (click)="all()">
-        All
-      </button>
-      <button mat-raised-button class="ml-2" color="primary" (click)="executing()">
+      <button mat-raised-button color="primary" (click)="executing()">
         Executing
       </button>
       <button mat-raised-button class="ml-2" color="primary" (click)="finished()">
@@ -12,6 +9,9 @@
       </button>
       <button mat-raised-button class="ml-2" color="primary" (click)="canceled()">
         Canceled
+      </button>
+      <button mat-raised-button class="ml-2" color="primary" (click)="all()">
+        All
       </button>
     </div>
 
