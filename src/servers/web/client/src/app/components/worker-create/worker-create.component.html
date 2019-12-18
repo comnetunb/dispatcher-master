@@ -19,6 +19,22 @@
       </div>
 
       <div class="row">
+        <div class="col">
+          <mat-form-field>
+            <input matInput type="number" placeholder="CPU Limit (%/100)" formControlName="cpuLimit" max="1" min="0">
+            <mat-error>{{getErrorMessage('cpuLimit')}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col">
+          <mat-form-field>
+            <input matInput type="number" placeholder="Memory Limit (%/100)" formControlName="memoryLimit" max="1"
+              min="0">
+            <mat-error>{{getErrorMessage('memoryLimit')}}</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-6">
           <mat-form-field>
             <input matInput type="password" placeholder="Password" formControlName="password">

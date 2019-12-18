@@ -5,6 +5,8 @@ import { Request, Response } from 'express';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { WorkerCreateRequest } from '../client/src/app/api/worker-create-request';
 import { WorkerEditRequest } from '../client/src/app/api/worker-edit-request';
+import bodyParser = require('body-parser');
+import Configuration from '../../../database/models/configuration';
 
 export function pauseWorker(req: Request, res: Response): void | Response {
   if (!req.user.admin) {
@@ -51,6 +53,8 @@ export async function editWorker(req: Request, res: Response): Promise<void | Re
 
     worker.name = body.name;
     worker.description = body.description;
+    worker.resourceLimit.cpu = body.cpuLimit;
+    worker.resourceLimit.memory = body.memoryLimit;
     if (body.newPassword) {
       worker.password = Worker.encryptPassword(body.newPassword);
     }
@@ -64,7 +68,20 @@ export async function editWorker(req: Request, res: Response): Promise<void | Re
 
 export async function getOnlineWorkers(req: Request, res: Response): Promise<void | Response> {
   try {
+    let config = await Configuration.get();
     let workers = await Worker.find({ 'status.online': true });
+    for (let worker of workers) {
+      let available = true;
+      if (worker.resourceLimit.cpu && worker.resource.cpu > worker.resourceLimit.cpu ||
+        !worker.resourceLimit.cpu && worker.resource.cpu > config.cpuLimit) {
+        available = false;
+      }
+      if (worker.resourceLimit.memory && worker.resource.memory > worker.resourceLimit.memory ||
+        !worker.resourceLimit.memory && worker.resource.memory > config.memoryLimit) {
+        available = false;
+      }
+      worker.available = available;
+    }
     return res.send(workers);
   } catch (error) {
     logger.error(error);
@@ -99,7 +116,11 @@ export async function createWorker(req: Request, res: Response) {
     const newWorker = new Worker({
       name,
       description,
-      password: hash
+      password: hash,
+      resourceLimit: {
+        cpu: request.cpuLimit,
+        memory: request.memoryLimit,
+      }
     });
     const worker = await newWorker.save();
     res.status(httpStatusCodes.CREATED).send(worker);

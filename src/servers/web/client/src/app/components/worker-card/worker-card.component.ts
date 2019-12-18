@@ -23,4 +23,17 @@ export class WorkerCardComponent implements OnInit {
     }
   }
 
+  public get runningTasks() {
+    let available = 'Available';
+    if (!this.worker.available) {
+      available = 'Not available, resource usage above limits';
+    }
+
+    if (this.worker.runningInstances == 0) {
+      return available;
+    } else {
+      return `${this.worker.runningInstances} tasks running - ${available}`
+    }
+  }
+
 }

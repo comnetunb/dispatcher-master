@@ -15,10 +15,15 @@ interface IWorkerDocument extends Document {
     cpu?: number,
     memory?: number,
   },
+  resourceLimit: {
+    cpu?: number,
+    memory?: number,
+  }
   performance: {
     ratio?: number,
     level?: string,
   },
+  available?: boolean,
 }
 
 export interface WorkerStatus {
@@ -78,12 +83,20 @@ const workerSchema: Schema = new Schema({
     cpu: Number,
     memory: Number
   },
+  resourceLimit: {
+    cpu: Number,
+    memory: Number
+  },
   performance: {
     ratio: Number,
     level: {
       type: String,
       default: 'Undefined'
     }
+  },
+  // Not used, just a hack
+  available: {
+    type: Boolean,
   },
 });
 
@@ -104,11 +117,38 @@ workerSchema.methods.validPassword = function (password: string): boolean { // e
 workerSchema.statics.getAvailables = async function (cpuThreshold: number, memoryThreshold: number): Promise<IWorker[]> {
   const filter = {
     'resource.outdated': false,
-    'resource.cpu': { $lt: cpuThreshold },
-    'resource.memory': { $lt: memoryThreshold },
-    'state': WorkerState.Executing,
+    'state': 0,
     'status.online': true,
+    $and: [
+      {
+        $or: [
+          {
+            // if custom limit is set, use it, default otherwise
+            'resourceLimit.cpu': { $ne: null },
+            $expr: { $lt: ["$resource.cpu", "$resourceLimit.cpu"] }
+          },
+          {
+            'resourceLimit.cpu': null,
+            'resource.cpu': { $lt: 1 }
+          },
+        ]
+      },
+      {
+        $or: [
+          {
+            'resourceLimit.memory': { $ne: null },
+            $expr: { $lt: ["$resource.memory", "$resourceLimit.memory"] }
+          },
+          {
+            'resourceLimit.memory': null,
+            'resource.memory': { $lt: 1 }
+          },
+        ]
+      },
+    ]
   };
+
+
   const worker: IWorkerModel = this;
   const availableWorkers = await worker.find(filter);
   return availableWorkers;

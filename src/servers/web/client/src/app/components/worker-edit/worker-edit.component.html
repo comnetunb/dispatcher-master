@@ -1,7 +1,7 @@
 <ngx-loading [show]="loading"></ngx-loading>
 <div class="content-wrapper">
-  <div class="container-fluid pt-4">
-    <h1>Create worker</h1>
+  <div class="container-fluid pt-4" *ngIf="worker">
+    <h1>Edit worker {{worker.name}}</h1>
 
     <form [formGroup]="form" (submit)="submit()">
       <div class="row">
@@ -16,6 +16,22 @@
           <textarea matInput placeholder="Description" formControlName="description"></textarea>
           <mat-error>{{getErrorMessage('description')}}</mat-error>
         </mat-form-field>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <mat-form-field>
+            <input matInput type="number" placeholder="CPU Limit (%/100)" formControlName="cpuLimit" max="1" min="0">
+            <mat-error>{{getErrorMessage('cpuLimit')}}</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col">
+          <mat-form-field>
+            <input matInput type="number" placeholder="Memory Limit (%/100)" formControlName="memoryLimit" max="1"
+              min="0">
+            <mat-error>{{getErrorMessage('memoryLimit')}}</mat-error>
+          </mat-form-field>
+        </div>
       </div>
 
       <div class="row">

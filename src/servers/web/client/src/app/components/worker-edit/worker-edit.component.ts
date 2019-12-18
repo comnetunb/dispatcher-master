@@ -35,6 +35,8 @@ export class WorkerEditComponent implements OnInit {
       name: ['', Validators.required],
       password: [''],
       description: [''],
+      cpuLimit: ['', [Validators.min(0), Validators.max(1)]],
+      memoryLimit: ['', [Validators.min(0), Validators.max(1)]],
     });
 
     this.form.addControl('confirmPassword',
@@ -50,6 +52,8 @@ export class WorkerEditComponent implements OnInit {
         description: worker.description,
         password: null,
         confirmPassword: null,
+        cpuLimit: worker.resourceLimit.cpu || null,
+        memoryLimit: worker.resourceLimit.memory || null,
       });
     });
   }
@@ -71,6 +75,8 @@ export class WorkerEditComponent implements OnInit {
       name: formValue.name,
       newPassword: formValue.password,
       description: formValue.description,
+      cpuLimit: formValue.cpuLimit,
+      memoryLimit: formValue.memoryLimit,
     };
 
     this.workerService.edit(this.worker._id, request)
@@ -100,6 +106,16 @@ export class WorkerEditComponent implements OnInit {
       case 'confirmPassword':
         return formControl.hasError('required') ? 'Confirm your password' :
           formControl.hasError('notEqual') ? 'Passwords do not match' :
+            '';
+
+      case 'cpuLimit':
+        return formControl.hasError('min') ? 'The minimum is 0' :
+          formControl.hasError('max') ? 'The maximum is 1' :
+            '';
+
+      case 'memoryLimit':
+        return formControl.hasError('min') ? 'The minimum is 0' :
+          formControl.hasError('max') ? 'The maximum is 1' :
             '';
     }
 
