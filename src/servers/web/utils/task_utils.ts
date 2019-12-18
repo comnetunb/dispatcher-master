@@ -11,7 +11,7 @@ import { TaskSetData, InputFile, ParsedInput } from '../api/taskSetData';
 import { IUser } from '../../../database/models/user';
 import { OperationState, TaskSetPriority, InputType, Result } from '../../../api/enums';
 import { ExportFormat } from '../api/exportFormat';
-import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
+import { CreateTasksetRequest, EditTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 import { mongo } from 'mongoose';
 import sanitize from 'sanitize-filename';
 
@@ -40,6 +40,7 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
     remainingTasksCount: 0,
     totalTasksCount: 0,
     priority: TaskSetPriority.Normal,
+    inputLabels: [],
     _files: [],
   });
 
@@ -50,7 +51,6 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
   });
 
   let processedInputs: string[][] = [];
-  let inputLabels: string[] = [];
   for (let input of inputs) {
     if (input.type == InputType.CommaSeparatedValues) {
       processedInputs.push(processCSVInput(input.input as string));
@@ -64,12 +64,12 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
       processedInputs.push(processStartEndStepInput(input.input as string));
     }
 
-    inputLabels.push(input.label);
+    taskSet.inputLabels.push(input.label);
   }
   taskSet = await taskSet.save();
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
-  let tasks = await createTasks(taskSet._id, template, inputLabels, processedInputs);
+  let tasks = await createTasks(taskSet._id, template, processedInputs);
 
   const tasksSavePromises: Promise<ITask>[] = [];
   for (let task of tasks) {
@@ -84,6 +84,79 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
   return taskSet;
 }
 
+
+export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest, user: IUser): Promise<ITaskSet> {
+  taskset.name = request.name;
+  taskset.description = request.description;
+  taskset.errorLimitCount = request.errorCountLimit;
+  taskset._runnable = request.runnableId;
+  taskset._runnableType = request.runnableType;
+  taskset._files = [];
+  taskset.inputLabels = [];
+  taskset.inputs = request.inputs;
+
+  const inputs = request.inputs.sort((a, b) => {
+    if (a.priority > b.priority) return 1;
+    if (a.priority < b.priority) return -1;
+    return 0;
+  });
+
+  let processedInputs: string[][] = [];
+  for (let input of inputs) {
+    if (input.type == InputType.CommaSeparatedValues) {
+      processedInputs.push(processCSVInput(input.input as string));
+    } else if (input.type == InputType.Files) {
+      processedInputs.push(await processFilesInput(input.input as string[]));
+      let fileIds = input.input as string[];
+      for (let i = 0; i < fileIds.length; i++) {
+        taskset._files.push(fileIds[i]);
+      }
+    } else if (input.type == InputType.StartEndStep) {
+      processedInputs.push(processStartEndStepInput(input.input as string));
+    }
+
+    taskset.inputLabels.push(input.label);
+  }
+
+  await Task.updateMany({ _taskSet: taskset._id }, { $set: { underEdit: true } });
+  taskset = await taskset.save();
+
+  let runnable = await File.findById(taskset._runnable);
+  let template = `${taskset._runnableType} ${runnable.name} ${taskset.argumentTemplate}`;
+  let tasks = await createTasks(taskset._id, template, processedInputs);
+
+  let newTasks = false;
+
+  const promises = await tasks.map(async task => {
+    const existingTask = await Task.findOne({
+      _taskSet: taskset._id,
+      arguments: task.arguments,
+      commandLine: task.commandLine,
+    });
+
+    if (!existingTask) {
+      newTasks = true;
+      return await task.save();
+    }
+
+    existingTask.precedence = task.precedence;
+    existingTask.underEdit = false;
+    return await existingTask.save();
+  });
+
+  await Promise.all(promises);
+  await Task.deleteMany({ _taskSet: taskset._id, underEdit: true });
+
+  const tasksCount = await Task.countDocuments({ _taskSet: taskset._id });
+  if (newTasks && taskset.state != OperationState.Canceled) {
+    taskset.state = OperationState.Executing;
+  }
+  taskset.totalTasksCount = tasksCount;
+  await taskset.save();
+  await taskset.updateRemainingTasksCount();
+  return taskset;
+}
+
 async function getCommandFromTemplateAndInputs(template: string, inputs: ProcessedInput[]) {
   let processed = template;
   for (let input of inputs) {
@@ -95,7 +168,7 @@ async function getCommandFromTemplateAndInputs(template: string, inputs: Process
   return processed;
 }
 
-async function createTasks(tasksetId: string, template: string, inputLabels: string[], inputs: string[][]): Promise<ITask[]> {
+async function createTasks(tasksetId: string, template: string, inputs: string[][]): Promise<ITask[]> {
   const tasks: ITask[] = [];
 
   let processedInputs: ProcessedInput[][] = [[]];
@@ -122,19 +195,16 @@ async function createTasks(tasksetId: string, template: string, inputLabels: str
     let precedence = 0;
     let indexes = [];
     let args = [];
-    let taskInputLabels = [];
     for (let i = 0; i < curInput.length; i++) {
       precedence *= inputs[i].length;
       precedence += curInput[i].innerIndex;
       indexes.push(curInput[i].innerIndex);
-      taskInputLabels.push(inputLabels[curInput[i].index]);
       args.push(curInput[i].input);
     }
 
     const newTask = new Task({
       _taskSet: tasksetId,
       commandLine: command,
-      inputLabels: taskInputLabels,
       precedence,
       arguments: args,
     });

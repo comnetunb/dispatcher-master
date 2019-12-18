@@ -75,7 +75,7 @@ export async function plotData(req: Request, res: Response): Promise<void | Resp
         const yAxis = graphs[i].yAxis;
 
         for (let task of tasks) { // eslint-disable-line
-          const curveIdx = task.inputLabels.findIndex(i => i == curve);
+          const curveIdx = taskset.inputLabels.findIndex(i => i == curve);
           const curveLabel = task.arguments[curveIdx];
           if (!curves.hasOwnProperty(curveLabel)) {
             curves[curveLabel] = [];

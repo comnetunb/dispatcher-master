@@ -7,7 +7,7 @@ import { ITaskSet } from '../../../../../../database/models/taskSet';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { OperationState } from '../../../../../../api/enums';
 import { ITask } from '../../../../../../database/models/task';
-import { CreateTasksetRequest } from '../api/create-taskset-request';
+import { CreateTasksetRequest, EditTasksetRequest } from '../api/create-taskset-request';
 
 const apiRoute = '/api/tasksets';
 
@@ -39,6 +39,10 @@ export class TasksetService implements ObservableSearchService {
 
   create(request: CreateTasksetRequest): Observable<ITaskSet> {
     return this.http.post<ITaskSet>(`${apiRoute}`, request);
+  }
+
+  edit(tasksetId: string, request: EditTasksetRequest): Observable<ITaskSet> {
+    return this.http.put<ITaskSet>(`${apiRoute}/${tasksetId}`, request);
   }
 
   get(tasksetId: string): Observable<ITaskSet> {

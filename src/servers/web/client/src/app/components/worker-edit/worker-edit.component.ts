@@ -83,7 +83,7 @@ export class WorkerEditComponent implements OnInit {
       .subscribe(() => {
         this.loading = false;
         this.dialogService.alert(`Worker ${this.worker.name} has been edited!`).subscribe((ok) => {
-          this.router.navigate(['..'], { relativeTo: this.route });
+          this.router.navigate(['..'], { relativeTo: this.route, queryParams: { refresh: true } });
         });
       }, (error) => {
         this.loading = false;

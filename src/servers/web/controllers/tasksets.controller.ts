@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import * as taskUtils from '../utils/task_utils';
 import httpStatusCodes from '../utils/httpStatusCodes';
 import { OperationState } from '../../../api/enums';
-import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
+import { CreateTasksetRequest, EditTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
 
 export async function getTaskSets(req: Request, res: Response): Promise<void | Response> {
   const taskSetFilter: TaskSetFilter = {};
@@ -31,6 +31,18 @@ export async function createTaskSet(req: Request, res: Response): Promise<void |
   try {
     let request: CreateTasksetRequest = req.body;
     const taskset = await taskUtils.createTaskset(request, req.user);
+    return res.send(taskset);
+  } catch (error) {
+    logger.error(error);
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}
+
+export async function editTaskset(req: Request, res: Response): Promise<void | Response> {
+  try {
+    let request: EditTasksetRequest = req.body;
+    let taskset = await TaskSet.findById(req.params.id);
+    taskset = await taskUtils.editTaskset(taskset, request, req.user);
     return res.send(taskset);
   } catch (error) {
     logger.error(error);

@@ -4,7 +4,7 @@ import TaskSet, { ITaskSet } from './taskSet';
 
 interface ITaskDocument extends Document {
   _taskSet: ITaskSet['_id'],
-  inputLabels: string[],
+  underEdit: boolean,
   arguments: string[],
   commandLine: string,
   precedence: number,
@@ -37,10 +37,6 @@ const taskSchema: Schema = new Schema({
     ref: 'TaskSet',
     required: true,
   },
-  inputLabels: [{
-    type: String,
-    required: true,
-  }],
   arguments: [{
     type: String,
     required: true,
@@ -73,7 +69,10 @@ const taskSchema: Schema = new Schema({
   },
   endTime: {
     type: Date,
-  }
+  },
+  underEdit: {
+    type: Boolean,
+  },
 });
 
 taskSchema.methods.updateToDefaultState = async function (): Promise<ITask> {

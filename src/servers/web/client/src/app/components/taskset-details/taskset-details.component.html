@@ -13,7 +13,11 @@
           <mat-divider></mat-divider>
           <mat-card-content class="pt-2">
             <mat-list>
-              <h3 mat-subheader>Details</h3>
+
+              <h3 mat-subheader>
+                <a (click)="refresh(); false" href="#">
+                  <mat-icon>refresh</mat-icon>
+                </a> Details</h3>
               <p mat-line>Name: {{taskset.name}}</p>
               <p mat-line *ngIf="taskset.description">Description: {{taskset.description}}</p>
               <p mat-line>Command Template: {{taskset.argumentTemplate}}</p>
@@ -44,6 +48,7 @@
             <div class="row">
               <button mat-raised-button (click)="clone()" color="primary" class="ml-2 mt-2">Clone</button>
               <button mat-raised-button (click)="export()" color="primary" class="ml-2 mt-2">Export</button>
+              <button mat-raised-button (click)="edit()" color="primary" class="ml-2 mt-2">Edit</button>
             </div>
 
             <div class="row">

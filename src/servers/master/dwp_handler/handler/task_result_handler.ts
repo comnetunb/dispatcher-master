@@ -27,6 +27,12 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
 
     try {
       const task = await Task.findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true });
+      if (!task) {
+        logger.warn(`Finished task does not exist anymore`, pdu.task.id);
+        await worker.updateRunningInstances();
+        return;
+      }
+
       logger.info(`Worker ${worker.status.remoteAddress} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
 
       const taskSet = await TaskSet.findById(task._taskSet);

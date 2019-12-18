@@ -6,6 +6,7 @@ router.get('/', TaskSetsController.getTaskSets);
 router.get('/supported-runnables', TaskSetsController.supportedRunnables);
 
 router.post('/', TaskSetsController.createTaskSet);
+router.put('/:id', TaskSetsController.editTaskset);
 
 router.get('/:id/export', TaskSetsController.exportTaskSet);
 router.post('/:id/cancel', TaskSetsController.cancelTaskSet);

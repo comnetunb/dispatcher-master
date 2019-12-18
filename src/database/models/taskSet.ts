@@ -18,6 +18,7 @@ interface ITaskSetDocument extends Document {
   _files: string[],
   name: string,
   description: string,
+  inputLabels: string[],
   argumentTemplate: string,
   graphs: any[],
   priority: TaskSetPriority,
@@ -58,6 +59,10 @@ const taskSetSchema: Schema = new Schema({
   _files: [{
     type: Schema.Types.ObjectId,
     ref: 'File'
+  }],
+  inputLabels: [{
+    type: String,
+    required: true,
   }],
   name: {
     type: String,

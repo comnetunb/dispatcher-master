@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { ITaskSet } from '../../../../../../../database/models/taskSet';
 import { TasksetService } from 'src/app/services/taskset.service';
 import { DialogService } from 'src/app/services/dialog.service';
@@ -7,14 +7,16 @@ import { getErrorMessage } from 'src/app/classes/utils';
 import { LacunaMaterialTableComponent } from 'lacuna-mat-table';
 import { ITask } from '../../../../../../../database/models/task';
 import { TaskListComponent } from '../task-list/task-list.component';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-taskset-details',
   templateUrl: './taskset-details.component.html',
   styleUrls: ['./taskset-details.component.scss']
 })
-export class TasksetDetailsComponent implements OnInit {
-
+export class TasksetDetailsComponent implements OnInit, OnDestroy {
+  $toUnsubscribe: Subscription[] = [];
   taskset: ITaskSet;
   tasksetId: string;
   loading: boolean = false;
@@ -26,9 +28,24 @@ export class TasksetDetailsComponent implements OnInit {
     private dialogService: DialogService
   ) { }
 
+  ngOnDestroy() {
+    for (let sub of this.$toUnsubscribe) {
+      sub.unsubscribe();
+    }
+  }
+
   ngOnInit() {
     this.tasksetId = this.route.snapshot.params['tasksetId'];
     this.loadTaskset();
+
+
+    this.$toUnsubscribe.push(
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd && event.url.endsWith(this.tasksetId))
+      ).subscribe(() => {
+        this.refresh();
+      })
+    );
   }
 
   @ViewChild(TaskListComponent, { static: false }) taskList: TaskListComponent;
@@ -98,6 +115,11 @@ export class TasksetDetailsComponent implements OnInit {
     });
   }
 
+  refresh() {
+    this.loadTaskset();
+    this.taskList.refresh();
+  }
+
   clone() {
     this.router.navigate(['..', 'create'], {
       queryParams: {
@@ -109,6 +131,10 @@ export class TasksetDetailsComponent implements OnInit {
 
   graphs() {
     this.router.navigate(['graphs'], { relativeTo: this.route });
+  }
+
+  edit() {
+    this.router.navigate(['edit'], { relativeTo: this.route });
   }
 
   export() {

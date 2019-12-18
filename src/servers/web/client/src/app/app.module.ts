@@ -55,6 +55,7 @@ import { WorkerCreateComponent } from './components/worker-create/worker-create.
 import { WorkerStatusPipe } from './pipes/worker-status.pipe';
 import { DialogConfigFileComponent } from './components/dialog-config-file/dialog-config-file.component';
 import { WorkerEditComponent } from './components/worker-edit/worker-edit.component';
+import { TasksetEditComponent } from './components/taskset-edit/taskset-edit.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +100,7 @@ import { WorkerEditComponent } from './components/worker-edit/worker-edit.compon
     WorkerStatusPipe,
     DialogConfigFileComponent,
     WorkerEditComponent,
+    TasksetEditComponent,
   ],
   imports: [
     CommonModule,

@@ -9,3 +9,13 @@ export interface CreateTasksetRequest {
   template: string;
   inputs: IInput[];
 }
+
+export interface EditTasksetRequest {
+  name: string;
+  description: string;
+  errorCountLimit: number;
+  runnableId: string;
+  runnableType: string;
+  template: string;
+  inputs: IInput[];
+}
