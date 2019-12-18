@@ -38,19 +38,6 @@ interface IWorkerModel extends Model<IWorker> {
   encryptPassword(password: string): string,
 }
 
-const workerStatusSchema: Schema = new Schema({
-  online: {
-    type: Boolean,
-    default: false,
-  },
-  remoteAddress: {
-    type: String,
-  },
-  connectionId: {
-    type: String,
-  },
-});
-
 const workerSchema: Schema = new Schema({
   password: {
     type: String,
@@ -65,8 +52,16 @@ const workerSchema: Schema = new Schema({
     required: true
   },
   status: {
-    type: workerStatusSchema,
-    default: { online: false },
+    online: {
+      type: Boolean,
+      default: false,
+    },
+    remoteAddress: {
+      type: String,
+    },
+    connectionId: {
+      type: String,
+    },
   },
   runningInstances: {
     type: Number,
