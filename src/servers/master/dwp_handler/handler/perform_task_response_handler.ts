@@ -14,11 +14,12 @@ export async function execute(pdu: PerformTaskResponse, worker: IWorker): Promis
       }
 
 
-      if (task.worker !== worker._id) {
+      if (task.worker !== worker._id.toString()) {
         const response: TerminateTask = {
           type: ProtocolType.TerminateTask,
           taskId: task.id,
         }
+
         // There is already a worker executing it
         await connectionManager.send(worker, response);
         return;
