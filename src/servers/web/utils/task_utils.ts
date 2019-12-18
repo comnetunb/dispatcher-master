@@ -70,7 +70,7 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
   await createTasks(taskSet._id, template, inputLabels, processedInputs, 0, []);
-  const tasksCount = await Task.count({ _taskSet: taskSet._id });
+  const tasksCount = await Task.countDocuments({ _taskSet: taskSet._id });
   taskSet.totalTasksCount = tasksCount;
   await taskSet.save();
   await taskSet.updateRemainingTasksCount();

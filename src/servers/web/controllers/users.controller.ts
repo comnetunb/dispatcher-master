@@ -60,7 +60,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
     const info: RegisterUserRequest = req.body;
     const { email, name, password } = info;
 
-    const count = await User.count({});
+    const count = await User.countDocuments({});
     const hash = User.encryptPassword(password);
     let admin = false;
     let permitted = false;

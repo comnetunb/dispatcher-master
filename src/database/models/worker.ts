@@ -121,7 +121,7 @@ workerSchema.statics.getAvailables = async function (cpuThreshold: number, memor
 
 workerSchema.methods.updateRunningInstances = async function (): Promise<IWorker> {
   const worker: IWorker = this;
-  const count = await Task.count({ worker: worker._id });
+  const count = await Task.countDocuments({ worker: worker._id });
   worker.runningInstances = count;
   return await worker.save();
 };

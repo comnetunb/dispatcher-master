@@ -118,7 +118,7 @@ taskSetSchema.methods.updateRemainingTasksCount = async function (): Promise<ITa
     ]
   };
   const taskSet: ITaskSet = this;
-  const count = await Task.count(taskFilter);
+  const count = await Task.countDocuments(taskFilter);
   taskSet.remainingTasksCount = count;
   return await taskSet.save();
 };

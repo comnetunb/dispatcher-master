@@ -67,7 +67,7 @@ async function cascadeConclusion(tasksetId: ITaskSet): Promise<void> {
     ],
   };
 
-  const activeCount = await Task.count(taskFilter);
+  const activeCount = await Task.countDocuments(taskFilter);
   if (activeCount > 0) {
     return;
   }
@@ -101,7 +101,7 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
     ],
   };
 
-  const failedCount = await Task.count(taskFilter);
+  const failedCount = await Task.countDocuments(taskFilter);
   let result = Result.Success;
   if (failedCount > 0) {
     result = Result.Warning;
@@ -118,15 +118,75 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
   await notification.save();
 }
 
+async function dateString(milliseconds: number) {
+  const second = 1000;
+  const minute = 60 * second;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+
+  const days = Math.floor(milliseconds / day);
+  milliseconds = milliseconds % day;
+  const hours = Math.floor(milliseconds / hour);
+  milliseconds = milliseconds % hour;
+  const minutes = Math.floor(milliseconds / minute);
+  milliseconds = milliseconds % minute;
+  const seconds = Math.floor(milliseconds / second);
+
+  const values = [];
+  if (days > 0) {
+    values.push([days, days == 1 ? 'day' : 'days']);
+  }
+  if (hours > 0) {
+    values.push([hours, hours == 1 ? 'hour' : 'hours']);
+  }
+  if (minutes > 0) {
+    values.push([minutes, minutes == 1 ? 'minute' : 'minutes']);
+  }
+  if (seconds > 0) {
+    values.push([seconds, seconds == 1 ? 'second' : 'seconds']);
+  }
+
+  let value = '';
+  for (let i = 0; i < values.length; i++) {
+    let cur = `${values[i][0]} ${values[i][1]}`;
+
+
+    if (i != 0 && i == values.length - 1) value += ' and ';
+    else if (i != 0) value += ', ';
+
+    value += cur;
+  }
+
+  return value;
+}
+
 async function sendConclusionEmail(taskSet: ITaskSet): Promise<void> {
   const to = taskSet._user.email;
   const subject = `Task set "${taskSet.name}" has finished`;
+  const difference = Math.abs(taskSet.startTime.getTime() - taskSet.endTime.getTime());
+
+  const finishedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Finished });
+  const failedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Failed });
+  const canceledTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Canceled });
+  const duration = await dateString(difference + 123456958000);
 
   // TODO: use template email
-  const text =
-    `Start time: ${taskSet.startTime}` +
-    `\nEnd time: ${taskSet.endTime}` +
-    `\nPriority: ${taskSet.priority}`;
+  const text = `
+The task set ${taskSet.name} has finished after ${duration}.
+
+Taskset description: ${taskSet.description}
+
+Argument template string: ${taskSet.argumentTemplate}
+
+Start time: ${taskSet.startTime}
+End time: ${taskSet.endTime}
+Duration: ${duration}
+Priority: ${taskSet.priority}
+
+Total tasks: ${taskSet.totalTasksCount}
+Finished tasks: ${finishedTasks}
+Failed tasks: ${failedTasks}
+Canceled tasks: ${canceledTasks}`;
 
   await mailer.sendMail(to, subject, text);
 }
