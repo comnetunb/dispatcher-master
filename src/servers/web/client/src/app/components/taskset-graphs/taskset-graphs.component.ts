@@ -24,6 +24,25 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
   loadingCharts: boolean = false;
   graphInterval: Subscription = null;
 
+  defaultColors: string[] = [
+    '#3969b1', // blue
+    '#da7c30', // orange
+    '#3e9651', // green
+    '#cc2529', // red
+    '#535154', // gray
+    '#6b4c9a', // purple
+    '#922428', // darker red
+    '#948b3d', // darker yellow
+  ]
+
+  getColor(i: number): string {
+    if (i < this.defaultColors.length) {
+      return this.defaultColors[i];
+    }
+
+    return '#' + Math.random().toString(16).slice(2, 8);
+  }
+
   get loading(): boolean {
     return this.loadingTaskset || this.loadingPlotinfo || this.loadingCharts;
   }
@@ -89,11 +108,12 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
         datasets: [{ data: [] }],
       });
     }
+
     this.graphInterval = interval(2000).subscribe(() => {
       this.loadingCharts = false;
       let infos = this.charts.map(c => c.info);
       this.tasksetChartService.set(this.taskset._id, infos);
-      this.tasksetChartService.plotData(tasksetId, infos).subscribe(graphs => {
+      let plotDataSub = this.tasksetChartService.plotData(tasksetId, infos).subscribe(graphs => {
         for (let i = 0; i < graphs.length; i++) {
           let data = graphs[i];
           let chartDataSets: ChartDataSets[] = [];
@@ -101,7 +121,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
           let j = 0;
           for (let curve in data) {
             let previous = this.charts[i].datasets[j];
-            let color = "#" + Math.random().toString(16).slice(2, 8);
+            let color = this.getColor(j);
             if (previous) {
               color = previous.borderColor as string;
             }
@@ -125,11 +145,11 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
               let xx = avg[x];
               final.push({ x: xx.xValue, y: (xx.yValueSum / xx.yCount) });
             }
+
             if (previous) {
               this.charts[i].datasets[j].data = final;
               this.charts[i].datasets[j].label = `${infos[i].curve} ${curve}`;
             } else {
-              let color = "#" + Math.random().toString(16).slice(2, 8);
               let dataset: ChartDataSets = {
                 data: final,
                 label: `${infos[i].curve} ${curve}`,
@@ -141,11 +161,13 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
               };
               this.charts[i].datasets.push(dataset);
             }
+
             j++;
           }
           this.charts[i].datasets.length = j;
         }
         // if (this.graphInterval) this.graphInterval.unsubscribe();
+        plotDataSub.unsubscribe();
       });
     });
   }
