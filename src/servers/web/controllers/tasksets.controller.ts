@@ -30,7 +30,7 @@ export async function getTaskSets(req: Request, res: Response): Promise<void | R
 export async function createTaskSet(req: Request, res: Response): Promise<void | Response> {
   try {
     let request: CreateTasksetRequest = req.body;
-    const taskset = await taskUtils.buildTasks(request, req.user);
+    const taskset = await taskUtils.createTaskset(request, req.user);
     return res.send(taskset);
   } catch (error) {
     logger.error(error);

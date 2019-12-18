@@ -21,7 +21,7 @@ interface ProcessedInput {
   innerIndex: number;
 }
 
-export async function buildTasks(request: CreateTasksetRequest, user: IUser): Promise<ITaskSet> {
+export async function createTaskset(request: CreateTasksetRequest, user: IUser): Promise<ITaskSet> {
   const existingTaskset = await TaskSet.findOne({ name: request.name, _user: user._id });
   if (existingTaskset != null) {
     throw 'There already exists a Task Set with this name.';
@@ -69,7 +69,14 @@ export async function buildTasks(request: CreateTasksetRequest, user: IUser): Pr
   taskSet = await taskSet.save();
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
-  await createTasks(taskSet._id, template, inputLabels, processedInputs, 0, []);
+  let tasks = await createTasks(taskSet._id, template, inputLabels, processedInputs);
+
+  const tasksSavePromises: Promise<ITask>[] = [];
+  for (let task of tasks) {
+    tasksSavePromises.push(task.save());
+  }
+  await Promise.all(tasksSavePromises);
+
   const tasksCount = await Task.countDocuments({ _taskSet: taskSet._id });
   taskSet.totalTasksCount = tasksCount;
   await taskSet.save();
@@ -88,10 +95,29 @@ async function getCommandFromTemplateAndInputs(template: string, inputs: Process
   return processed;
 }
 
-async function createTasks(tasksetId: string, template: string, inputLabels: string[], inputs: string[][], curLevel: number, curInput: ProcessedInput[]): Promise<any> {
-  const promises: Promise<any>[] = [];
+async function createTasks(tasksetId: string, template: string, inputLabels: string[], inputs: string[][]): Promise<ITask[]> {
+  const tasks: ITask[] = [];
 
-  if (curLevel == inputs.length) {
+  let processedInputs: ProcessedInput[][] = [[]];
+
+  for (let curLevel = 0; curLevel < inputs.length; curLevel++) {
+    let newProcessedInputs: ProcessedInput[][] = [];
+    for (let i = 0; i < processedInputs.length; i++) {
+      for (let j = 0; j < inputs[curLevel].length; j++) {
+        const newInput = processedInputs[i].slice();
+        newInput.push({
+          input: inputs[curLevel][j],
+          index: curLevel,
+          innerIndex: j,
+        });
+        newProcessedInputs.push(newInput);
+      }
+    }
+    processedInputs = newProcessedInputs;
+  }
+
+  for (let i = 0; i < processedInputs.length; i++) {
+    let curInput = processedInputs[i];
     const command = await getCommandFromTemplateAndInputs(template, curInput);
     let precedence = 0;
     let indexes = [];
@@ -112,21 +138,10 @@ async function createTasks(tasksetId: string, template: string, inputLabels: str
       precedence,
       arguments: args,
     });
-    return newTask.save();
+    tasks.push(newTask);
   }
 
-  for (let i = 0; i < inputs[curLevel].length; i++) {
-    const newInput = curInput.slice();
-    newInput.push({
-      input: inputs[curLevel][i],
-      index: curLevel,
-      innerIndex: i,
-    });
-
-    promises.push(createTasks(tasksetId, template, inputLabels, inputs, curLevel + 1, newInput));
-  }
-
-  return Promise.all(promises);
+  return tasks;
 }
 
 function processStartEndStepInput(input: string) {
