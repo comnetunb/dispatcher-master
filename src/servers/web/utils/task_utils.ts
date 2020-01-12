@@ -94,6 +94,7 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
   taskset._files = [];
   taskset.inputLabels = [];
   taskset.inputs = request.inputs;
+  taskset.argumentTemplate = request.template;
 
   const inputs = request.inputs.sort((a, b) => {
     if (a.priority > b.priority) return 1;

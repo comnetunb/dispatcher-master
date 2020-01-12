@@ -174,7 +174,7 @@ async function sendConclusionEmail(taskSet: ITaskSet): Promise<void> {
   const finishedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Finished });
   const failedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Failed });
   const canceledTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Canceled });
-  const duration = await dateString(difference + 123456958000);
+  const duration = await dateString(difference);
 
   // TODO: use template email
   const text = `
