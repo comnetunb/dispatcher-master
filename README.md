@@ -56,3 +56,5 @@ $ npm run build
 Right now you have a full generate website under the `dispatcher-master/src/servers/web/client/dist/client` directory. You can serve it using the server of your choice, such as Nginx, Apache or related.
 
 Here you can find more details: [Angular Deployment Guide - Server Configuration](https://angular.io/guide/deployment#server-configuration)
+
+**IMPORTANT**: The angular server must run on the **same host** as the master one, started with `forever` and be listening on **port 4200**. Why? The master server will act as a proxy for all non-api http requests. Requesting them to `http://localhost:4200`.
