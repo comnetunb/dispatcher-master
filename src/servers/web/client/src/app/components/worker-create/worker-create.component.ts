@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RegisterUserRequest } from '../../api/register-user-request';
 import { getErrorMessage } from '../../classes/utils';
 import { WorkerCreateRequest } from '../../api/worker-create-request';
@@ -23,7 +23,8 @@ export class WorkerCreateComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
-    private workerService: WorkerService
+    private workerService: WorkerService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -68,7 +69,11 @@ export class WorkerCreateComponent implements OnInit {
     };
 
     this.workerService.create(request)
-      .subscribe(() => { this.loading = false; },
+      .subscribe(() => {
+        this.loading = false;
+        this.loading = false;
+        this.router.navigate(['..'], { relativeTo: this.route });
+      },
         (error) => {
           this.loading = false;
           this.errorMessage = getErrorMessage(error);
