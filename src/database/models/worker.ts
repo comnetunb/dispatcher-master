@@ -161,8 +161,6 @@ workerSchema.methods.updateRunningInstances = async function (): Promise<IWorker
   return await worker.save();
 };
 
-workerSchema.index({ address: 1, port: 1 }, { unique: true });
-
 export const Worker: IWorkerModel = model<IWorker, IWorkerModel>('Worker', workerSchema);
 
 export default Worker;
