@@ -45,7 +45,7 @@ import { DialogNotificationsComponent } from './components/dialog-notifications/
 import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
 import { DialogService } from './services/dialog.service';
 import { GraphComponent } from './components/graph/graph.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { ChartsModule } from 'ng2-charts';
 import { SettingsComponent } from './components/settings/settings.component';
 import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
@@ -139,6 +139,10 @@ import { TasksetEditComponent } from './components/taskset-edit/taskset-edit.com
       provide: HTTP_INTERCEPTORS,
       useClass: AdminModeInterceptor,
       multi: true
+    },
+    {
+      provide: LocationStrategy,
+      useClass: PathLocationStrategy,
     },
     DialogService,
   ],
