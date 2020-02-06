@@ -343,12 +343,13 @@ export async function exportTaskSet(tasksetId: string, format: ExportFormat = Ex
 
   await Promise.all(promises);
 
-  const zipPath = `${tmpPath.name}/${taskset.name}.zip`;
+  const tmpZipPath = tmp.dirSync();
+  const zipPath = `${tmpZipPath.name}/${taskset.name}.zip`;
   await zipDirectory(tmpPath.name, zipPath);
   return zipPath;
 };
 
-function zipDirectory(source: string, out: fs.PathLike): Promise<void> {
+function zipDirectory(source: string, out: fs.PathLike): Promise<string> {
   const archive = archiver('zip', { zlib: { level: 9 } });
   const stream = fs.createWriteStream(out);
 
