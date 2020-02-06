@@ -60,6 +60,7 @@ const workerSchema: Schema = new Schema({
     online: {
       type: Boolean,
       default: false,
+      index: true,
     },
     remoteAddress: {
       type: String,
@@ -74,18 +75,31 @@ const workerSchema: Schema = new Schema({
   },
   state: {
     type: Number,
+    index: true,
   },
   resource: {
     outdated: {
       type: Boolean,
       default: true
     },
-    cpu: Number,
-    memory: Number
+    cpu: {
+      type: Number,
+      index: true,
+    },
+    memory: {
+      type: Number,
+      index: true,
+    }
   },
   resourceLimit: {
-    cpu: Number,
-    memory: Number
+    cpu: {
+      type: Number,
+      index: true,
+    },
+    memory: {
+      type: Number,
+      index: true,
+    }
   },
   performance: {
     ratio: Number,

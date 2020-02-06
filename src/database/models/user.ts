@@ -32,7 +32,8 @@ const userSchema: Schema = new Schema({
     required: true,
     lowercase: true,
     trim: true,
-    unique: true
+    unique: true,
+    index: true,
   },
   name: {
     type: String,
@@ -49,15 +50,18 @@ const userSchema: Schema = new Schema({
   pending: {
     type: Boolean,
     default: true,
+    index: true,
   },
   permitted: {
     type: Boolean,
     required: false,
+    index: true,
   },
   tokens: [{
     token: {
       type: String,
-      required: true
+      required: true,
+      index: true,
     }
   }]
 });

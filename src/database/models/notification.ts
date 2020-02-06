@@ -31,6 +31,7 @@ const notificationSchema: Schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    index: true,
   },
   tasksetId: {
     type: Schema.Types.ObjectId,
@@ -61,6 +62,7 @@ const notificationSchema: Schema = new Schema({
     type: Boolean,
     required: true,
     default: false,
+    index: true,
   }
 });
 

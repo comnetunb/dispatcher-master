@@ -37,14 +37,17 @@ const taskSchema: Schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'TaskSet',
     required: true,
+    index: true,
   },
   arguments: [{
     type: String,
     required: true,
+    index: true,
   }],
   commandLine: {
     type: String,
     required: true,
+    index: true,
   },
   precedence: {
     type: Number,
@@ -57,10 +60,12 @@ const taskSchema: Schema = new Schema({
   },
   worker: {
     type: String,
+    index: true,
   },
   state: {
     type: Number,
     default: OperationState.Pending,
+    index: true,
   },
   priority: {
     type: Number,
@@ -136,6 +141,8 @@ taskSchema.methods.isCanceled = function (): boolean {
 taskSchema.methods.isFailed = function (): boolean {
   return this.state === OperationState.Failed;
 };
+
+taskSchema.index({ priority: -1, precedence: 1 });
 
 export const Task: ITaskModel = model<ITask, ITaskModel>('Task', taskSchema);
 
