@@ -55,6 +55,7 @@ import { WorkerStatusPipe } from './pipes/worker-status.pipe';
 import { DialogConfigFileComponent } from './components/dialog-config-file/dialog-config-file.component';
 import { WorkerEditComponent } from './components/worker-edit/worker-edit.component';
 import { TasksetEditComponent } from './components/taskset-edit/taskset-edit.component';
+import { PriorityPipe } from './pipes/priority.pipe';
 
 @NgModule({
   declarations: [
@@ -100,6 +101,7 @@ import { TasksetEditComponent } from './components/taskset-edit/taskset-edit.com
     DialogConfigFileComponent,
     WorkerEditComponent,
     TasksetEditComponent,
+    PriorityPipe,
   ],
   imports: [
     CommonModule,

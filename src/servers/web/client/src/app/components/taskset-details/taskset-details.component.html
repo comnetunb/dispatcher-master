@@ -20,6 +20,7 @@
                 </a> Details</h3>
               <p mat-line>Name: {{taskset.name}}</p>
               <p mat-line *ngIf="taskset.description">Description: {{taskset.description}}</p>
+              <p mat-line>Priority: {{taskset.priority | priority}}</p>
               <p mat-line>Command Template: {{taskset.argumentTemplate}}</p>
               <p mat-line>Error Limit: {{taskset.errorLimitCount}}</p>
               <p mat-line>
