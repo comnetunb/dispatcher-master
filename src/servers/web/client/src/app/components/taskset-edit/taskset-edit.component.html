@@ -4,14 +4,24 @@
     <form [formGroup]="form" (submit)="submit()">
 
       <div class="row">
-        <mat-form-field class="col">
+        <mat-form-field class="col-6">
           <input matInput placeholder="Name" formControlName="name">
           <mat-error>{{getErrorMessage('name')}}</mat-error>
         </mat-form-field>
 
-        <mat-form-field class="col">
+        <mat-form-field class="col-2">
           <input matInput type="number" placeholder="Error Count Limit" formControlName="errorCountLimit">
           <mat-error>{{getErrorMessage('errorCountLimit')}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-2">
+          <mat-select placeholder="Priority" formControlName="priority">
+            <mat-option [value]="0">Minimum</mat-option>
+            <mat-option [value]="1">Low</mat-option>
+            <mat-option [value]="2">Normal</mat-option>
+            <mat-option [value]="3">High</mat-option>
+            <mat-option [value]="4">Urgent</mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
 

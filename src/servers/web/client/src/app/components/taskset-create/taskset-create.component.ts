@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, FormControl } from '@angular/forms';
 import { TasksetService } from '../../services/taskset.service';
-import { Modifier, InputType } from '../../../../../../../api/enums';
+import { Modifier, InputType, TaskSetPriority } from '../../../../../../../api/enums';
 import { IFile } from '../../../../../../../database/models/file';
 import { FilesService } from '../../services/files.service';
 import { ReplaySubject, Subject } from 'rxjs';
@@ -55,6 +55,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       runnable: ['', Validators.required],
       runnableType: ['', Validators.required],
       template: ['', Validators.required],
+      priority: [TaskSetPriority.Normal, Validators.required],
       inputs: this.inputs,
     });
 
@@ -83,6 +84,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
           runnable: ts._runnable,
           runnableType: ts._runnableType,
           template: ts.argumentTemplate,
+          priority: ts.priority,
           inputs: [],
         };
         this.form.setValue(value);
@@ -131,6 +133,7 @@ export class TasksetCreateComponent implements OnInit, OnDestroy {
       runnableId: formValue.runnable,
       runnableType: formValue.runnableType,
       template: formValue.template,
+      priority: formValue.priority,
       inputs: inputs,
     };
 

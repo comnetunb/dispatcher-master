@@ -39,7 +39,7 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
     state: OperationState.Executing,
     remainingTasksCount: 0,
     totalTasksCount: 0,
-    priority: TaskSetPriority.Normal,
+    priority: request.priority,
     inputLabels: [],
     _files: [],
   });
@@ -95,6 +95,7 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
   taskset.inputLabels = [];
   taskset.inputs = request.inputs;
   taskset.argumentTemplate = request.template;
+  taskset.priority = request.priority;
 
   const inputs = request.inputs.sort((a, b) => {
     if (a.priority > b.priority) return 1;
