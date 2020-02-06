@@ -113,15 +113,13 @@ async function batchDispatch(): Promise<void> {
 
   const tasks = await Task.find(taskFilter)
     .populate(taskPopulate)
-    .sort({ precedence: 1 })
+    .sort({ priority: -1, precedence: 1 })
     .limit(availableWorkers.length);
 
   if (!tasks) {
     // No tasks are pending
     return;
   }
-
-  const promises: Promise<ITask>[] = [];
 
   for (let i = 0; i < tasks.length; i += 1) {
     try {

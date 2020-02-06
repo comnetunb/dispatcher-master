@@ -69,7 +69,7 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
   taskSet = await taskSet.save();
   let runnable = await File.findById(taskSet._runnable);
   let template = `${taskSet._runnableType} ${runnable.name} ${taskSet.argumentTemplate}`;
-  let tasks = await createTasks(taskSet._id, template, processedInputs);
+  let tasks = await createTasks(taskSet, template, processedInputs);
 
   const tasksSavePromises: Promise<ITask>[] = [];
   for (let task of tasks) {
@@ -125,7 +125,7 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
 
   let runnable = await File.findById(taskset._runnable);
   let template = `${taskset._runnableType} ${runnable.name} ${taskset.argumentTemplate}`;
-  let tasks = await createTasks(taskset._id, template, processedInputs);
+  let tasks = await createTasks(taskset, template, processedInputs);
 
   let newTasks = false;
 
@@ -141,6 +141,7 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
       return await task.save();
     }
 
+    existingTask.priority = request.priority;
     existingTask.precedence = task.precedence;
     existingTask.underEdit = false;
     return await existingTask.save();
@@ -170,7 +171,7 @@ async function getCommandFromTemplateAndInputs(template: string, inputs: Process
   return processed;
 }
 
-async function createTasks(tasksetId: string, template: string, inputs: string[][]): Promise<ITask[]> {
+async function createTasks(taskset: ITaskSet, template: string, inputs: string[][]): Promise<ITask[]> {
   const tasks: ITask[] = [];
 
   let processedInputs: ProcessedInput[][] = [[]];
@@ -205,10 +206,11 @@ async function createTasks(tasksetId: string, template: string, inputs: string[]
     }
 
     const newTask = new Task({
-      _taskSet: tasksetId,
+      _taskSet: taskset._id,
       commandLine: command,
       precedence,
       arguments: args,
+      priority: taskset.priority,
     });
     tasks.push(newTask);
   }
