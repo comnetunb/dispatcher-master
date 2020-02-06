@@ -108,9 +108,9 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
   };
 
   const failedCount = await Task.countDocuments(taskFilter);
-  let result = Result.Success;
+  let result = "Success";
   if (failedCount > 0) {
-    result = Result.Warning;
+    result = "Warning";
   }
 
   const notification = new Notification({
