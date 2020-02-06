@@ -1,5 +1,5 @@
 import { model, Schema, Document, Model } from 'mongoose';
-import { OperationState, Result } from '../../api/enums';
+import { OperationState, Result, TaskSetPriority } from '../../api/enums';
 import TaskSet, { ITaskSet } from './taskSet';
 
 interface ITaskDocument extends Document {
@@ -11,6 +11,7 @@ interface ITaskDocument extends Document {
   errorCount: number,
   worker?: string,
   state: OperationState,
+  priority: TaskSetPriority,
   result?: string,
   startTime?: Date,
   endTime?: Date,
@@ -60,6 +61,11 @@ const taskSchema: Schema = new Schema({
   state: {
     type: Number,
     default: OperationState.Pending,
+  },
+  priority: {
+    type: Number,
+    default: TaskSetPriority.Normal,
+    required: true,
   },
   result: {
     type: String,
