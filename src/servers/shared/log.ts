@@ -12,51 +12,48 @@ configure({
   },
 });
 
-const logger = getLogger();
+const _logger = getLogger();
 
-async function createLog(
-  message: string,
-  level: LogLevel,
-  taskId?: string
-): Promise<ILog> {
+function saveLog(message: string, level: LogLevel, taskId?: string): void {
   const log = new Log({
     log: message,
     date: Date.now(),
     level: level,
     taskId,
   });
-  await log.save();
-  return log;
+  log.save().catch(() => {});
 }
 
-export async function trace(message: any, taskId?: string): Promise<void> {
-  logger.trace(message);
-  await createLog(message, LogLevel.Trace, taskId);
+class Logger {
+  trace(message: any, taskId?: string): void {
+    _logger.trace(message);
+    saveLog(message, LogLevel.Trace, taskId);
+  }
+
+  debug(message: any, taskId?: string): void {
+    _logger.debug(message);
+    saveLog(message, LogLevel.Debug, taskId);
+  }
+
+  info(message: any, taskId?: string): void {
+    _logger.info(message);
+    saveLog(message, LogLevel.Info, taskId);
+  }
+
+  warn(message: any, taskId?: string): void {
+    _logger.warn(message);
+    saveLog(message, LogLevel.Warn, taskId);
+  }
+
+  error(message: any, taskId?: string): void {
+    _logger.error(message);
+    saveLog(message, LogLevel.Error, taskId);
+  }
+
+  fatal(message: any, taskId?: string): void {
+    _logger.fatal(message);
+    saveLog(message, LogLevel.Fatal, taskId);
+  }
 }
 
-export async function debug(message: any, taskId?: string): Promise<void> {
-  logger.debug(message);
-  await createLog(message, LogLevel.Debug, taskId);
-}
-
-export async function info(message: any, taskId?: string): Promise<void> {
-  logger.info(message);
-  await createLog(message, LogLevel.Info, taskId);
-}
-
-export async function warn(message: any, taskId?: string): Promise<void> {
-  logger.warn(message);
-  await createLog(message, LogLevel.Warn, taskId);
-}
-
-export async function error(message: any, taskId?: string): Promise<void> {
-  logger.error(message);
-  await createLog(message, LogLevel.Error, taskId);
-}
-
-export async function fatal(message: any, taskId?: string): Promise<void> {
-  logger.fatal(message);
-  await createLog(message, LogLevel.Fatal, taskId);
-}
-
-export default { trace, debug, info, warn, error, fatal };
+export default new Logger();

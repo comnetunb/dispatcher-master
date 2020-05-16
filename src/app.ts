@@ -11,6 +11,8 @@ dbDriver()
 
     // Initialize WEB Server
     webServer();
+
+    return null;
   })
   .catch((e) => {
     logger.error(e);

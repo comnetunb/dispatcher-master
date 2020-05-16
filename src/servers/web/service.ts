@@ -6,6 +6,7 @@ import indexRouter from "./routers/index.router";
 import { IUser } from "../../database/models/user";
 import { auth } from "./middlewares/auth";
 import ServerConfiguration from "../../config/server_configuration";
+import logger from "../shared/log";
 
 // Extending Request to properly type our users
 declare global {
@@ -38,5 +39,6 @@ app.use("/api", indexRouter);
 app.use(apiProxy);
 
 export = () => {
+  logger.info(`Server listening on port ${ServerConfiguration.api.port}`);
   app.listen(ServerConfiguration.api.port, "0.0.0.0");
 };
