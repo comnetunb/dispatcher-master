@@ -1,22 +1,22 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
-import { ITaskSet } from "../../../../../../../database/models/taskSet";
-import { ActivatedRoute, Router } from "@angular/router";
-import { TasksetService } from "../../services/taskset.service";
-import { DialogService } from "../../services/dialog.service";
-import { getErrorMessage } from "../../classes/utils";
-import { TasksetChartService } from "../../services/taskset-chart.service";
-import { ChartOptions, ChartData, ChartDataSets } from "chart.js";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ITaskSet } from '../../../../../../../database/models/taskSet';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TasksetService } from '../../services/taskset.service';
+import { DialogService } from '../../services/dialog.service';
+import { getErrorMessage } from '../../classes/utils';
+import { TasksetChartService } from '../../services/taskset-chart.service';
+import { ChartOptions, ChartData, ChartDataSets } from 'chart.js';
 import {
   TasksetChartInfo,
   TasksetChart,
-} from "../../classes/taskset-chart-config";
-import { PlotInfo } from "../../../../../api/plotInfo";
-import { Subscription, interval } from "rxjs";
+} from '../../classes/taskset-chart-config';
+import { PlotInfo } from '../../../../../api/plotInfo';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
-  selector: "app-taskset-graphs",
-  templateUrl: "./taskset-graphs.component.html",
-  styleUrls: ["./taskset-graphs.component.scss"],
+  selector: 'app-taskset-graphs',
+  templateUrl: './taskset-graphs.component.html',
+  styleUrls: ['./taskset-graphs.component.scss'],
 })
 export class TasksetGraphsComponent implements OnInit, OnDestroy {
   charts: TasksetChart[] = [];
@@ -28,21 +28,21 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
   graphInterval: Subscription = null;
 
   defaultColors: string[] = [
-    "#3969b1", // blue
-    "#da7c30", // orange
-    "#3e9651", // green
-    "#cc2529", // red
-    "#535154", // gray
-    "#6b4c9a", // purple
-    "#922428", // darker red
-    "#948b3d", // darker yellow
+    '#3969b1', // blue
+    '#da7c30', // orange
+    '#3e9651', // green
+    '#cc2529', // red
+    '#535154', // gray
+    '#6b4c9a', // purple
+    '#922428', // darker red
+    '#948b3d', // darker yellow
   ];
 
   standardOptions: ChartOptions = {
     scales: {
       xAxes: [
         {
-          type: "linear",
+          type: 'linear',
           display: true,
           scaleLabel: {
             display: true,
@@ -73,7 +73,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
       return this.defaultColors[i];
     }
 
-    return "#" + Math.random().toString(16).slice(2, 8);
+    return '#' + Math.random().toString(16).slice(2, 8);
   }
 
   get loading(): boolean {
@@ -100,9 +100,9 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
       (err) => {
         console.error(err);
         this.dialogService
-          .alert(getErrorMessage(err), "Could not load the Taskset")
+          .alert(getErrorMessage(err), 'Could not load the Taskset')
           .subscribe(() => {
-            this.router.navigate([".."], { relativeTo: this.route });
+            this.router.navigate(['..'], { relativeTo: this.route });
           });
       }
     );
@@ -211,7 +211,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
         xAxis: null,
         yAxis: null,
         curve: null,
-        type: "scatter",
+        type: 'scatter',
         legend: true,
       },
       datasets: [{ data: [] }],
