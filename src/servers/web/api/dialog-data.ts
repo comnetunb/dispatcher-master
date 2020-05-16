@@ -11,4 +11,5 @@ export interface DialogNotificationsData {
 
 export interface DialogConfigFileData {
   workerId: string;
+  workerApiPort: number;
 }

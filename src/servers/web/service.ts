@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 // New hostname+path as specified by question:
-const proxyUri = `http://${ServerConfiguration.api.proxyHost}:${ServerConfiguration.api.proxyPort}`;
+const proxyUri = `http://${ServerConfiguration.webApi.proxyHost}:${ServerConfiguration.webApi.proxyPort}`;
 const apiProxy = createProxyMiddleware("**", { target: proxyUri });
 
 app.use("/api", auth);
@@ -39,6 +39,6 @@ app.use("/api", indexRouter);
 app.use(apiProxy);
 
 export = () => {
-  logger.info(`Server listening on port ${ServerConfiguration.api.port}`);
-  app.listen(ServerConfiguration.api.port, "0.0.0.0");
+  logger.info(`Server listening on port ${ServerConfiguration.webApi.port}`);
+  app.listen(ServerConfiguration.webApi.port, "0.0.0.0");
 };

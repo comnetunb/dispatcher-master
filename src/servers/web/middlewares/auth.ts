@@ -8,7 +8,7 @@ export interface JWTData {
   _id: string;
 }
 
-export const AuthSecretKey = ServerConfiguration.api.authSecretKey;
+export const AuthSecretKey = ServerConfiguration.webApi.authSecretKey;
 
 export async function auth(req: any, res: Response, next: NextFunction) {
   if (

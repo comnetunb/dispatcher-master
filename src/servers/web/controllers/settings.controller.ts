@@ -4,6 +4,8 @@ import httpStatusCodes from "../utils/httpStatusCodes";
 import Configuration from "../../../database/models/configuration";
 import { EditSettingsRequest } from "../api/edit-settings-request";
 import { startRoutines } from "../../master/master";
+import ServerConfiguration from "../../../config/server_configuration";
+import { LimitedServerConfiguration } from "../api/server-configuration";
 
 export async function get(
   req: Request,
@@ -16,6 +18,26 @@ export async function get(
   try {
     let settings = await Configuration.get();
     return res.send(settings);
+  } catch (error) {
+    logger.error(error);
+    return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
+}
+
+export async function getServer(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
+  if (!req.user.admin) {
+    return res.sendStatus(httpStatusCodes.FORBIDDEN);
+  }
+
+  try {
+    const response: LimitedServerConfiguration = {
+      workerApiPort: ServerConfiguration.workerApi.port,
+    };
+
+    return res.send(response);
   } catch (error) {
     logger.error(error);
     return res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });

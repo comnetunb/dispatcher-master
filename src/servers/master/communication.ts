@@ -10,6 +10,7 @@ import io from "socket.io";
 import { socketIOAuth } from "./authentication";
 import Worker, { IWorker } from "../../database/models/worker";
 import Task from "../../database/models/task";
+import ServerConfiguration from "../../config/server_configuration";
 
 const httpServer = http.createServer();
 const server = io(httpServer);
@@ -45,7 +46,7 @@ export async function execute(): Promise<void> {
 
   socketIOAuth(server, postAuthenticate, disconnect);
   // Open worker
-  httpServer.listen(16180, "0.0.0.0", () => {
+  httpServer.listen(ServerConfiguration.workerApi.port, "0.0.0.0", () => {
     let addressInfo = httpServer.address() as net.AddressInfo;
     if (addressInfo.port) {
       logger.info(

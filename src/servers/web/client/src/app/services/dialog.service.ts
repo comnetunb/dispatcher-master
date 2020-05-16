@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { DialogOverviewComponent } from '../components/dialog-overview/dialog-overview.component';
 import { Observable } from 'rxjs';
 import { DialogAlertComponent } from '../components/dialog-alert/dialog-alert.component';
 import { DialogConfirmComponent } from '../components/dialog-confirm/dialog-confirm.component';
@@ -9,16 +8,13 @@ import { DialogNotificationsComponent } from '../components/dialog-notifications
 import { DialogConfigFileComponent } from '../components/dialog-config-file/dialog-config-file.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DialogService {
-
-  constructor(
-    private dialog: MatDialog
-  ) { }
+  constructor(private dialog: MatDialog) {}
 
   alert(message: string, title?: string): Observable<any> {
-    let dialogRef = this.dialog.open(DialogAlertComponent, {
+    const dialogRef = this.dialog.open(DialogAlertComponent, {
       width: '500px',
       data: {
         message,
@@ -26,10 +22,10 @@ export class DialogService {
       },
     });
     return dialogRef.afterClosed();
-  };
+  }
 
   confirm(message: string, title?: string): Observable<any> {
-    let dialogRef = this.dialog.open(DialogConfirmComponent, {
+    const dialogRef = this.dialog.open(DialogConfirmComponent, {
       width: '500px',
       data: {
         message,
@@ -40,7 +36,7 @@ export class DialogService {
   }
 
   notifications(notifications: INotification[]): Observable<any> {
-    let dialogRef = this.dialog.open(DialogNotificationsComponent, {
+    const dialogRef = this.dialog.open(DialogNotificationsComponent, {
       width: '500px',
       data: {
         notifications,
@@ -49,11 +45,12 @@ export class DialogService {
     return dialogRef.afterClosed();
   }
 
-  configFile(workerId: string): Observable<any> {
-    let dialogRef = this.dialog.open(DialogConfigFileComponent, {
+  configFile(workerId: string, workerApiPort: number): Observable<any> {
+    const dialogRef = this.dialog.open(DialogConfigFileComponent, {
       width: '500px',
       data: {
         workerId,
+        workerApiPort,
       },
     });
     return dialogRef.afterClosed();

@@ -4,16 +4,21 @@ interface IDatabaseConfiguration {
   data: string;
 }
 
-interface IAPIConfiguration {
+interface IWebAPIConfiguration {
   port: number;
   proxyHost: string;
   proxyPort: number;
   authSecretKey: string;
 }
 
-interface IServerConfiguration {
+interface IWorkerAPIConfiguration {
+  port: number;
+}
+
+export interface IServerConfiguration {
   database: IDatabaseConfiguration;
-  api: IAPIConfiguration;
+  webApi: IWebAPIConfiguration;
+  workerApi: IWorkerAPIConfiguration;
 }
 
 const defaultConfiguration: IServerConfiguration = {
@@ -22,11 +27,14 @@ const defaultConfiguration: IServerConfiguration = {
     port: 27017,
     data: "ons",
   },
-  api: {
+  webApi: {
     port: 8080,
     proxyHost: "localhost",
     proxyPort: 4200,
     authSecretKey: "abcde",
+  },
+  workerApi: {
+    port: 16180,
   },
 };
 
@@ -38,14 +46,21 @@ const ServerConfiguration: IServerConfiguration = {
       ? +process.env.DB_PORT
       : defaultConfiguration.database.port,
   },
-  api: {
-    proxyHost: process.env.PROXY_HOST || defaultConfiguration.api.proxyHost,
+  webApi: {
+    proxyHost: process.env.PROXY_HOST || defaultConfiguration.webApi.proxyHost,
     proxyPort: process.env.PROXY_PORT
       ? +process.env.PROXY_PORT
-      : defaultConfiguration.api.proxyPort,
-    port: process.env.PORT ? +process.env.PORT : defaultConfiguration.api.port,
+      : defaultConfiguration.webApi.proxyPort,
+    port: process.env.WEB_API_PORT
+      ? +process.env.WEB_API_PORT
+      : defaultConfiguration.webApi.port,
     authSecretKey:
-      process.env.AUTH_SECRET_KEY || defaultConfiguration.api.authSecretKey,
+      process.env.AUTH_SECRET_KEY || defaultConfiguration.webApi.authSecretKey,
+  },
+  workerApi: {
+    port: process.env.WORKER_API_PORT
+      ? +process.env.WORKER_API_PORT
+      : defaultConfiguration.workerApi.port,
   },
 };
 
