@@ -1,21 +1,20 @@
-import { model, Schema, Document, Model } from 'mongoose';
+import { model, Schema, Document, Model } from "mongoose";
 
 interface IConfigurationDocument extends Document {
-  cpuLimit: number,
-  memoryLimit: number,
-  requestResourceInterval: number,
-  dispatchInterval: number,
-  emailService: string,
-  emailUser: string,
-  emailPassword: string,
-  authTimeout: number,
+  cpuLimit: number;
+  memoryLimit: number;
+  requestResourceInterval: number;
+  dispatchInterval: number;
+  emailService: string;
+  emailUser: string;
+  emailPassword: string;
+  authTimeout: number;
 }
 
-export interface IConfiguration extends IConfigurationDocument {
-}
+export interface IConfiguration extends IConfigurationDocument {}
 
 interface IConfigurationModel extends Model<IConfiguration> {
-  get(): Promise<IConfiguration>,
+  get(): Promise<IConfiguration>;
 }
 
 const configurationSchema: Schema = new Schema({
@@ -29,11 +28,11 @@ const configurationSchema: Schema = new Schema({
   },
   requestResourceInterval: {
     type: Number,
-    default: 1000,
+    default: 1,
   },
   dispatchInterval: {
     type: Number,
-    default: 1000,
+    default: 1,
   },
   emailService: {
     type: String,
@@ -59,6 +58,9 @@ configurationSchema.statics.get = async function (): Promise<IConfiguration> {
   return configuration;
 };
 
-export const Configuration: IConfigurationModel = model<IConfiguration, IConfigurationModel>('Configuration', configurationSchema);
+export const Configuration: IConfigurationModel = model<
+  IConfiguration,
+  IConfigurationModel
+>("Configuration", configurationSchema);
 
 export default Configuration;
