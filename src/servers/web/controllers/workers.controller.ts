@@ -1,12 +1,12 @@
-import Worker from '../../../database/models/worker';
-import * as interfaceManager from '../../shared/interface_manager';
-import logger from '../../shared/log';
-import { Request, Response } from 'express';
-import httpStatusCodes from '../utils/httpStatusCodes';
-import { WorkerCreateRequest } from '../client/src/app/api/worker-create-request';
-import { WorkerEditRequest } from '../client/src/app/api/worker-edit-request';
-import bodyParser = require('body-parser');
-import Configuration from '../../../database/models/configuration';
+import Worker from "../../../database/models/worker";
+import * as interfaceManager from "../../shared/interface_manager";
+import logger from "../../shared/log";
+import { Request, Response } from "express";
+import httpStatusCodes from "../utils/httpStatusCodes";
+import { WorkerCreateRequest } from "../api/worker-create-request";
+import { WorkerEditRequest } from "../api/worker-edit-request";
+import bodyParser = require("body-parser");
+import Configuration from "../../../database/models/configuration";
 
 export function pauseWorker(req: Request, res: Response): void | Response {
   if (!req.user.admin) {
@@ -35,7 +35,10 @@ export function stopWorker(req: Request, res: Response): void | Response {
   res.sendStatus(httpStatusCodes.OK);
 }
 
-export async function getWorker(req: Request, res: Response): Promise<void | Response> {
+export async function getWorker(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let worker = await Worker.findById(req.params.workerId);
     return res.send(worker);
@@ -45,11 +48,14 @@ export async function getWorker(req: Request, res: Response): Promise<void | Res
   }
 }
 
-export async function editWorker(req: Request, res: Response): Promise<void | Response> {
+export async function editWorker(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let body: WorkerEditRequest = req.body;
     let worker = await Worker.findById(req.params.workerId);
-    if (!worker) throw 'Worker not found';
+    if (!worker) throw "Worker not found";
 
     worker.name = body.name;
     worker.description = body.description;
@@ -66,18 +72,28 @@ export async function editWorker(req: Request, res: Response): Promise<void | Re
   }
 }
 
-export async function getOnlineWorkers(req: Request, res: Response): Promise<void | Response> {
+export async function getOnlineWorkers(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let config = await Configuration.get();
-    let workers = await Worker.find({ 'status.online': true });
+    let workers = await Worker.find({ "status.online": true });
     for (let worker of workers) {
       let available = true;
-      if (worker.resourceLimit.cpu && worker.resource.cpu > worker.resourceLimit.cpu ||
-        !worker.resourceLimit.cpu && worker.resource.cpu > config.cpuLimit) {
+      if (
+        (worker.resourceLimit.cpu &&
+          worker.resource.cpu > worker.resourceLimit.cpu) ||
+        (!worker.resourceLimit.cpu && worker.resource.cpu > config.cpuLimit)
+      ) {
         available = false;
       }
-      if (worker.resourceLimit.memory && worker.resource.memory > worker.resourceLimit.memory ||
-        !worker.resourceLimit.memory && worker.resource.memory > config.memoryLimit) {
+      if (
+        (worker.resourceLimit.memory &&
+          worker.resource.memory > worker.resourceLimit.memory) ||
+        (!worker.resourceLimit.memory &&
+          worker.resource.memory > config.memoryLimit)
+      ) {
         available = false;
       }
       worker.available = available;
@@ -89,7 +105,10 @@ export async function getOnlineWorkers(req: Request, res: Response): Promise<voi
   }
 }
 
-export async function getAllWorkers(req: Request, res: Response): Promise<void | Response> {
+export async function getAllWorkers(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let workers = await Worker.find();
     return res.send(workers);
@@ -105,8 +124,9 @@ export async function createWorker(req: Request, res: Response) {
     const workerFilter = { name: request.name };
     const existingWorker = await Worker.findOne(workerFilter);
     if (existingWorker) {
-      res.status(httpStatusCodes.BAD_REQUEST)
-        .send({ error: 'There already is a worker with this name.' });
+      res
+        .status(httpStatusCodes.BAD_REQUEST)
+        .send({ error: "There already is a worker with this name." });
       return;
     }
 
@@ -120,12 +140,11 @@ export async function createWorker(req: Request, res: Response) {
       resourceLimit: {
         cpu: request.cpuLimit,
         memory: request.memoryLimit,
-      }
+      },
     });
     const worker = await newWorker.save();
     res.status(httpStatusCodes.CREATED).send(worker);
   } catch (error) {
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ error });
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }

@@ -1,13 +1,19 @@
-import TaskSet, { TaskSetFilter } from '../../../database/models/taskSet';
-import Task from '../../../database/models/task';
-import logger from '../../shared/log';
-import { Request, Response } from 'express';
-import * as taskUtils from '../utils/task_utils';
-import httpStatusCodes from '../utils/httpStatusCodes';
-import { OperationState } from '../../../api/enums';
-import { CreateTasksetRequest, EditTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
+import TaskSet, { TaskSetFilter } from "../../../database/models/taskSet";
+import Task from "../../../database/models/task";
+import logger from "../../shared/log";
+import { Request, Response } from "express";
+import * as taskUtils from "../utils/task_utils";
+import httpStatusCodes from "../utils/httpStatusCodes";
+import { OperationState } from "../../../api/enums";
+import {
+  CreateTasksetRequest,
+  EditTasksetRequest,
+} from "../api/create-taskset-request";
 
-export async function getTaskSets(req: Request, res: Response): Promise<void | Response> {
+export async function getTaskSets(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   const taskSetFilter: TaskSetFilter = {};
 
   if (!req.adminMode) {
@@ -27,7 +33,10 @@ export async function getTaskSets(req: Request, res: Response): Promise<void | R
   }
 }
 
-export async function createTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function createTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let request: CreateTasksetRequest = req.body;
     const taskset = await taskUtils.createTaskset(request, req.user);
@@ -38,7 +47,10 @@ export async function createTaskSet(req: Request, res: Response): Promise<void |
   }
 }
 
-export async function editTaskset(req: Request, res: Response): Promise<void | Response> {
+export async function editTaskset(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   try {
     let request: EditTasksetRequest = req.body;
     let taskset = await TaskSet.findById(req.params.id);
@@ -50,7 +62,10 @@ export async function editTaskset(req: Request, res: Response): Promise<void | R
   }
 }
 
-export async function removeTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function removeTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.id) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -74,7 +89,10 @@ export async function removeTaskSet(req: Request, res: Response): Promise<void |
   }
 }
 
-export async function cancelTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function cancelTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.id) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -85,21 +103,27 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
       return res.sendStatus(httpStatusCodes.NOT_FOUND);
     }
 
-    const taskFilter = { _taskSet: req.params.id, state: OperationState.Pending };
-    const taskSetFilter = { _id: req.params.id, state: OperationState.Executing };
+    const taskFilter = {
+      _taskSet: req.params.id,
+      state: OperationState.Pending,
+    };
+    const taskSetFilter = {
+      _id: req.params.id,
+      state: OperationState.Executing,
+    };
 
     await Task.updateMany(taskFilter, {
       $set: {
         state: OperationState.Canceled,
         endTime: new Date(),
-      }
+      },
     });
 
     taskset = await TaskSet.updateOne(taskSetFilter, {
       $set: {
         state: OperationState.Canceled,
         endTime: new Date(),
-      }
+      },
     });
 
     res.send(taskset);
@@ -109,18 +133,26 @@ export async function cancelTaskSet(req: Request, res: Response): Promise<void |
   }
 }
 
-export function supportedRunnables(req: Request, res: Response): void | Response {
-  return res.send([{
-    type: 'java',
-    extension: '.jar'
-  },
-  {
-    type: 'python',
-    extension: '.py'
-  }]);
+export function supportedRunnables(
+  req: Request,
+  res: Response
+): void | Response {
+  return res.send([
+    {
+      type: "java",
+      extension: ".jar",
+    },
+    {
+      type: "python",
+      extension: ".py",
+    },
+  ]);
 }
 
-export async function exportTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function exportTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.id) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -131,7 +163,10 @@ export async function exportTaskSet(req: Request, res: Response): Promise<void |
       return res.sendStatus(httpStatusCodes.NOT_FOUND);
     }
 
-    const zipPath = await taskUtils.exportTaskSet(req.params.id, req.query.format);
+    const zipPath = await taskUtils.exportTaskSet(
+      req.params.id,
+      req.query.format
+    );
     res.sendFile(zipPath);
   } catch (error) {
     logger.error(error);
@@ -139,7 +174,10 @@ export async function exportTaskSet(req: Request, res: Response): Promise<void |
   }
 }
 
-export async function getTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function getTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.id) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -157,7 +195,10 @@ export async function getTaskSet(req: Request, res: Response): Promise<void | Re
   }
 }
 
-export async function restartTaskSet(req: Request, res: Response): Promise<void | Response> {
+export async function restartTaskSet(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.id) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -179,7 +220,7 @@ export async function restartTaskSet(req: Request, res: Response): Promise<void 
         result: null,
         startTime: null,
         endTime: null,
-      }
+      },
     });
 
     taskset = await TaskSet.updateOne(taskSetFilter, {
@@ -188,7 +229,7 @@ export async function restartTaskSet(req: Request, res: Response): Promise<void 
         startTime: new Date(),
         endTime: null,
         remainingTasksCount: taskset.totalTasksCount,
-      }
+      },
     });
     res.send();
   } catch (error) {

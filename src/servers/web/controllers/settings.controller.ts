@@ -1,13 +1,18 @@
-import Worker from '../../../database/models/worker';
-import * as interfaceManager from '../../shared/interface_manager';
-import logger from '../../shared/log';
-import { Request, Response } from 'express';
-import httpStatusCodes from '../utils/httpStatusCodes';
-import Configuration, { IConfiguration } from '../../../database/models/configuration';
-import { EditSettingsRequest } from '../client/src/app/api/edit-settings-request';
-import { startRoutines } from '../../master/master';
+import Worker from "../../../database/models/worker";
+import * as interfaceManager from "../../shared/interface_manager";
+import logger from "../../shared/log";
+import { Request, Response } from "express";
+import httpStatusCodes from "../utils/httpStatusCodes";
+import Configuration, {
+  IConfiguration,
+} from "../../../database/models/configuration";
+import { EditSettingsRequest } from "../api/edit-settings-request";
+import { startRoutines } from "../../master/master";
 
-export async function get(req: Request, res: Response): Promise<void | Response> {
+export async function get(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
@@ -21,7 +26,10 @@ export async function get(req: Request, res: Response): Promise<void | Response>
   }
 }
 
-export async function set(req: Request, res: Response): Promise<void | Response> {
+export async function set(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }

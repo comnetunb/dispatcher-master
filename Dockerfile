@@ -20,6 +20,7 @@ RUN npm i npm@latest -g
 WORKDIR /opt
 COPY package.json package-lock.json* ./
 RUN npm install --no-optional && npm cache clean --force
+RUN npm run build
 ENV PATH /opt/node_modules/.bin:$PATH
 
 # check every 30s to ensure this service returns HTTP 200
@@ -42,4 +43,4 @@ EXPOSE 8080
 # so that signals are passed properly. Note the code in index.js is needed to catch Docker signals
 # using node here is still more graceful stopping then npm with --init afaik
 # I still can't come up with a good production way to run with npm and graceful shutdown
-CMD [ "node", "app.js" ]
+CMD [ "node", "dist/app.js" ]

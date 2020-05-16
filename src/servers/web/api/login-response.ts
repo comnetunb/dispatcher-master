@@ -1,4 +1,4 @@
-import { IUser } from '../../../../../../database/models/user';
+import { IUser } from "../../../database/models/user";
 
 export interface LoginResponse {
   token: string;

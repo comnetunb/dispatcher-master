@@ -1,4 +1,4 @@
-import { INotification } from '../../../../../../database/models/notification';
+import { INotification } from "../../../database/models/notification";
 
 export interface DialogData {
   title?: string;

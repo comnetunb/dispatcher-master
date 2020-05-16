@@ -1,5 +1,5 @@
-import { IInput } from '../../../../../../database/models/taskSet';
-import { TaskSetPriority } from '../../../../../../api/enums';
+import { IInput } from "../../../database/models/taskSet";
+import { TaskSetPriority } from "../../../api/enums";
 
 export interface CreateTasksetRequest {
   name: string;

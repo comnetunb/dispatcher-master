@@ -1,19 +1,13 @@
 {
-    "compilerOptions": {
-        "outDir": "./dist",
-        "target": "es6",
-        "esModuleInterop": true,
-        "allowJs": true,
-        "module": "commonjs",
-        "allowSyntheticDefaultImports": true
-    },
-    "include": [
-        "./src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "src/servers/web/client",
-    ],
-    "declaration": true
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "es6",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "./src/servers/web/client/**/*"],
+  "declaration": true
 }

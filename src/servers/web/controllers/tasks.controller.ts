@@ -1,13 +1,16 @@
-import TaskSet, { TaskSetFilter } from '../../../database/models/taskSet';
-import Task from '../../../database/models/task';
-import logger from '../../shared/log';
-import { Request, Response } from 'express';
-import * as taskUtils from '../utils/task_utils';
-import httpStatusCodes from '../utils/httpStatusCodes';
-import { OperationState } from '../../../api/enums';
-import { CreateTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
+import TaskSet, { TaskSetFilter } from "../../../database/models/taskSet";
+import Task from "../../../database/models/task";
+import logger from "../../shared/log";
+import { Request, Response } from "express";
+import * as taskUtils from "../utils/task_utils";
+import httpStatusCodes from "../utils/httpStatusCodes";
+import { OperationState } from "../../../api/enums";
+import { CreateTasksetRequest } from "../api/create-taskset-request";
 
-export async function getTasks(req: Request, res: Response): Promise<void | Response> {
+export async function getTasks(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.tasksetId) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
@@ -28,13 +31,16 @@ export async function getTasks(req: Request, res: Response): Promise<void | Resp
   }
 }
 
-export async function discardTask(req: Request, res: Response): Promise<void | Response> {
+export async function discardTask(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.params.taskId) {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
   }
 
   try {
-    let task = await Task.findById(req.params.taskId).populate('_taskSet');
+    let task = await Task.findById(req.params.taskId).populate("_taskSet");
 
     if (!task || (!req.user.admin && task._taskSet._user != req.user._id)) {
       return res.sendStatus(httpStatusCodes.NOT_FOUND);

@@ -1,22 +1,19 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { IUser } from '../../../../../../database/models/user';
-import { RegisterUserRequest } from '../api/register-user-request';
-import { LoginResponse } from '../api/login-response';
-import { EditUserRequest } from '../api/edit-user-request';
-import { SearchService } from 'lacuna-mat-table';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { IUser } from "../../../../../../database/models/user";
+import { RegisterUserRequest } from "../../../../api/register-user-request";
+import { LoginResponse } from "../../../../api/login-response";
+import { EditUserRequest } from "../../../../api/edit-user-request";
+import { SearchService } from "lacuna-mat-table";
 
-const apiRoute = '/api/users';
+const apiRoute = "/api/users";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class UserService {
-
-  constructor(
-    private http: HttpClient
-  ) { }
+  constructor(private http: HttpClient) {}
 
   registerUser(info: RegisterUserRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${apiRoute}/sign_up`, info);
@@ -28,19 +25,19 @@ export class UserService {
 
   adminUser(userId: string, admin: boolean): Observable<void> {
     let params = new HttpParams();
-    params = params.append('admin', admin ? 'true' : 'false');
+    params = params.append("admin", admin ? "true" : "false");
     return this.http.post<void>(`${apiRoute}/make-admin/${userId}`, null, {
       params,
-      responseType: 'text' as 'json',
+      responseType: "text" as "json",
     });
   }
 
   manageUser(userId: string, allow: boolean): Observable<void> {
     let params = new HttpParams();
-    params = params.append('allow', allow ? 'true' : 'false');
+    params = params.append("allow", allow ? "true" : "false");
     return this.http.post<void>(`${apiRoute}/manage/${userId}`, null, {
       params,
-      responseType: 'text' as 'json',
+      responseType: "text" as "json",
     });
   }
 
@@ -62,11 +59,11 @@ export class UserService {
 
   dataSource(status: string): SearchService<IUser> {
     switch (status) {
-      case 'pending':
+      case "pending":
         return {
           list: () => this.getAllPendingUsers(),
         };
-      case 'rejected':
+      case "rejected":
         return {
           list: () => this.getAllDisallowedUsers(),
         };

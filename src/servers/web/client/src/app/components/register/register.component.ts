@@ -1,15 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
-import { RegisterUserRequest } from '../../api/register-user-request';
-import { Router } from '@angular/router';
-import { getErrorMessage } from 'src/app/classes/utils';
+import { Component, OnInit } from "@angular/core";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from "@angular/forms";
+import { AuthService } from "../../services/auth.service";
+import { UserService } from "../../services/user.service";
+import { RegisterUserRequest } from "../../../../../api/register-user-request";
+import { Router } from "@angular/router";
+import { getErrorMessage } from "src/app/classes/utils";
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  selector: "app-register",
+  templateUrl: "./register.component.html",
+  styleUrls: ["./register.component.scss"],
 })
 export class RegisterComponent implements OnInit {
   form: FormGroup;
@@ -21,24 +26,30 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
-      fullName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      fullName: ["", Validators.required],
+      email: ["", [Validators.required, Validators.email]],
+      password: ["", Validators.required],
     });
 
-    this.form.addControl('confirmPassword',
-      new FormControl('', [Validators.required, this.validateAreEqual.bind(this)])
+    this.form.addControl(
+      "confirmPassword",
+      new FormControl("", [
+        Validators.required,
+        this.validateAreEqual.bind(this),
+      ])
     );
   }
 
   private validateAreEqual(fieldControl: FormControl): { notEqual: boolean } {
-    return fieldControl.value === this.form.get("password").value ? null : {
-      notEqual: true
-    };
+    return fieldControl.value === this.form.get("password").value
+      ? null
+      : {
+          notEqual: true,
+        };
   }
 
   submit() {
@@ -60,11 +71,12 @@ export class RegisterComponent implements OnInit {
       password: formValue.password,
     };
 
-    this.authService.register(request)
-      .subscribe(() => { },
-        (error) => {
-          this.errorMessage = getErrorMessage(error);
-        });
+    this.authService.register(request).subscribe(
+      () => {},
+      (error) => {
+        this.errorMessage = getErrorMessage(error);
+      }
+    );
   }
 
   getErrorMessage(formControlName: string) {
@@ -72,26 +84,27 @@ export class RegisterComponent implements OnInit {
     let formValue = this.form.value;
 
     switch (formControlName) {
-      case 'fullName':
-        return formControl.hasError('required') ? 'Fill your full name' :
-          '';
+      case "fullName":
+        return formControl.hasError("required") ? "Fill your full name" : "";
 
-      case 'email':
-        return formControl.hasError('required') ? 'E-mail is required' :
-          formControl.hasError('email') ? 'E-mail inválido' :
-            '';
+      case "email":
+        return formControl.hasError("required")
+          ? "E-mail is required"
+          : formControl.hasError("email")
+          ? "E-mail inválido"
+          : "";
 
-      case 'password':
-        return formControl.hasError('required') ? 'Password is required' :
-          '';
+      case "password":
+        return formControl.hasError("required") ? "Password is required" : "";
 
-      case 'confirmPassword':
-        return formControl.hasError('required') ? 'Confirm your password' :
-          formControl.hasError('notEqual') ? 'Passwords do not match' :
-            '';
+      case "confirmPassword":
+        return formControl.hasError("required")
+          ? "Confirm your password"
+          : formControl.hasError("notEqual")
+          ? "Passwords do not match"
+          : "";
     }
 
-    return 'Invalid field'; // should not happen
+    return "Invalid field"; // should not happen
   }
-
 }

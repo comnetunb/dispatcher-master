@@ -1,23 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { IConfiguration } from '../../../../../../../database/models/configuration';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { isEqualToAnother } from '../../classes/is-equal-to-anoter-validator';
-import { EditUserRequest } from '../../api/edit-user-request';
-import { getErrorMessage } from '../../classes/utils';
-import { SettingsService } from '../../services/settings.service';
-import { DialogService } from '../../services/dialog.service';
-import { EditSettingsRequest } from '../../api/edit-settings-request';
+import { Component, OnInit } from "@angular/core";
+import { IConfiguration } from "../../../../../../../database/models/configuration";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormControl,
+} from "@angular/forms";
+import { AuthService } from "../../services/auth.service";
+import { UserService } from "../../services/user.service";
+import { Router, ActivatedRoute } from "@angular/router";
+import { isEqualToAnother } from "../../classes/is-equal-to-anoter-validator";
+import { EditUserRequest } from "../../../../../api/edit-user-request";
+import { getErrorMessage } from "../../classes/utils";
+import { SettingsService } from "../../services/settings.service";
+import { DialogService } from "../../services/dialog.service";
+import { EditSettingsRequest } from "../../../../../api/edit-settings-request";
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  selector: "app-settings",
+  templateUrl: "./settings.component.html",
+  styleUrls: ["./settings.component.scss"],
 })
 export class SettingsComponent implements OnInit {
-
   settings: IConfiguration;
   form: FormGroup;
   loading = false;
@@ -29,20 +33,20 @@ export class SettingsComponent implements OnInit {
     private dialogService: DialogService,
     private router: Router,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
-      cpuLimit: ['', Validators.required],
-      memoryLimit: ['', Validators.required],
-      requestResourceInterval: ['', Validators.required],
-      dispatchInterval: ['', Validators.required],
-      emailService: [''],
-      emailUser: [''],
-      emailPassword: [''],
+      cpuLimit: ["", Validators.required],
+      memoryLimit: ["", Validators.required],
+      requestResourceInterval: ["", Validators.required],
+      dispatchInterval: ["", Validators.required],
+      emailService: [""],
+      emailUser: [""],
+      emailPassword: [""],
     });
 
-    this.settingsService.get().subscribe(settings => {
+    this.settingsService.get().subscribe((settings) => {
       this.settings = settings;
       this.form.setValue({
         cpuLimit: settings.cpuLimit,
@@ -53,7 +57,7 @@ export class SettingsComponent implements OnInit {
         emailUser: settings.emailUser || null,
         emailPassword: settings.emailPassword || null,
       });
-    })
+    });
   }
 
   submit() {
@@ -78,43 +82,44 @@ export class SettingsComponent implements OnInit {
       emailService: formValue.emailService,
       emailUser: formValue.emailUser,
       emailPassword: formValue.emailPassword,
-    }
+    };
 
     this.loading = true;
 
-    this.settingsService.set(request)
-      .subscribe(() => {
+    this.settingsService.set(request).subscribe(
+      () => {
         this.loading = false;
-        this.dialogService.alert('Settings updated!', 'Success!');
+        this.dialogService.alert("Settings updated!", "Success!");
       },
-        (error) => {
-          this.dialogService.alert(getErrorMessage(error), 'Error');
-        });
+      (error) => {
+        this.dialogService.alert(getErrorMessage(error), "Error");
+      }
+    );
   }
 
   getErrorMessage(formControlName: string) {
     let formControl = this.form.get(formControlName);
 
     switch (formControlName) {
-      case 'cpuLimit':
-        return formControl.hasError('required') ? 'CPU Limit is required' :
-          '';
+      case "cpuLimit":
+        return formControl.hasError("required") ? "CPU Limit is required" : "";
 
-      case 'memoryLimit':
-        return formControl.hasError('required') ? 'Memory limit is required' :
-          '';
+      case "memoryLimit":
+        return formControl.hasError("required")
+          ? "Memory limit is required"
+          : "";
 
-      case 'requestResourceInterval':
-        return formControl.hasError('required') ? 'Request resource interval is required' :
-          '';
+      case "requestResourceInterval":
+        return formControl.hasError("required")
+          ? "Request resource interval is required"
+          : "";
 
-      case 'dispatchInterval':
-        return formControl.hasError('required') ? 'Dispatch interval is required' :
-          '';
+      case "dispatchInterval":
+        return formControl.hasError("required")
+          ? "Dispatch interval is required"
+          : "";
     }
 
-    return 'Invalid field'; // should not happen
+    return "Invalid field"; // should not happen
   }
-
-
 }

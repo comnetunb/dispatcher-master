@@ -1,9 +1,9 @@
-import User, { UserFilter } from '../../../database/models/user';
-import { Request, Response } from 'express';
-import httpStatusCodes from '../utils/httpStatusCodes';
-import { NextFunction } from 'connect';
-import { RegisterUserRequest } from '../client/src/app/api/register-user-request';
-import { EditUserRequest } from '../client/src/app/api/edit-user-request';
+import User, { UserFilter } from "../../../database/models/user";
+import { Request, Response } from "express";
+import httpStatusCodes from "../utils/httpStatusCodes";
+import { NextFunction } from "connect";
+import { RegisterUserRequest } from "../api/register-user-request";
+import { EditUserRequest } from "../api/edit-user-request";
 
 export function isSignedIn(req: Request, res: Response): void {
   if (req.user) {
@@ -23,37 +23,48 @@ export function signOut(req: Request, res: Response): void {
   res.sendStatus(httpStatusCodes.OK);
 }
 
-export async function signIn(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
+export async function signIn(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ email: username.toLowerCase() });
     if (!user) {
-      return res.status(httpStatusCodes.BAD_REQUEST).send({ error: 'User not found.' });
+      return res
+        .status(httpStatusCodes.BAD_REQUEST)
+        .send({ error: "User not found." });
     }
 
     if (!user.validPassword(password)) {
-      return res.status(httpStatusCodes.UNAUTHORIZED).send({ error: 'Wrong password.' });
+      return res
+        .status(httpStatusCodes.UNAUTHORIZED)
+        .send({ error: "Wrong password." });
     }
-
 
     const token = await user.generateAuthToken();
     user.password = undefined;
     user.tokens = undefined;
     return res.send({ user, token });
   } catch (error) {
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ error });
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }
 
-export async function signUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function signUp(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   const userFilter: UserFilter = { email: req.body.email };
 
   try {
     const existingUser = await User.findOne(userFilter);
     if (existingUser) {
-      res.status(httpStatusCodes.BAD_REQUEST)
-        .send({ error: 'There already is an account with this e-mail.' });
+      res
+        .status(httpStatusCodes.BAD_REQUEST)
+        .send({ error: "There already is an account with this e-mail." });
       return;
     }
 
@@ -87,12 +98,14 @@ export async function signUp(req: Request, res: Response, next: NextFunction): P
     user.tokens = undefined;
     res.status(httpStatusCodes.CREATED).send({ user, token });
   } catch (error) {
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ error });
-  };
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
+  }
 }
 
-export async function getUser(req: Request, res: Response): Promise<void | Response> {
+export async function getUser(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   const userId = req.params.id;
 
   if (!req.user.admin && req.user.id != userId) {
@@ -103,7 +116,10 @@ export async function getUser(req: Request, res: Response): Promise<void | Respo
   return res.send(user);
 }
 
-export async function editUser(req: Request, res: Response): Promise<void | Response> {
+export async function editUser(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   const userId = req.params.id;
 
   if (!req.user.admin && req.user.id != userId) {
@@ -132,16 +148,19 @@ export async function editUser(req: Request, res: Response): Promise<void | Resp
   return res.send(user);
 }
 
-export async function manageUser(req: Request, res: Response): Promise<void | Response> {
+export async function manageUser(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
 
   const userFilter: UserFilter = { _id: req.params.id };
   let allow: boolean;
-  if (req.query.allow === 'false') {
+  if (req.query.allow === "false") {
     allow = false;
-  } else if (req.query.allow === 'true') {
+  } else if (req.query.allow === "true") {
     allow = true;
   } else {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
@@ -154,12 +173,14 @@ export async function manageUser(req: Request, res: Response): Promise<void | Re
     await user.save();
     res.sendStatus(httpStatusCodes.OK);
   } catch (error) {
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ error });
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }
 
-export async function pendingUsers(req: Request, res: Response): Promise<void | Response> {
+export async function pendingUsers(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }
@@ -170,7 +191,10 @@ export async function pendingUsers(req: Request, res: Response): Promise<void | 
   res.send(users);
 }
 
-export async function allowedUsers(req: Request, res: Response): Promise<void | Response> {
+export async function allowedUsers(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }
@@ -181,7 +205,10 @@ export async function allowedUsers(req: Request, res: Response): Promise<void | 
   res.send(users);
 }
 
-export async function disallowedUsers(req: Request, res: Response): Promise<void | Response> {
+export async function disallowedUsers(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.status(httpStatusCodes.FORBIDDEN).send();
   }
@@ -192,16 +219,19 @@ export async function disallowedUsers(req: Request, res: Response): Promise<void
   res.send(users);
 }
 
-export async function adminUser(req: Request, res: Response): Promise<void | Response> {
+export async function adminUser(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   if (!req.user.admin) {
     return res.sendStatus(httpStatusCodes.FORBIDDEN);
   }
 
   const userFilter: UserFilter = { _id: req.params.id };
   let admin: boolean;
-  if (req.query.admin === 'false') {
+  if (req.query.admin === "false") {
     admin = false;
-  } else if (req.query.admin === 'true') {
+  } else if (req.query.admin === "true") {
     admin = true;
   } else {
     return res.sendStatus(httpStatusCodes.BAD_REQUEST);
@@ -213,7 +243,6 @@ export async function adminUser(req: Request, res: Response): Promise<void | Res
     await user.save();
     res.sendStatus(httpStatusCodes.OK);
   } catch (error) {
-    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR)
-      .send({ error });
+    res.status(httpStatusCodes.INTERNAL_SERVER_ERROR).send({ error });
   }
 }

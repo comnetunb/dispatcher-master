@@ -1,19 +1,27 @@
-import tmp from 'tmp';
-import path from 'path';
-import mkdirp from 'mkdirp';
-import fs from 'fs';
-import archiver from 'archiver';
-import { Parser as Json2csvParser } from 'json2csv';
-import TaskSet, { ITaskSet } from '../../../database/models/taskSet';
-import Task, { ITask } from '../../../database/models/task';
-import File, { IFile } from '../../../database/models/file';
-import { TaskSetData, InputFile, ParsedInput } from '../api/taskSetData';
-import { IUser } from '../../../database/models/user';
-import { OperationState, TaskSetPriority, InputType, Result } from '../../../api/enums';
-import { ExportFormat } from '../api/exportFormat';
-import { CreateTasksetRequest, EditTasksetRequest } from '../../web/client/src/app/api/create-taskset-request';
-import { mongo } from 'mongoose';
-import sanitize from 'sanitize-filename';
+import tmp from "tmp";
+import path from "path";
+import mkdirp from "mkdirp";
+import fs from "fs";
+import archiver from "archiver";
+import { Parser as Json2csvParser } from "json2csv";
+import TaskSet, { ITaskSet } from "../../../database/models/taskSet";
+import Task, { ITask } from "../../../database/models/task";
+import File, { IFile } from "../../../database/models/file";
+import { TaskSetData, InputFile, ParsedInput } from "../api/taskSetData";
+import { IUser } from "../../../database/models/user";
+import {
+  OperationState,
+  TaskSetPriority,
+  InputType,
+  Result,
+} from "../../../api/enums";
+import { ExportFormat } from "../api/exportFormat";
+import {
+  CreateTasksetRequest,
+  EditTasksetRequest,
+} from "../api/create-taskset-request";
+import { mongo } from "mongoose";
+import sanitize from "sanitize-filename";
 
 interface ProcessedInput {
   input: string;
@@ -21,10 +29,16 @@ interface ProcessedInput {
   innerIndex: number;
 }
 
-export async function createTaskset(request: CreateTasksetRequest, user: IUser): Promise<ITaskSet> {
-  const existingTaskset = await TaskSet.findOne({ name: request.name, _user: user._id });
+export async function createTaskset(
+  request: CreateTasksetRequest,
+  user: IUser
+): Promise<ITaskSet> {
+  const existingTaskset = await TaskSet.findOne({
+    name: request.name,
+    _user: user._id,
+  });
   if (existingTaskset != null) {
-    throw 'There already exists a Task Set with this name.';
+    throw "There already exists a Task Set with this name.";
   }
 
   let taskSet = new TaskSet({
@@ -84,8 +98,11 @@ export async function createTaskset(request: CreateTasksetRequest, user: IUser):
   return taskSet;
 }
 
-
-export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest, user: IUser): Promise<ITaskSet> {
+export async function editTaskset(
+  taskset: ITaskSet,
+  request: EditTasksetRequest,
+  user: IUser
+): Promise<ITaskSet> {
   taskset.name = request.name;
   taskset.description = request.description;
   taskset.errorLimitCount = request.errorCountLimit;
@@ -120,7 +137,10 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
     taskset.inputLabels.push(input.label);
   }
 
-  await Task.updateMany({ _taskSet: taskset._id }, { $set: { underEdit: true } });
+  await Task.updateMany(
+    { _taskSet: taskset._id },
+    { $set: { underEdit: true } }
+  );
   taskset = await taskset.save();
 
   let runnable = await File.findById(taskset._runnable);
@@ -129,7 +149,7 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
 
   let newTasks = false;
 
-  const promises = await tasks.map(async task => {
+  const promises = await tasks.map(async (task) => {
     const existingTask = await Task.findOne({
       _taskSet: taskset._id,
       arguments: task.arguments,
@@ -160,18 +180,25 @@ export async function editTaskset(taskset: ITaskSet, request: EditTasksetRequest
   return taskset;
 }
 
-async function getCommandFromTemplateAndInputs(template: string, inputs: ProcessedInput[]) {
+async function getCommandFromTemplateAndInputs(
+  template: string,
+  inputs: ProcessedInput[]
+) {
   let processed = template;
   for (let input of inputs) {
     const idx = input.index;
-    const reg = new RegExp(`\(?<!\\\\)\\{${idx}\\}`)
+    const reg = new RegExp(`\(?<!\\\\)\\{${idx}\\}`);
     processed = processed.replace(reg, input.input);
   }
 
   return processed;
 }
 
-async function createTasks(taskset: ITaskSet, template: string, inputs: string[][]): Promise<ITask[]> {
+async function createTasks(
+  taskset: ITaskSet,
+  template: string,
+  inputs: string[][]
+): Promise<ITask[]> {
   const tasks: ITask[] = [];
 
   let processedInputs: ProcessedInput[][] = [[]];
@@ -222,7 +249,7 @@ function processStartEndStepInput(input: string) {
   let matches = input.match(/\d+;\d+;\d+/g);
 
   if (matches) {
-    const loopValues = matches[0].split(';');
+    const loopValues = matches[0].split(";");
 
     const startValue = Number(loopValues[0]);
     const endValue = Number(loopValues[1]);
@@ -236,7 +263,7 @@ function processStartEndStepInput(input: string) {
 
     return values;
   } else {
-    throw 'Invalid Start End Step input';
+    throw "Invalid Start End Step input";
   }
 }
 
@@ -244,16 +271,18 @@ async function processFilesInput(ids: string[]) {
   let fileNames: string[] = [];
   let promises: Promise<void>[] = [];
   for (let id of ids) {
-    promises.push(new Promise(async (resolve, reject) => {
-      try {
-        const file = await File.findById(id);
-        fileNames.push(file.name);
-        resolve();
-      } catch (err) {
-        reject(`Could not find file of id ${id}`);
-      }
-    }));
-  };
+    promises.push(
+      new Promise(async (resolve, reject) => {
+        try {
+          const file = await File.findById(id);
+          fileNames.push(file.name);
+          resolve();
+        } catch (err) {
+          reject(`Could not find file of id ${id}`);
+        }
+      })
+    );
+  }
 
   const result = await Promise.all(promises);
   return fileNames;
@@ -261,35 +290,58 @@ async function processFilesInput(ids: string[]) {
 
 // https://stackoverflow.com/a/14991797/6149445
 function processCSVInput(input: string) {
-
   let arr = [];
-  let quote = false;  // true means we're inside a quoted field
+  let quote = false; // true means we're inside a quoted field
 
   // iterate over each character, keep track of current row and column (of the returned array)
   for (let row = 0, col = 0, c = 0; c < input.length; c++) {
-    let cc = input[c], nc = input[c + 1];        // current character, next character
-    arr[row] = arr[row] || [];             // create a new row if necessary
-    arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
+    let cc = input[c],
+      nc = input[c + 1]; // current character, next character
+    arr[row] = arr[row] || []; // create a new row if necessary
+    arr[row][col] = arr[row][col] || ""; // create a new column (start with empty string) if necessary
 
     // If the current character is a quotation mark, and we're inside a
     // quoted field, and the next character is also a quotation mark,
     // add a quotation mark to the current column and skip the next character
-    if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+    if (cc == '"' && quote && nc == '"') {
+      arr[row][col] += cc;
+      ++c;
+      continue;
+    }
 
     // If it's just one quotation mark, begin/end quoted field
-    if (cc == '"') { quote = !quote; continue; }
+    if (cc == '"') {
+      quote = !quote;
+      continue;
+    }
 
     // If it's a comma and we're not in a quoted field, move on to the next column
-    if (cc == ',' && !quote) { ++col; continue; }
+    if (cc == "," && !quote) {
+      ++col;
+      continue;
+    }
 
     // If it's a newline (CRLF) and we're not in a quoted field, skip the next character
     // and move on to the next row and move to column 0 of that new row
-    if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+    if (cc == "\r" && nc == "\n" && !quote) {
+      ++row;
+      col = 0;
+      ++c;
+      continue;
+    }
 
     // If it's a newline (LF or CR) and we're not in a quoted field,
     // move on to the next row and move to column 0 of that new row
-    if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-    if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+    if (cc == "\n" && !quote) {
+      ++row;
+      col = 0;
+      continue;
+    }
+    if (cc == "\r" && !quote) {
+      ++row;
+      col = 0;
+      continue;
+    }
 
     // Otherwise, append the current character to the current column
     arr[row][col] += cc;
@@ -297,7 +349,10 @@ function processCSVInput(input: string) {
   return arr[0];
 }
 
-export async function exportTaskSet(tasksetId: string, format: ExportFormat = ExportFormat.JSON): Promise<string> {
+export async function exportTaskSet(
+  tasksetId: string,
+  format: ExportFormat = ExportFormat.JSON
+): Promise<string> {
   const taskFilter = {
     _taskSet: tasksetId,
     state: OperationState.Finished,
@@ -314,7 +369,8 @@ export async function exportTaskSet(tasksetId: string, format: ExportFormat = Ex
   const baseName = `${taskset.name}`;
   const promises: Promise<any>[] = [];
 
-  for (let task in tasks) { // eslint-disable-line
+  for (let task in tasks) {
+    // eslint-disable-line
     let base = baseName;
     const argumentsArray = tasks[task].arguments;
 
@@ -350,20 +406,19 @@ export async function exportTaskSet(tasksetId: string, format: ExportFormat = Ex
   const zipPath = `${tmpZipPath.name}/${taskset.name}.zip`;
   await zipDirectory(tmpPath.name, zipPath);
   return zipPath;
-};
+}
 
 function zipDirectory(source: string, out: fs.PathLike): Promise<string> {
-  const archive = archiver('zip', { zlib: { level: 9 } });
+  const archive = archiver("zip", { zlib: { level: 9 } });
   const stream = fs.createWriteStream(out);
 
   return new Promise((resolve, reject) => {
     archive
       .directory(source, false)
-      .on('error', err => reject(err))
-      .pipe(stream)
-      ;
+      .on("error", (err) => reject(err))
+      .pipe(stream);
 
-    stream.on('close', () => resolve());
+    stream.on("close", () => resolve());
     archive.finalize();
   });
 }
