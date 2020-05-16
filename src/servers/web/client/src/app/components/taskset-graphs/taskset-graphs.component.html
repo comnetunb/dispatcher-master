@@ -2,6 +2,9 @@
 <div class="content-wrapper" *ngIf="!loading">
   <div class="container-fluid">
     <div class="row" class="mt-2 ml-1">
+      Tasks finished with success being plotted: {{finishedTasks}}
+    </div>
+    <div class="row" class="mt-2 ml-1">
       <button mat-raised-button color="primary" (click)="addChart()">
         Add Chart
       </button>

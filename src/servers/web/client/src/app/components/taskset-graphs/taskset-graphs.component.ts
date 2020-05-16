@@ -20,6 +20,7 @@ import { Subscription, interval } from 'rxjs';
 })
 export class TasksetGraphsComponent implements OnInit, OnDestroy {
   charts: TasksetChart[] = [];
+  finishedTasks: number;
   plotInfo: PlotInfo;
   taskset: ITaskSet;
   loadingTaskset: boolean = false;
@@ -89,6 +90,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.finishedTasks = 0;
     const tasksetId = this.route.parent.snapshot.params.tasksetId;
     this.loadingTaskset = true;
 
@@ -132,7 +134,9 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
       this.tasksetChartService.set(this.taskset._id, chartInfos);
       const plotDataSub = this.tasksetChartService
         .plotData(this.taskset, chartInfos)
-        .subscribe((graphs) => {
+        .subscribe((result) => {
+          this.finishedTasks = result.taskCount;
+          const graphs = result.charts;
           for (let i = 0; i < graphs.length; i++) {
             const data = graphs[i];
 

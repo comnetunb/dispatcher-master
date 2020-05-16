@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { SearchService } from "lacuna-mat-table";
-import { ITask } from "../../../../../../database/models/task";
-import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { Injectable } from '@angular/core';
+import { SearchService } from 'lacuna-mat-table';
+import { ITask } from '../../../../../../database/models/task';
+import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
-const apiRoute = "/api/tasks";
+const apiRoute = '/api/tasks';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class TasksService {
   constructor(private http: HttpClient) {}
@@ -20,7 +20,19 @@ export class TasksService {
     };
   }
 
-  getFromTaskset(tasksetId: string): Observable<ITask[]> {
+  getFromTaskset(
+    tasksetId: string,
+    filterSuccessful: boolean = false
+  ): Observable<ITask[]> {
+    const query = {
+      filterSuccessful: filterSuccessful.toString(),
+    };
+    return this.http.get<ITask[]>(`${apiRoute}/from-taskset/${tasksetId}`, {
+      params: query,
+    });
+  }
+
+  getSuccessfulFromTaskset(tasksetId: string): Observable<ITask[]> {
     return this.http.get<ITask[]>(`${apiRoute}/from-taskset/${tasksetId}`);
   }
 

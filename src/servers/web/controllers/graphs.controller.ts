@@ -16,6 +16,7 @@ export async function plotInfo(
   try {
     const taskset = await TaskSet.findById(req.params.tasksetId);
     if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
+      console.log(taskset);
       return res.sendStatus(httpStatusCodes.NOT_FOUND);
     }
 
@@ -31,14 +32,11 @@ export async function plotInfo(
       argumentTemplate: undefined,
     };
 
-    if (!task) {
-      return res
-        .status(httpStatusCodes.NOT_FOUND)
-        .send({ error: "No finished task" });
+    info.argumentTemplate = taskset.argumentTemplate;
+    info.axes = [];
+    if (task) {
+      info.axes = Object.getOwnPropertyNames(JSON.parse(task.result));
     }
-
-    info.argumentTemplate = task._taskSet.argumentTemplate;
-    info.axes = Object.getOwnPropertyNames(JSON.parse(task.result));
 
     for (let i = 0; i < taskset.inputs.length; i += 1) {
       info.curves.push(taskset.inputs[i].label);

@@ -1,19 +1,19 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
   TasksetChartInfo,
   TasksetChartData,
-} from "../classes/taskset-chart-config";
-import { PlotInfo } from "../../../../api/plotInfo";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { TasksService } from "./tasks.service";
-import { ITaskSet } from "../../../../../../database/models/taskSet";
+} from '../classes/taskset-chart-config';
+import { PlotInfo } from '../../../../api/plotInfo';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { TasksService } from './tasks.service';
+import { ITaskSet } from '../../../../../../database/models/taskSet';
 
-const apiRoute = "/api/graphs";
+const apiRoute = '/api/graphs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class TasksetChartService {
   constructor(private http: HttpClient, private tasksService: TasksService) {}
@@ -25,7 +25,7 @@ export class TasksetChartService {
   get(tasksetId: string): TasksetChartInfo[] {
     const chartString = localStorage.getItem(this.key(tasksetId));
     if (!chartString) {
-      localStorage.setItem(this.key(tasksetId), "[]");
+      localStorage.setItem(this.key(tasksetId), '[]');
       return [];
     }
     const charts = JSON.parse(chartString) as TasksetChartInfo[];
@@ -53,8 +53,8 @@ export class TasksetChartService {
   plotData(
     taskset: ITaskSet,
     charts: TasksetChartInfo[]
-  ): Observable<TasksetChartData[]> {
-    return this.tasksService.getFromTaskset(taskset._id).pipe(
+  ): Observable<{ charts: TasksetChartData[]; taskCount: number }> {
+    return this.tasksService.getFromTaskset(taskset._id, true).pipe(
       map((tasks) => {
         const chartsCurves: TasksetChartData[] = [];
 
@@ -91,7 +91,7 @@ export class TasksetChartService {
           }
         }
 
-        return chartsCurves;
+        return { charts: chartsCurves, taskCount: tasks.length };
       })
     );
   }

@@ -6,6 +6,7 @@ import * as taskUtils from "../utils/task_utils";
 import httpStatusCodes from "../utils/httpStatusCodes";
 import { OperationState } from "../../../api/enums";
 import { CreateTasksetRequest } from "../api/create-taskset-request";
+import { ReturnCode } from "dispatcher-protocol";
 
 export async function getTasks(
   req: Request,
@@ -17,12 +18,18 @@ export async function getTasks(
 
   try {
     const taskset = await TaskSet.findById(req.params.tasksetId);
+    const filterSuccessful = req.query.filterSuccessful === "true";
 
     if (!taskset || (!req.user.admin && taskset._user != req.user._id)) {
       return res.sendStatus(httpStatusCodes.NOT_FOUND);
     }
 
-    const taskSetFilter = { _taskSet: req.params.tasksetId };
+    const taskSetFilter: any = { _taskSet: req.params.tasksetId };
+
+    if (filterSuccessful) {
+      taskSetFilter.status = ReturnCode.Success;
+    }
+
     const tasks = await Task.find(taskSetFilter);
     return res.send(tasks);
   } catch (error) {
