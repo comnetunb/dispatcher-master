@@ -6,21 +6,14 @@ import archiver from "archiver";
 import { Parser as Json2csvParser } from "json2csv";
 import TaskSet, { ITaskSet } from "../../../database/models/taskSet";
 import Task, { ITask } from "../../../database/models/task";
-import File, { IFile } from "../../../database/models/file";
-import { TaskSetData, InputFile, ParsedInput } from "../api/taskSetData";
+import File from "../../../database/models/file";
 import { IUser } from "../../../database/models/user";
-import {
-  OperationState,
-  TaskSetPriority,
-  InputType,
-  Result,
-} from "../../../api/enums";
+import { OperationState, InputType } from "../../../api/enums";
 import { ExportFormat } from "../api/exportFormat";
 import {
   CreateTasksetRequest,
   EditTasksetRequest,
 } from "../api/create-taskset-request";
-import { mongo } from "mongoose";
 import sanitize from "sanitize-filename";
 
 interface ProcessedInput {
