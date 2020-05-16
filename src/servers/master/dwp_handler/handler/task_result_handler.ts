@@ -1,11 +1,11 @@
-import Task from '../../../../database/models/task';
-import TaskSet, { ITaskSet } from '../../../../database/models/taskSet';
-import Notification from '../../../../database/models/notification';
-import * as mailer from '../../../shared/mailer';
-import logger from '../../../shared/log';
-import { TaskResult, ReturnCode } from 'dispatcher-protocol';
-import { IWorker } from '../../../../database/models/worker';
-import { OperationState, Result } from '../../../../api/enums';
+import Task from "../../../../database/models/task";
+import TaskSet, { ITaskSet } from "../../../../database/models/taskSet";
+import Notification from "../../../../database/models/notification";
+import * as mailer from "../../../shared/mailer";
+import logger from "../../../shared/log";
+import { TaskResult, ReturnCode } from "dispatcher-protocol";
+import { IWorker } from "../../../../database/models/worker";
+import { OperationState } from "../../../../api/enums";
 
 export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   if (pdu.code === ReturnCode.Success) {
@@ -18,22 +18,28 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   }
 
   if (pdu.code === ReturnCode.Success) {
+    const unset: true = true;
     const taskUpdate = {
       result: pdu.output,
       state: OperationState.Finished,
       endTime: new Date(),
-      $unset: { worker: 1 }
+      $unset: { worker: unset },
     };
 
     try {
-      const task = await Task.findByIdAndUpdate(pdu.task.id, taskUpdate, { new: true });
+      const task = await Task.findByIdAndUpdate(pdu.task.id, taskUpdate, {
+        new: true,
+      });
       if (!task) {
         logger.warn(`Finished task does not exist anymore`, pdu.task.id);
         await worker.updateRunningInstances();
         return;
       }
 
-      logger.info(`Worker ${worker.status.remoteAddress} has finished task with precedence ${task.precedence} (${task._id})`, pdu.task.id);
+      logger.info(
+        `Worker ${worker.status.remoteAddress} has finished task with precedence ${task.precedence} (${task._id})`,
+        pdu.task.id
+      );
 
       const taskSet = await TaskSet.findById(task._taskSet);
       await taskSet.updateRemainingTasksCount();
@@ -49,7 +55,7 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
     try {
       const task = await Task.findById(pdu.task.id);
       if (!task) {
-        throw 'Task not found';
+        throw "Task not found";
       }
 
       await task.flagError();
@@ -61,7 +67,7 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
       logger.error(error);
     }
   }
-};
+}
 
 async function cascadeConclusion(tasksetId: ITaskSet): Promise<void> {
   const taskFilter = {
@@ -69,7 +75,7 @@ async function cascadeConclusion(tasksetId: ITaskSet): Promise<void> {
     $or: [
       { state: OperationState.Pending },
       { state: OperationState.Sent },
-      { state: OperationState.Executing }
+      { state: OperationState.Executing },
     ],
   };
 
@@ -81,12 +87,14 @@ async function cascadeConclusion(tasksetId: ITaskSet): Promise<void> {
   // All tasks are done. Finish TaskSet
   const taskSetUpdate = {
     state: OperationState.Finished,
-    endTime: Date.now()
+    endTime: new Date(),
   };
 
-  const taskSet = await TaskSet
-    .findOneAndUpdate({ _id: tasksetId, state: OperationState.Executing }, taskSetUpdate, { new: true })
-    .populate('_user');
+  const taskSet = await TaskSet.findOneAndUpdate(
+    { _id: tasksetId, state: OperationState.Executing },
+    taskSetUpdate,
+    { new: true }
+  ).populate("_user");
 
   if (taskSet) {
     await sendConclusionNotification(taskSet);
@@ -101,10 +109,7 @@ async function sendConclusionNotification(taskSet: ITaskSet): Promise<void> {
 
   const taskFilter = {
     _taskSet: taskSet._id,
-    $or: [
-      { state: OperationState.Canceled },
-      { state: OperationState.Failed }
-    ],
+    $or: [{ state: OperationState.Canceled }, { state: OperationState.Failed }],
   };
 
   const failedCount = await Task.countDocuments(taskFilter);
@@ -140,25 +145,24 @@ async function dateString(milliseconds: number) {
 
   const values = [];
   if (days > 0) {
-    values.push([days, days == 1 ? 'day' : 'days']);
+    values.push([days, days == 1 ? "day" : "days"]);
   }
   if (hours > 0) {
-    values.push([hours, hours == 1 ? 'hour' : 'hours']);
+    values.push([hours, hours == 1 ? "hour" : "hours"]);
   }
   if (minutes > 0) {
-    values.push([minutes, minutes == 1 ? 'minute' : 'minutes']);
+    values.push([minutes, minutes == 1 ? "minute" : "minutes"]);
   }
   if (seconds > 0) {
-    values.push([seconds, seconds == 1 ? 'second' : 'seconds']);
+    values.push([seconds, seconds == 1 ? "second" : "seconds"]);
   }
 
-  let value = '';
+  let value = "";
   for (let i = 0; i < values.length; i++) {
     let cur = `${values[i][0]} ${values[i][1]}`;
 
-
-    if (i != 0 && i == values.length - 1) value += ' and ';
-    else if (i != 0) value += ', ';
+    if (i != 0 && i == values.length - 1) value += " and ";
+    else if (i != 0) value += ", ";
 
     value += cur;
   }
@@ -169,11 +173,22 @@ async function dateString(milliseconds: number) {
 async function sendConclusionEmail(taskSet: ITaskSet): Promise<void> {
   const to = taskSet._user.email;
   const subject = `Task set "${taskSet.name}" has finished`;
-  const difference = Math.abs(taskSet.startTime.getTime() - taskSet.endTime.getTime());
+  const difference = Math.abs(
+    taskSet.startTime.getTime() - taskSet.endTime.getTime()
+  );
 
-  const finishedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Finished });
-  const failedTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Failed });
-  const canceledTasks = await Task.countDocuments({ _taskSet: taskSet._id, state: OperationState.Canceled });
+  const finishedTasks = await Task.countDocuments({
+    _taskSet: taskSet._id,
+    state: OperationState.Finished,
+  });
+  const failedTasks = await Task.countDocuments({
+    _taskSet: taskSet._id,
+    state: OperationState.Failed,
+  });
+  const canceledTasks = await Task.countDocuments({
+    _taskSet: taskSet._id,
+    state: OperationState.Canceled,
+  });
   const duration = await dateString(difference);
 
   // TODO: use template email

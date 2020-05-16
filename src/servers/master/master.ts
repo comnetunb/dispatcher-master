@@ -1,16 +1,20 @@
-import logger from '../shared/log';
-import * as fs from 'fs';
-import * as communication from './communication';
-import * as connectionManager from './connection_manager';
-import { event as interfaceManagerEvent } from '../shared/interface_manager';
-import Task, { ITask } from '../../database/models/task';
-import Configuration, { IConfiguration } from '../../database/models/configuration';
-import Worker, { IWorker } from '../../database/models/worker';
-import { GetReport, ProtocolType, EncapsulatePDU, PerformTask, Command, PerformCommand } from 'dispatcher-protocol';
-import { OperationState } from '../../api/enums';
-import { IFile } from '../../database/models/file';
-import { ProtocolFile } from 'dispatcher-protocol';
-import { request } from 'http';
+import logger from "../shared/log";
+import * as fs from "fs";
+import * as communication from "./communication";
+import * as connectionManager from "./connection_manager";
+import Task from "../../database/models/task";
+import Configuration from "../../database/models/configuration";
+import Worker from "../../database/models/worker";
+import {
+  GetReport,
+  ProtocolType,
+  PerformTask,
+  Command,
+  PerformCommand,
+} from "dispatcher-protocol";
+import { OperationState } from "../../api/enums";
+import { IFile } from "../../database/models/file";
+import { ProtocolFile } from "dispatcher-protocol";
 
 let requestResourceInterval: NodeJS.Timeout;
 let batchDispatchInterval: NodeJS.Timeout;
@@ -38,7 +42,7 @@ export async function startRoutines(): Promise<void> {
   }
   if (batchDispatchInterval) {
     clearInterval(batchDispatchInterval);
-    requestResourceInterval = null;
+    batchDispatchInterval = null;
   }
 
   await requestResourceRoutine();
@@ -82,7 +86,9 @@ async function requestResourceFromAllWorkers(): Promise<void> {
     try {
       await connectionManager.send(worker, getResource);
     } catch (err) {
-      logger.error(`Could not send GetReport command to worker ${worker.name}: ${err}`);
+      logger.error(
+        `Could not send GetReport command to worker ${worker.name}: ${err}`
+      );
     }
   });
 }
@@ -95,7 +101,11 @@ async function requestResourceFromAllWorkers(): Promise<void> {
 
 async function batchDispatch(): Promise<void> {
   let config = await Configuration.get();
-  const availableWorkers = await Worker.getAvailables(config.cpuLimit, config.memoryLimit);
+  const availableWorkers = await Worker.getAvailables(
+    config.cpuLimit,
+    config.memoryLimit
+  );
+
   if (!availableWorkers || !availableWorkers.length) {
     return;
   }
@@ -105,10 +115,10 @@ async function batchDispatch(): Promise<void> {
   };
 
   const taskPopulate = {
-    path: '_taskSet',
-    select: '_runnable name _files',
-    populate: { path: '_runnable _files' },
-    options: { sort: { '_taskSet.priority': -1 } }
+    path: "_taskSet",
+    select: "_runnable name _files",
+    populate: { path: "_runnable _files" },
+    options: { sort: { "_taskSet.priority": -1 } },
   };
 
   const tasks = await Task.find(taskFilter)
@@ -132,14 +142,16 @@ async function batchDispatch(): Promise<void> {
       const files: IFile[] = task._taskSet._files;
       let pduFiles: ProtocolFile[] = [];
       for (let i = 0; i < files.length; i++) {
-        let content = fs.readFileSync(files[i].path, { encoding: 'base64' });
+        let content = fs.readFileSync(files[i].path, { encoding: "base64" });
         pduFiles.push({
           name: files[i].name,
           content,
         });
       }
 
-      let runnableContent = fs.readFileSync(task._taskSet._runnable.path, { encoding: 'base64' });
+      let runnableContent = fs.readFileSync(task._taskSet._runnable.path, {
+        encoding: "base64",
+      });
       pduFiles.push({
         name: task._taskSet._runnable.name,
         content: runnableContent,
@@ -157,78 +169,54 @@ async function batchDispatch(): Promise<void> {
 
       const taskSetName = task._taskSet.name;
 
-      logger.info(`Dispatched task with precedence ${task.precedence} (${task._id}) from set `
-        + `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`, task._id);
+      logger.info(
+        `Dispatched task with precedence ${task.precedence} (${task._id}) from set ` +
+          `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`,
+        task._id
+      );
 
       setTimeout(async () => {
         try {
           const taskRefreshed = await Task.findById(task._id);
           if (!taskRefreshed) {
-            logger.error(`Could not find task with id ${task._id} that was just dispatched to worker ${availableWorkers[i].name}`);
+            logger.error(
+              `Could not find task with id ${task._id} that was just dispatched to worker ${availableWorkers[i].name}`
+            );
             return;
           }
 
           if (taskRefreshed.isSent()) {
-            logger.warn(`Timeout from worker ${availableWorkers[i].status.remoteAddress}`, task._id);
+            logger.warn(
+              `Timeout from worker ${availableWorkers[i].status.remoteAddress}`,
+              task._id
+            );
             await taskRefreshed.updateToDefaultState();
           }
         } catch (err) {
-          logger.error(`Could not verify if worker ${availableWorkers[i].name} properly started task ${task._id}`);
+          logger.error(
+            `Could not verify if worker ${availableWorkers[i].name} properly started task ${task._id}`
+          );
         }
       }, 10000);
-    } catch (err) {
-
-    }
-  };
+    } catch (err) {}
+  }
 }
 
 async function cleanUp(): Promise<void> {
   // Clean all tasks
   const taskFilter = {
-    $or: [
-      { state: OperationState.Sent },
-      { state: OperationState.Executing }
-    ]
+    $or: [{ state: OperationState.Sent }, { state: OperationState.Executing }],
   };
 
+  const unset: true = true;
   const taskUpdate = {
     state: OperationState.Pending,
-    $unset: { worker: 1, startTime: 1 }
+    $unset: { worker: unset, startTime: unset },
   };
 
   const promises = [];
 
-  promises
-    .push(Task
-      .updateMany(taskFilter, taskUpdate, { multi: true }));
+  promises.push(Task.updateMany(taskFilter, taskUpdate, { multi: true }));
 
   await Promise.all(promises);
 }
-
-interfaceManagerEvent.on('worker_command', async (workerId: string, command: Command) => {
-  try {
-    const worker = await Worker.findById(workerId);
-    if (!worker) {
-      throw String('Worker not found');
-    }
-
-    const performCommand: PerformCommand = {
-      type: ProtocolType.PerformCommand,
-      command,
-    };
-
-    const getReport: GetReport = {
-      type: ProtocolType.GetReport,
-      state: true,
-      tasks: true,
-      alias: false,
-      supportedLanguages: false,
-      resources: false,
-    };
-
-    await connectionManager.send(worker, performCommand);
-    await connectionManager.send(worker, getReport);
-  } catch (err) {
-    logger.fatal(`Could not execute command for worker with id ${workerId}: ${err}`);
-  }
-});

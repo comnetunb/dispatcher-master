@@ -1,15 +1,15 @@
-import * as net from 'net';
-import _ from 'lodash';
-import EventEmitter from 'events';
-import * as connectionManager from './connection_manager';
-import * as dwpManager from './dwp_handler/manager';
-import logger from '../shared/log';
-import { GetReport, ProtocolType, PDU } from 'dispatcher-protocol';
-import http from 'http';
-import io from 'socket.io';
-import { socketIOAuth } from './authentication';
-import Worker, { IWorker } from '../../database/models/worker';
-import Task from '../../database/models/task';
+import * as net from "net";
+import _ from "lodash";
+import EventEmitter from "events";
+import * as connectionManager from "./connection_manager";
+import * as dwpManager from "./dwp_handler/manager";
+import logger from "../shared/log";
+import { GetReport, ProtocolType, PDU } from "dispatcher-protocol";
+import http from "http";
+import io from "socket.io";
+import { socketIOAuth } from "./authentication";
+import Worker, { IWorker } from "../../database/models/worker";
+import Task from "../../database/models/task";
 
 const httpServer = http.createServer();
 const server = io(httpServer);
@@ -25,11 +25,11 @@ const postAuthenticate = (socket: io.Socket, data: any) => {
     tasks: true,
     state: true,
     supportedLanguages: true,
-  }
+  };
 
   connectionManager.send(socket.worker, getReport);
 
-  socket.on('data', (data: PDU): void => {
+  socket.on("data", (data: PDU): void => {
     try {
       dwpManager.treat(data, socket);
     } catch (e) {
@@ -38,28 +38,29 @@ const postAuthenticate = (socket: io.Socket, data: any) => {
       // Do not treat exception!
     }
   });
-}
+};
 
 export async function execute(): Promise<void> {
-
   await Worker.resetAllConnections();
 
   socketIOAuth(server, postAuthenticate, disconnect);
   // Open worker
-  httpServer.listen(16180, '0.0.0.0', () => {
+  httpServer.listen(16180, "0.0.0.0", () => {
     let addressInfo = httpServer.address() as net.AddressInfo;
     if (addressInfo.port) {
-      logger.info(`TCP server listening on ${addressInfo.address}:${addressInfo.port}`);
+      logger.info(
+        `TCP server listening on ${addressInfo.address}:${addressInfo.port}`
+      );
     } else {
       logger.info(`TCP server listening on ${httpServer.address() as string}`);
     }
   });
-};
+}
 
 export async function findSocket(worker: IWorker): Promise<io.Socket> {
   let connectionId: string = worker.status.connectionId;
 
-  let socket: io.Socket = server.nsps['/'].connected[connectionId] || null;
+  let socket: io.Socket = server.nsps["/"].connected[connectionId] || null;
 
   if (!socket) {
     await disconnectWorker(worker);
@@ -71,7 +72,7 @@ export async function findSocket(worker: IWorker): Promise<io.Socket> {
 const disconnect = async (socket: io.Socket) => {
   logger.debug(`Socket ${socket.id} disconnected.`);
   await disconnectWorker(socket.worker);
-}
+};
 
 const disconnectWorker = async (worker: IWorker) => {
   if (!worker) return;
@@ -94,9 +95,10 @@ const disconnectWorker = async (worker: IWorker) => {
       tasks.map((task) => {
         return task.updateToDefaultState();
       });
-
     }
   } catch (err) {
-    logger.fatal(`Could not properly update status of worker ${worker.name}: ${err}`);
+    logger.fatal(
+      `Could not properly update status of worker ${worker.name}: ${err}`
+    );
   }
-}
+};

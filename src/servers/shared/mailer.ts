@@ -1,18 +1,22 @@
-import nodemailer from 'nodemailer';
-import logger from './log';
-import Mail from 'nodemailer/lib/mailer';
-import Configuration from '../../database/models/configuration';
+import nodemailer from "nodemailer";
+import logger from "./log";
+import Mail from "nodemailer/lib/mailer";
+import Configuration from "../../database/models/configuration";
 
-export async function sendMail(to: string, subject: string, text: string): Promise<void> {
+export async function sendMail(
+  to: string,
+  subject: string,
+  text: string
+): Promise<void> {
   let config = await Configuration.get();
   if (!config.emailService) {
-    throw 'No email service is set';
+    throw "No email service is set";
   }
   if (!config.emailUser) {
-    throw 'No email user is set';
+    throw "No email user is set";
   }
   if (!config.emailPassword) {
-    throw 'No email password is set';
+    throw "No email password is set";
   }
 
   const transporter = nodemailer.createTransport({
@@ -20,7 +24,7 @@ export async function sendMail(to: string, subject: string, text: string): Promi
     auth: {
       user: config.emailUser,
       pass: config.emailPassword,
-    }
+    },
   });
 
   const mailOptions: Mail.Options = {
@@ -40,4 +44,4 @@ export async function sendMail(to: string, subject: string, text: string): Promi
     });
   });
   await promise;
-};
+}

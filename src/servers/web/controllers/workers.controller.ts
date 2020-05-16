@@ -1,39 +1,10 @@
 import Worker from "../../../database/models/worker";
-import * as interfaceManager from "../../shared/interface_manager";
 import logger from "../../shared/log";
 import { Request, Response } from "express";
 import httpStatusCodes from "../utils/httpStatusCodes";
 import { WorkerCreateRequest } from "../api/worker-create-request";
 import { WorkerEditRequest } from "../api/worker-edit-request";
-import bodyParser = require("body-parser");
 import Configuration from "../../../database/models/configuration";
-
-export function pauseWorker(req: Request, res: Response): void | Response {
-  if (!req.user.admin) {
-    return res.sendStatus(httpStatusCodes.FORBIDDEN);
-  }
-
-  interfaceManager.pauseWorker(req.params.address);
-  res.sendStatus(httpStatusCodes.OK);
-}
-
-export function resumeWorker(req: Request, res: Response): void | Response {
-  if (!req.user.admin) {
-    return res.sendStatus(httpStatusCodes.FORBIDDEN);
-  }
-
-  interfaceManager.resumeWorker(req.params.address);
-  res.sendStatus(httpStatusCodes.OK);
-}
-
-export function stopWorker(req: Request, res: Response): void | Response {
-  if (!req.user.admin) {
-    return res.sendStatus(httpStatusCodes.FORBIDDEN);
-  }
-
-  interfaceManager.stopWorker(req.params.address);
-  res.sendStatus(httpStatusCodes.OK);
-}
 
 export async function getWorker(
   req: Request,

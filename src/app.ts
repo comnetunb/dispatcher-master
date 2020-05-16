@@ -1,7 +1,7 @@
-import webServer from './servers/web/service';
-import dbDriver from './database/db_driver';
-import master from './servers/master/master';
-import logger from './servers/shared/log';
+import webServer from "./servers/web/service";
+import dbDriver from "./database/db_driver";
+import master from "./servers/master/master";
+import logger from "./servers/shared/log";
 
 // Setup Database Driver
 dbDriver()
@@ -15,4 +15,3 @@ dbDriver()
   .catch((e) => {
     logger.error(e);
   });
-
