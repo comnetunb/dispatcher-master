@@ -1,10 +1,11 @@
 import express from "express";
-import proxy from "http-proxy-middleware";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import indexRouter from "./routers/index.router";
-import User, { IUser, IUserDocument } from "../../database/models/user";
+import { IUser } from "../../database/models/user";
 import { auth } from "./middlewares/auth";
+import ServerConfiguration from "../../config/server_configuration";
 
 // Extending Request to properly type our users
 declare global {
@@ -29,14 +30,13 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 // New hostname+path as specified by question:
-const apiProxy = proxy("**", { target: "http://localhost:4200" });
+const proxyUri = `http:${ServerConfiguration.api.proxyHost}:${ServerConfiguration.api.proxyPort}`;
+const apiProxy = createProxyMiddleware("**", { target: proxyUri });
 
 app.use("/api", auth);
 app.use("/api", indexRouter);
 app.use(apiProxy);
 
 export = () => {
-  app.listen(8080, "0.0.0.0");
-
-  console.log("ok");
+  app.listen(ServerConfiguration.api.port, "0.0.0.0");
 };
