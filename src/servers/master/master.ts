@@ -10,6 +10,7 @@ import { OperationState } from "../../api/enums";
 import { IFile } from "../../database/models/file";
 import { ProtocolFile } from "dispatcher-protocol";
 import { shuffleArray } from "../shared/utils";
+import { loadFile } from "../shared/file_service";
 
 let requestResourceInterval: NodeJS.Timeout;
 let batchDispatchInterval: NodeJS.Timeout;
@@ -142,22 +143,19 @@ async function batchDispatch(): Promise<void> {
       );
 
       await task.save();
+
       const files: IFile[] = task._taskSet._files;
       let pduFiles: ProtocolFile[] = [];
       for (let i = 0; i < files.length; i++) {
-        let content = fs.readFileSync(files[i].path, { encoding: "base64" });
         pduFiles.push({
           name: files[i].name,
-          content,
+          content: loadFile(files[i]),
         });
       }
 
-      let runnableContent = fs.readFileSync(task._taskSet._runnable.path, {
-        encoding: "base64",
-      });
       pduFiles.push({
         name: task._taskSet._runnable.name,
-        content: runnableContent,
+        content: loadFile(task._taskSet._runnable),
       });
 
       const pdu: PerformTask = {
@@ -206,6 +204,7 @@ async function batchDispatch(): Promise<void> {
       logger.error(
         `Error when dispatching task ${task._id} to worker ${availableWorkers[i].name}`
       );
+      await task.updateToDefaultState();
     }
   }
 }
