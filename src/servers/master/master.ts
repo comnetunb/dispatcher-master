@@ -5,16 +5,11 @@ import * as connectionManager from "./connection_manager";
 import Task from "../../database/models/task";
 import Configuration from "../../database/models/configuration";
 import Worker from "../../database/models/worker";
-import {
-  GetReport,
-  ProtocolType,
-  PerformTask,
-  Command,
-  PerformCommand,
-} from "dispatcher-protocol";
+import { GetReport, ProtocolType, PerformTask } from "dispatcher-protocol";
 import { OperationState } from "../../api/enums";
 import { IFile } from "../../database/models/file";
 import { ProtocolFile } from "dispatcher-protocol";
+import { shuffleArray } from "../shared/utils";
 
 let requestResourceInterval: NodeJS.Timeout;
 let batchDispatchInterval: NodeJS.Timeout;
@@ -27,8 +22,7 @@ export default async (): Promise<void> => {
     communication.execute();
 
     // Routines
-    await requestResourceRoutine();
-    await batchDispatchRoutine();
+    await startRoutines();
   } catch (e) {
     let error: Error = e;
     logger.fatal(error.message);
@@ -36,6 +30,7 @@ export default async (): Promise<void> => {
 };
 
 export async function startRoutines(): Promise<void> {
+  logger.info("Starting routines");
   if (requestResourceInterval) {
     clearInterval(requestResourceInterval);
     requestResourceInterval = null;
@@ -51,6 +46,7 @@ export async function startRoutines(): Promise<void> {
 
 async function requestResourceRoutine(): Promise<void> {
   let config = await Configuration.get();
+  logger.info("Configuring interval that requests resources from workers");
   requestResourceInterval = setInterval(async () => {
     try {
       await requestResourceFromAllWorkers();
@@ -62,6 +58,7 @@ async function requestResourceRoutine(): Promise<void> {
 
 async function batchDispatchRoutine(): Promise<void> {
   let config = await Configuration.get();
+  logger.info("Configuring interval that dispatches tasks");
   batchDispatchInterval = setInterval(async () => {
     try {
       await batchDispatch();
@@ -110,6 +107,8 @@ async function batchDispatch(): Promise<void> {
     return;
   }
 
+  shuffleArray(availableWorkers);
+
   const taskFilter = {
     state: OperationState.Pending,
   };
@@ -132,11 +131,15 @@ async function batchDispatch(): Promise<void> {
   }
 
   for (let i = 0; i < tasks.length; i += 1) {
+    let task = tasks[i];
+    task.state = OperationState.Sent;
+    task.worker = availableWorkers[i]._id;
+    task.startTime = new Date();
+
     try {
-      let task = tasks[i];
-      task.state = OperationState.Sent;
-      task.worker = availableWorkers[i]._id;
-      task.startTime = new Date();
+      logger.info(
+        `Dispatching task ${task._id} to worker ${availableWorkers[i].name}`
+      );
 
       await task.save();
       const files: IFile[] = task._taskSet._files;
@@ -156,6 +159,7 @@ async function batchDispatch(): Promise<void> {
         name: task._taskSet._runnable.name,
         content: runnableContent,
       });
+
       const pdu: PerformTask = {
         type: ProtocolType.PerformTask,
         commandLine: task.commandLine,
@@ -171,7 +175,7 @@ async function batchDispatch(): Promise<void> {
 
       logger.info(
         `Dispatched task with precedence ${task.precedence} (${task._id}) from set ` +
-          `${taskSetName} to ${availableWorkers[i].status.remoteAddress}`,
+          `${taskSetName} to worker ${availableWorkers[i].name} (${availableWorkers[i].status.remoteAddress})`,
         task._id
       );
 
@@ -198,7 +202,11 @@ async function batchDispatch(): Promise<void> {
           );
         }
       }, 10000);
-    } catch (err) {}
+    } catch (err) {
+      logger.error(
+        `Error when dispatching task ${task._id} to worker ${availableWorkers[i].name}`
+      );
+    }
   }
 }
 
