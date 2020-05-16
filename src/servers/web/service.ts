@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 // New hostname+path as specified by question:
-const proxyUri = `http:${ServerConfiguration.api.proxyHost}:${ServerConfiguration.api.proxyPort}`;
+const proxyUri = `http://${ServerConfiguration.api.proxyHost}:${ServerConfiguration.api.proxyPort}`;
 const apiProxy = createProxyMiddleware("**", { target: proxyUri });
 
 app.use("/api", auth);

@@ -21,9 +21,7 @@ export class UserFilesListComponent implements OnInit {
   constructor(
     private filesService: FilesService,
     private dialogService: DialogService
-  ) {
-    this.lacTable.searchLabel = 'Search';
-  }
+  ) {}
 
   ngOnInit() {
     this.dataSource = this.filesService;
