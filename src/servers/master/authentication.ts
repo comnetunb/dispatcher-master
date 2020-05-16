@@ -23,6 +23,17 @@ export async function socketIOAuth(
   _.each(server.nsps, forbidConnections);
   server.on("connection", async (socket) => {
     socket.auth = false;
+
+    const authTimeout = setTimeout(async () => {
+      // If the socket didn't authenticate after connection, disconnect it
+      if (!socket.auth) {
+        logger.debug(
+          `Socket ${socket.id} has not authenticated in 10 seconds, disconnecting it...`
+        );
+        socket.disconnect(true);
+      }
+    }, timeout);
+
     socket.on("authentication", async (data) => {
       const success = await authenticate(socket, data);
       if (success) {
@@ -33,28 +44,24 @@ export async function socketIOAuth(
           restoreConnection(nsp, socket);
         });
 
+        if (authTimeout) {
+          clearTimeout(authTimeout);
+        }
+
         socket.emit("authenticated");
         return postAuthenticate(socket, data);
       } else {
         logger.debug(`Authentication failure socket ${socket.id}`);
         socket.emit("unauthorized", { message: "Authentication failure" });
-        socket.disconnect(true);
       }
     });
 
     socket.on("disconnect", async () => {
+      if (authTimeout) {
+        clearTimeout(authTimeout);
+      }
       return disconnect(socket);
     });
-
-    setTimeout(async () => {
-      // If the socket didn't authenticate after connection, disconnect it
-      if (!socket.auth) {
-        logger.debug(
-          `Socket ${socket.id} has not authenticated in 10 seconds, disconnecting it...`
-        );
-        socket.disconnect(true);
-      }
-    }, timeout);
   });
 }
 
