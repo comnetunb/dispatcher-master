@@ -1,29 +1,29 @@
-import { model, Schema, Document, Model } from 'mongoose';
-import { compareSync, hashSync } from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
-import { TestJWTKEY } from '../../servers/web/middlewares/auth';
+import { model, Schema, Document, Model } from "mongoose";
+import { compareSync, hashSync } from "bcryptjs";
+import * as jwt from "jsonwebtoken";
+import { AuthSecretKey } from "../../servers/web/middlewares/auth";
 
 export interface Token {
-  token: string,
+  token: string;
 }
 
 export interface IUserDocument extends Document {
-  email: string,
-  name: string,
-  password: string,
-  admin: boolean,
-  pending: boolean,
-  permitted: boolean,
-  tokens: Token[],
+  email: string;
+  name: string;
+  password: string;
+  admin: boolean;
+  pending: boolean;
+  permitted: boolean;
+  tokens: Token[];
 }
 
 export interface IUser extends IUserDocument {
-  validPassword(password: string): boolean,
-  generateAuthToken(): Promise<string>,
+  validPassword(password: string): boolean;
+  generateAuthToken(): Promise<string>;
 }
 
 interface IUserModel extends Model<IUser> {
-  encryptPassword(password: string): string,
+  encryptPassword(password: string): string;
 }
 
 const userSchema: Schema = new Schema({
@@ -37,15 +37,15 @@ const userSchema: Schema = new Schema({
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   admin: {
     type: Boolean,
-    default: false
+    default: false,
   },
   pending: {
     type: Boolean,
@@ -57,13 +57,15 @@ const userSchema: Schema = new Schema({
     required: false,
     index: true,
   },
-  tokens: [{
-    token: {
-      type: String,
-      required: true,
-      index: true,
-    }
-  }]
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+        index: true,
+      },
+    },
+  ],
 });
 
 const saltRounds = 10;
@@ -72,30 +74,31 @@ userSchema.statics.encryptPassword = (password: string): string => {
   return hashSync(password, saltRounds);
 };
 
-userSchema.methods.validPassword = function (password: string): boolean { // eslint-disable-line func-names
+userSchema.methods.validPassword = function (password: string): boolean {
+  // eslint-disable-line func-names
   return compareSync(password, this.password);
 };
 
 userSchema.methods.generateAuthToken = async function (): Promise<string> {
   // Generate an auth token for the user
   const user = this;
-  const token = jwt.sign({ _id: user._id }, TestJWTKEY);
+  const token = jwt.sign({ _id: user._id }, AuthSecretKey);
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;
-}
+};
 
 export interface UserFilter {
-  _id?: string,
-  email?: string,
-  name?: string,
-  password?: string,
-  admin?: boolean,
-  pending?: boolean,
-  permitted?: boolean,
-  [key: string]: any,
+  _id?: string;
+  email?: string;
+  name?: string;
+  password?: string;
+  admin?: boolean;
+  pending?: boolean;
+  permitted?: boolean;
+  [key: string]: any;
 }
 
-export const User: IUserModel = model<IUser, IUserModel>('User', userSchema);
+export const User: IUserModel = model<IUser, IUserModel>("User", userSchema);
 
 export default User;

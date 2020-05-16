@@ -8,6 +8,7 @@ interface IAPIConfiguration {
   port: number;
   proxyHost: string;
   proxyPort: number;
+  authSecretKey: string;
 }
 
 interface IServerConfiguration {
@@ -25,6 +26,7 @@ const defaultConfiguration: IServerConfiguration = {
     port: 8080,
     proxyHost: "localhost",
     proxyPort: 4200,
+    authSecretKey: "abcde",
   },
 };
 
@@ -42,6 +44,8 @@ const ServerConfiguration: IServerConfiguration = {
       ? +process.env.PROXY_PORT
       : defaultConfiguration.api.proxyPort,
     port: process.env.PORT ? +process.env.PORT : defaultConfiguration.api.port,
+    authSecretKey:
+      process.env.AUTH_SECRET_KEY || defaultConfiguration.api.authSecretKey,
   },
 };
 
