@@ -9,6 +9,7 @@ import {
   CreateTasksetRequest,
   EditTasksetRequest,
 } from "../api/create-taskset-request";
+import { ExportFormat } from "../api/exportFormat";
 
 export async function getTaskSets(
   req: Request,
@@ -21,7 +22,7 @@ export async function getTaskSets(
   }
 
   if (req.query.state) {
-    taskSetFilter.state = req.query.state;
+    taskSetFilter.state = (req.query.state as unknown) as OperationState;
   }
 
   try {
@@ -165,7 +166,7 @@ export async function exportTaskSet(
 
     const zipPath = await taskUtils.exportTaskSet(
       req.params.id,
-      req.query.format
+      (req.query.format as unknown) as ExportFormat
     );
     res.sendFile(zipPath);
   } catch (error) {

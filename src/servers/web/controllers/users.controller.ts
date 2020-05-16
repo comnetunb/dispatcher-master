@@ -57,7 +57,29 @@ export async function signUp(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const userFilter: UserFilter = { email: req.body.email };
+  const info: RegisterUserRequest = req.body;
+  const { email, name, password } = info;
+
+  if (!req.body.email) {
+    res.status(httpStatusCodes.BAD_REQUEST).send({ error: "Email required" });
+    return;
+  }
+  if (!req.body.name) {
+    res.status(httpStatusCodes.BAD_REQUEST).send({ error: "Name required" });
+    return;
+  }
+  if (!req.body.password) {
+    res
+      .status(httpStatusCodes.BAD_REQUEST)
+      .send({ error: "Password required" });
+    return;
+  }
+
+  info.email = info.email.trim();
+  info.name = info.name.trim();
+  info.password = info.password.trim();
+
+  const userFilter: UserFilter = { email };
 
   try {
     const existingUser = await User.findOne(userFilter);
@@ -67,9 +89,6 @@ export async function signUp(
         .send({ error: "There already is an account with this e-mail." });
       return;
     }
-
-    const info: RegisterUserRequest = req.body;
-    const { email, name, password } = info;
 
     const count = await User.countDocuments({});
     const hash = User.encryptPassword(password);

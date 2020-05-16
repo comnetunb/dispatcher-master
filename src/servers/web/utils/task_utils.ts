@@ -35,14 +35,14 @@ export async function createTaskset(
   }
 
   let taskSet = new TaskSet({
-    name: request.name,
-    description: request.description,
+    name: request.name.trim(),
+    description: request.description.trim(),
     _user: user._id,
     inputs: request.inputs,
     errorLimitCount: request.errorCountLimit,
-    _runnable: request.runnableId,
-    _runnableType: request.runnableType,
-    argumentTemplate: request.template,
+    _runnable: request.runnableId.trim(),
+    _runnableType: request.runnableType.trim(),
+    argumentTemplate: request.template.trim(),
     state: OperationState.Executing,
     remainingTasksCount: 0,
     totalTasksCount: 0,
