@@ -9,11 +9,17 @@ import { OperationState } from "../../../../api/enums";
 
 export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   if (pdu.code === ReturnCode.Success) {
-    try {
-      JSON.parse(pdu.output);
-    } catch (error) {
-      pdu.output = `${error}\nJSON: ${pdu.output}`;
+    const parseNormal = tryParseJson(pdu.output);
+
+    const possibleHeader = 'Academic license - for non-commercial use only';
+    const stripped = pdu.output?.replace(possibleHeader, '').trim();
+    const parseStripped = tryParseJson(stripped);
+
+    if (parseNormal.error && parseStripped.error) {
+      pdu.output = `${parseNormal.error}\nJSON: ${pdu.output}`;
       pdu.code = ReturnCode.Error;
+    } else if (parseNormal.error) {
+      pdu.output = stripped;
     }
   }
 
@@ -210,4 +216,19 @@ Failed tasks: ${failedTasks}
 Canceled tasks: ${canceledTasks}`;
 
   await mailer.sendMail(to, subject, text);
+}
+
+function tryParseJson(input: string): { result: object, error: any } {
+  try {
+    const result = JSON.parse(input);
+    return {
+      result: result,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      result: null,
+      error: error,
+    }
+  }
 }
