@@ -9,7 +9,7 @@ export async function getAllLogs(req: Request, res: Response): Promise<void | Re
   }
 
   try {
-    let logs = await Log.getAllLogs(req.query.tasksetId);
+    let logs = await Log.getAllLogs(req.query.tasksetId as string);
     if (!logs) {
       throw String('Failed to get logs');
     }
@@ -27,7 +27,8 @@ export async function getAllLogsStartingFromDate(req: Request, res: Response): P
   }
 
   try {
-    let logs = await Log.getAllStartingFromDate(req.query.lastDate, req.query.tasksetId);
+    let logs = await Log.getAllStartingFromDate(new Date(req.query.lastDate as string),
+      req.query.tasksetId as string);
     if (!logs) {
       throw String('Failed to get logs');
     }
