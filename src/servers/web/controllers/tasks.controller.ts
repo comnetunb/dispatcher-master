@@ -27,7 +27,7 @@ export async function getTasks(
     const taskSetFilter: any = { _taskSet: req.params.tasksetId };
 
     if (filterSuccessful) {
-      taskSetFilter.status = ReturnCode.Success;
+      taskSetFilter.state = OperationState.Finished;
     }
 
     const tasks = await Task.find(taskSetFilter);
