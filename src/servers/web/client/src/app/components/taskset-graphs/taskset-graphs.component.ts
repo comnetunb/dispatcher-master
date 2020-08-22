@@ -87,7 +87,7 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialogService: DialogService,
     private tasksetChartService: TasksetChartService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.finishedTasks = 0;
@@ -178,11 +178,11 @@ export class TasksetGraphsComponent implements OnInit, OnDestroy {
 
               if (previous) {
                 this.charts[i].datasets[j].data = final;
-                this.charts[i].datasets[j].label = `${infos[i].curve} ${curve}`;
+                this.charts[i].datasets[j].label = `${chartInfos[i].curve} ${curve}`;
               } else {
                 const dataset: ChartDataSets = {
                   data: final,
-                  label: `${infos[i].curve} ${curve}`,
+                  label: `${chartInfos[i].curve} ${curve}`,
                   showLine: true,
                   borderColor: color, // Add custom color border
                   backgroundColor: color, // Add custom color
