@@ -18,7 +18,7 @@ interface IWorkerDocument extends Document {
   resourceLimit: {
     cpu?: number,
     memory?: number,
-  }
+  };
   performance: {
     ratio?: number,
     level?: string,
@@ -43,7 +43,7 @@ interface IWorkerModel extends Model<IWorker> {
   encryptPassword(password: string): string,
 }
 
-const workerSchema: Schema = new Schema({
+const workerSchema: Schema<IWorker, IWorkerModel> = new Schema({
   password: {
     type: String,
     required: true

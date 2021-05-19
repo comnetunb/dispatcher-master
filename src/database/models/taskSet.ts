@@ -38,7 +38,7 @@ export interface ITaskSet extends ITaskSetDocument {
 interface ITaskSetModel extends Model<ITaskSet> {
 }
 
-const taskSetSchema: Schema = new Schema({
+const taskSetSchema: Schema<ITaskSet, ITaskSetModel> = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
     ref: 'User',

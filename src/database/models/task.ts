@@ -32,7 +32,7 @@ interface ITaskModel extends Model<ITask> {
 
 }
 
-const taskSchema: Schema = new Schema({
+const taskSchema: Schema<ITask, ITaskModel> = new Schema({
   _taskSet: {
     type: Schema.Types.ObjectId,
     ref: 'TaskSet',

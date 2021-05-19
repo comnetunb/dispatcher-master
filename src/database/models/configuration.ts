@@ -11,13 +11,13 @@ interface IConfigurationDocument extends Document {
   authTimeout: number;
 }
 
-export interface IConfiguration extends IConfigurationDocument {}
+export interface IConfiguration extends IConfigurationDocument { }
 
 interface IConfigurationModel extends Model<IConfiguration> {
   get(): Promise<IConfiguration>;
 }
 
-const configurationSchema: Schema = new Schema({
+const configurationSchema: Schema<IConfiguration, IConfigurationModel> = new Schema({
   cpuLimit: {
     type: Number,
     default: 0.25,
