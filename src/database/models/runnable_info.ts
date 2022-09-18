@@ -14,7 +14,7 @@ interface IRunnableInfoModel extends Model<IRunnableInfo> {
   Python: IRunnableInfo,
 }
 
-const runnableInfoSchema: Schema<IRunnableInfo, IRunnableInfoModel> = new Schema({
+const runnableInfoSchema: Schema = new Schema({
   type: {
     type: String,
     required: true

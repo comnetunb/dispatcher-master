@@ -18,7 +18,7 @@ export interface IFile extends IFileDocument {
 interface IFileModel extends Model<IFile> {
 }
 
-const fileSchema: Schema<IFile, IFileModel> = new Schema({
+const fileSchema: Schema = new Schema({
   _user: {
     type: Schema.Types.ObjectId,
     ref: 'User',

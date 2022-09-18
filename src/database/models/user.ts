@@ -26,7 +26,7 @@ interface IUserModel extends Model<IUser> {
   encryptPassword(password: string): string;
 }
 
-const userSchema: Schema<IUser, IUserModel> = new Schema({
+const userSchema: Schema = new Schema({
   email: {
     type: String,
     required: true,

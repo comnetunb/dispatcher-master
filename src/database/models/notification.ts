@@ -26,7 +26,7 @@ interface INotificationModel extends Model<INotification> {
   add(result: Result, title: string, message: string, userId: string, tasksetId?: string, taskId?: string): Promise<INotification>,
 }
 
-const notificationSchema: Schema<INotification, INotificationModel> = new Schema({
+const notificationSchema: Schema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',

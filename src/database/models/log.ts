@@ -16,7 +16,7 @@ interface ILogModel extends Model<ILog> {
   getAllStartingFromDate(date: Date, tasksetId?: string): Promise<ILog[]>,
 }
 
-const logSchema: Schema<ILog, ILogModel> = new Schema({
+const logSchema: Schema = new Schema({
   log: {
     type: String,
     required: true
