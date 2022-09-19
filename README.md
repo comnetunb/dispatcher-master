@@ -47,7 +47,7 @@ sudo docker-compose up -d
 
 #### Prereqs:
 
-- [MongoDB v3.0.15 or better](https://www.mongodb.com/download-center?jmp=nav#community) _Up and running!_ I advise to install MongoDB as a service so it will automatically run once the operating system boots.
+- [MongoDB v3.0.15 or better](https://www.mongodb.com/download-center?jmp=nav#community) _Up and running!_
 - [NodeJS v10 LTS or better](https://nodejs.org/en/)
 
 After downloading and extracting the source to a directory, on a terminal, run the following command:
@@ -55,34 +55,7 @@ After downloading and extracting the source to a directory, on a terminal, run t
 ```bash
 $ git clone https://github.com/comnetunb/dispatcher-master
 $ cd dispatcher-master
-$ npm install
-$ npm run dev
+$ ./exec.sh npm i
+$ ./build.sh
+$ node dist/app.js
 ```
-
-### Deploy to production
-
-If you'd like to let the server run without being attached to a terminal, in a fault tolerance manner (restarts when it crashes), you can do the following:
-
-```bash
-$ git clone https://github.com/comnetunb/dispatcher-master
-$ cd dispatcher-master
-$ npm install
-$ npm run build
-$ forever start dist/app.js
-```
-
-You also have to start a static server for the front-end, an Angular application.
-
-In this case, assuming you are at the root of the directory, execute the following commands:
-
-```bash
-$ cd src/servers/web/client/
-$ npm install
-$ npm run build
-```
-
-Right now you have a full generate website under the `dispatcher-master/src/servers/web/client/dist/client` directory. You can serve it using the server of your choice, such as Nginx, Apache or related.
-
-Here you can find more details: [Angular Deployment Guide - Server Configuration](https://angular.io/guide/deployment#server-configuration)
-
-**IMPORTANT**: The angular server must run on the **same host** as the master one, started with `forever` and be listening on **port 4200**. Why? The master server will act as a proxy for all non-api http requests. Requesting them to `http://localhost:4200`.
