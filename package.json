@@ -8,8 +8,7 @@
     "test": "npm run lint",
     "build": "tsc",
     "dev": "tsnd --watch --ignore-watch node_modules --respawn src/app.ts",
-    "publish": "np",
-    "postversion": "./docker-publish.sh"
+    "publish": "np"
   },
   "np": {
     "publish": false,
