@@ -11,8 +11,10 @@ export async function execute(pdu: TaskResult, worker: IWorker): Promise<void> {
   if (pdu.code === ReturnCode.Success) {
     const parseNormal = tryParseJson(pdu.output);
 
-    const possibleHeader = 'Academic license - for non-commercial use only';
-    const stripped = pdu.output?.replace(possibleHeader, '').trim();
+    const possibleHeader = "Academic license - for non-commercial use only";
+    const stripped = pdu.output
+      ? pdu.output.replace(possibleHeader, "").trim()
+      : null;
     const parseStripped = tryParseJson(stripped);
 
     if (parseNormal.error && parseStripped.error) {
@@ -218,7 +220,7 @@ Canceled tasks: ${canceledTasks}`;
   await mailer.sendMail(to, subject, text);
 }
 
-function tryParseJson(input: string): { result: object, error: any } {
+function tryParseJson(input: string): { result: object; error: any } {
   try {
     const result = JSON.parse(input);
     return {
@@ -229,6 +231,6 @@ function tryParseJson(input: string): { result: object, error: any } {
     return {
       result: null,
       error: error,
-    }
+    };
   }
 }

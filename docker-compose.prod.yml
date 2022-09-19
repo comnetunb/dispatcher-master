@@ -1,0 +1,30 @@
+version: "2"
+services:
+  dispatcher-master:
+    image: comnetunb/dispatcher-master:latest
+    restart: unless-stopped
+    container_name: dispatcher-master
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=dispatcher-mongodb
+      - DB_DATA=ons
+      - DB_PORT=27017
+      - WEB_API_PORT=8080
+      - WORKER_API_PORT=16180
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY}
+    ports:
+      - ${DISPATCHER_MASTER_PORT}:8080
+      - 16180:16180
+    depends_on:
+      - dispatcher-mongodb
+  dispatcher-mongodb:
+    image: mongo:latest
+    container_name: "dispatcher-mongodb"
+    restart: unless-stopped
+    environment:
+      - MONGO_DATA_DIR=/data/db
+    volumes:
+      - mongodb_data_container:/data/db
+
+volumes:
+  mongodb_data_container:

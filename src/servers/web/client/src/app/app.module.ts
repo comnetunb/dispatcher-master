@@ -5,7 +5,22 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatButtonModule, MatCheckboxModule, MatMenuModule, MatIconModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSidenavModule, MatProgressBarModule, MatToolbarModule, MatDividerModule, MatSelectModule, MatListModule, MatDialogModule } from '@angular/material';
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatMenuModule,
+  MatIconModule,
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatSidenavModule,
+  MatProgressBarModule,
+  MatToolbarModule,
+  MatDividerModule,
+  MatSelectModule,
+  MatListModule,
+  MatDialogModule,
+} from '@angular/material';
 import { LoginComponent } from './components/login/login.component';
 import { FrontPageComponent } from './components/front-page/front-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -44,7 +59,11 @@ import { DialogNotificationsComponent } from './components/dialog-notifications/
 import { TasksetGraphsComponent } from './components/taskset-graphs/taskset-graphs.component';
 import { DialogService } from './services/dialog.service';
 import { GraphComponent } from './components/graph/graph.component';
-import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import {
+  CommonModule,
+  LocationStrategy,
+  PathLocationStrategy,
+} from '@angular/common';
 import { ChartsModule } from 'ng2-charts';
 import { SettingsComponent } from './components/settings/settings.component';
 import { AdminModeInterceptor } from './interceptors/admin-mode.interceptor';
@@ -56,6 +75,7 @@ import { DialogConfigFileComponent } from './components/dialog-config-file/dialo
 import { WorkerEditComponent } from './components/worker-edit/worker-edit.component';
 import { TasksetEditComponent } from './components/taskset-edit/taskset-edit.component';
 import { PriorityPipe } from './pipes/priority.pipe';
+import { DialogOverviewComponent } from './components/dialog-overview/dialog-overview.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +119,7 @@ import { PriorityPipe } from './pipes/priority.pipe';
     WorkerCreateComponent,
     WorkerStatusPipe,
     DialogConfigFileComponent,
+    DialogOverviewComponent,
     WorkerEditComponent,
     TasksetEditComponent,
     PriorityPipe,
@@ -134,12 +155,12 @@ import { PriorityPipe } from './pipes/priority.pipe';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AdminModeInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: LocationStrategy,
@@ -153,6 +174,6 @@ import { PriorityPipe } from './pipes/priority.pipe';
     DialogNotificationsComponent,
     DialogConfigFileComponent,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

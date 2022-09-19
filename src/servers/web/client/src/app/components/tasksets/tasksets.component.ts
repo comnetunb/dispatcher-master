@@ -6,18 +6,18 @@ import { BehaviorSubject, Observable } from 'rxjs';
 @Component({
   selector: 'app-tasksets',
   templateUrl: './tasksets.component.html',
-  styleUrls: ['./tasksets.component.scss']
+  styleUrls: ['./tasksets.component.scss'],
 })
 export class TasksetsComponent implements OnInit {
   private tasksetStateSubject: BehaviorSubject<OperationState>;
   public tasksetState: Observable<OperationState>;
 
-  constructor(
-    private route: ActivatedRoute
-  ) { }
+  constructor(public route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.tasksetStateSubject = new BehaviorSubject<OperationState>(OperationState.Executing);
+    this.tasksetStateSubject = new BehaviorSubject<OperationState>(
+      OperationState.Executing
+    );
     this.tasksetState = this.tasksetStateSubject.asObservable();
   }
 

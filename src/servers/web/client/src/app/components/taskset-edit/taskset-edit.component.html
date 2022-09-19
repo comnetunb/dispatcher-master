@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <div formArrayName="inputs" *ngFor="let input of form.get('inputs').controls; let i=index">
+      <div formArrayName="inputs" *ngFor="let input of form.get('inputs')['controls']; let i=index">
         <div [formGroupName]="i" class="row">
           <div class="col">
             <div class="row">

@@ -18,7 +18,7 @@ export class WorkersComponent implements OnInit, OnDestroy {
 
   constructor(
     private workerService: WorkerService,
-    private route: ActivatedRoute
+    public route: ActivatedRoute
   ) {}
 
   ngOnInit() {

@@ -4,15 +4,10 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-admin-workers',
   templateUrl: './admin-workers.component.html',
-  styleUrls: ['./admin-workers.component.scss']
+  styleUrls: ['./admin-workers.component.scss'],
 })
 export class AdminWorkersComponent implements OnInit {
+  constructor(public route: ActivatedRoute) {}
 
-  constructor(
-    private route: ActivatedRoute
-  ) { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

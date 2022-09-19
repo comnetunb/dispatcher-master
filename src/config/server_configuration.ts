@@ -6,8 +6,6 @@ interface IDatabaseConfiguration {
 
 interface IWebAPIConfiguration {
   port: number;
-  proxyHost: string;
-  proxyPort: number;
   authSecretKey: string;
 }
 
@@ -29,8 +27,6 @@ const defaultConfiguration: IServerConfiguration = {
   },
   webApi: {
     port: 8080,
-    proxyHost: "localhost",
-    proxyPort: 4200,
     authSecretKey: "abcde",
   },
   workerApi: {
@@ -47,10 +43,6 @@ const ServerConfiguration: IServerConfiguration = {
       : defaultConfiguration.database.port,
   },
   webApi: {
-    proxyHost: process.env.PROXY_HOST || defaultConfiguration.webApi.proxyHost,
-    proxyPort: process.env.PROXY_PORT
-      ? +process.env.PROXY_PORT
-      : defaultConfiguration.webApi.proxyPort,
     port: process.env.WEB_API_PORT
       ? +process.env.WEB_API_PORT
       : defaultConfiguration.webApi.port,

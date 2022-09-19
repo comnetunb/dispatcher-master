@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "es6",
     "esModuleInterop": true,
     "allowJs": true,
+    "target": "esnext",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true
   },

@@ -1,20 +1,13 @@
-version: "2"
+version: "3.9"
 services:
-  dispatcher:
-    build: .
-    container_name: "dispatcher"
+  dispatcher-worker:
+    image: comnetunb/dispatcher-worker
+    container_name: dispatcher-worker
     environment:
       - NODE_ENV=production
-    depends_on:
-      - mongodb
-    network_mode: "host"
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
     volumes:
-      - ./data/db:/data/db
-    ports:
-      - 27017:27017
+      - type: bind
+        source: "${DISPATCHER_WORKER_CONFIG_FILE}"
+        target: "/opt/app/config/config.json"
+        read_only: true
+    restart: unless-stopped

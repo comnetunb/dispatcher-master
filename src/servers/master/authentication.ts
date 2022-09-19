@@ -17,7 +17,14 @@ export async function socketIOAuth(
   postAuthenticate: (socket: io.Socket, data: any) => any,
   disconnect: (socket: io.Socket) => any
 ) {
-  let config = await Configuration.get();
+  let config;
+  try {
+    config = await Configuration.get();
+  } catch (err) {
+    logger.error(err);
+    return;
+  }
+
   var timeout = config.authTimeout;
 
   _.each(server.nsps, forbidConnections);
