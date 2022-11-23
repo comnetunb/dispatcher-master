@@ -58,7 +58,7 @@
     "nodemailer": "^4.1.2",
     "rimraf": "^2.6.2",
     "sanitize-filename": "^1.6.3",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.5.0",
     "tmp": "0.0.33",
     "tslib": "^1.10.0",
     "typescript": "^3.6.3"
