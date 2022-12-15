@@ -55,7 +55,7 @@ configurationSchema.statics.get = async function (): Promise<IConfiguration> {
     let configuration = new Configuration({});
     await configuration.save();
   }
-  return configuration;
+  return await Configuration.findOne({});
 };
 
 export const Configuration: IConfigurationModel = model<
