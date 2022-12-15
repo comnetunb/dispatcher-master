@@ -19,26 +19,11 @@ Pre-requisites:
 
 - Install [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-Replace the environment variable values and run the following snippet:
+Download the installation script and run it with bash.
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/comnetunb/dispatcher-master/master/install.sh | sh
-```
-
-Or, you can execute the script contents yourself.
-
-```sh
-mkdir -p /tmp/dispatcher-master
-cd /tmp/dispatcher-master
-
-curl -L https://raw.githubusercontent.com/comnetunb/dispatcher-master/master/docker-compose.prod.yml -o docker-compose.yml
-
-echo "Auth Secret Key is used for user authentication, please use a secure value."
-read -s -p "Auth Secret Key:" AUTH_SECRET_KEY
-
-export DISPATCHER_MASTER_PORT=8080
-
-sudo docker-compose up -d
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/comnetunb/dispatcher-master/master/install.sh > /tmp/install-dispatcher.sh
+bash /tmp/install-dispatcher.sh
 ```
 
 ## Development
